@@ -1,0 +1,32 @@
+[package]
+name = "hyper-messenger-sdk"
+description = "The public library surface for hyper-messenger: one client over every messenger provider a build enabled."
+version.workspace = true
+edition.workspace = true
+rust-version.workspace = true
+license.workspace = true
+repository.workspace = true
+authors.workspace = true
+
+[features]
+default = ["mock"]
+mock = ["dep:hyper-messenger-provider-mock"]
+kakaotalk = ["dep:hyper-messenger-provider-kakaotalk"]
+discord = ["dep:hyper-messenger-provider-discord"]
+telegram = ["dep:hyper-messenger-provider-telegram"]
+channeltalk = ["dep:hyper-messenger-provider-channeltalk"]
+all = ["mock", "kakaotalk", "discord", "telegram", "channeltalk"]
+schemars = ["hyper-messenger-core/schemars"]
+
+[dependencies]
+hyper-messenger-core.workspace = true
+hyper-messenger-provider-mock = { workspace = true, optional = true }
+hyper-messenger-provider-kakaotalk = { workspace = true, optional = true }
+hyper-messenger-provider-discord = { workspace = true, optional = true }
+hyper-messenger-provider-telegram = { workspace = true, optional = true }
+hyper-messenger-provider-channeltalk = { workspace = true, optional = true }
+serde.workspace = true
+serde_json.workspace = true
+
+[dev-dependencies]
+tokio.workspace = true

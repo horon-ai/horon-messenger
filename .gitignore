@@ -1,0 +1,7 @@
+/target
+**/*.rs.bk
+.DS_Store
+*.swp
+.omo/sessions
+.omo/senpi-task
+.omo/ulw-loop/**/.state.lock

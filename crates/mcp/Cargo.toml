@@ -1,0 +1,23 @@
+[package]
+name = "hyper-messenger-mcp"
+description = "The hyper-messenger MCP server."
+version.workspace = true
+edition.workspace = true
+rust-version.workspace = true
+license.workspace = true
+repository.workspace = true
+authors.workspace = true
+
+[[bin]]
+name = "hyper-messenger-mcp"
+path = "src/main.rs"
+
+[dependencies]
+hyper-messenger-sdk = { workspace = true, features = ["schemars"] }
+anyhow.workspace = true
+rmcp.workspace = true
+schemars.workspace = true
+serde.workspace = true
+serde_json.workspace = true
+tokio.workspace = true
+tracing-subscriber.workspace = true

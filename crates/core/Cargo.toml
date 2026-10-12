@@ -1,0 +1,24 @@
+[package]
+name = "hyper-messenger-core"
+description = "Core contracts for hyper-messenger: the provider abstraction, domain model, config, credentials and the shared wire envelope."
+version.workspace = true
+edition.workspace = true
+rust-version.workspace = true
+license.workspace = true
+repository.workspace = true
+authors.workspace = true
+
+[features]
+schemars = ["dep:schemars"]
+
+[dependencies]
+async-trait.workspace = true
+chrono.workspace = true
+dirs.workspace = true
+serde.workspace = true
+serde_json.workspace = true
+thiserror.workspace = true
+schemars = { workspace = true, optional = true }
+
+[dev-dependencies]
+async-trait.workspace = true

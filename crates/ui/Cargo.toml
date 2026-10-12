@@ -1,0 +1,20 @@
+[package]
+name = "hyper-messenger-ui"
+description = "The hyper-messenger terminal user interface."
+version.workspace = true
+edition.workspace = true
+rust-version.workspace = true
+license.workspace = true
+repository.workspace = true
+authors.workspace = true
+
+[[bin]]
+name = "hyper-messenger-tui"
+path = "src/main.rs"
+
+[dependencies]
+hyper-messenger-sdk.workspace = true
+anyhow.workspace = true
+clap.workspace = true
+ratatui.workspace = true
+tokio.workspace = true

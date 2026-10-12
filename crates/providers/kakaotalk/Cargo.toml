@@ -1,0 +1,12 @@
+[package]
+name = "hyper-messenger-provider-kakaotalk"
+description = "KakaoTalk provider for hyper-messenger."
+version.workspace = true
+edition.workspace = true
+rust-version.workspace = true
+license.workspace = true
+repository.workspace = true
+authors.workspace = true
+
+[dependencies]
+hyper-messenger-core.workspace = true
