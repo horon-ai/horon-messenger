@@ -1,0 +1,8 @@
+$ curl -s -o /dev/null -w '%{http_code}' localhost:8799/v1/providers/discord/chats
+200
+$ curl -s localhost:8799/v1/providers/discord/chats
+{"ok":true,"data":[{"id":"200000000000000001","kind":"channel","name":"Test Guild","provider":"discord"}],"meta":{"provider":"discord","generated_at":"2026-10-12T07:38:14.270Z"}}
+$ curl -s localhost:8799/v1/providers/channeltalk/chats
+{"ok":true,"data":[{"id":"ws1","kind":"channel","name":"Test Workspace","provider":"channeltalk"}],"meta":{"provider":"channeltalk","generated_at":"2026-10-12T07:38:14.283Z"}}
+$ curl -s localhost:8799/v1/providers/mock/chats
+{"ok":true,"data":[{"id":"general","kind":"channel","last_message_at":"2026-10-12T07:38:14.293Z","member_count":12,"name":"#general","provider":"mock","unread_count":2},{"id":"team","kind":"group","last_message_at":"2026-10-12T07:38:14.293Z","member_count":5,"name":"Team Standup","provider":"mock","unread_count":0},{"id":"dm-alice","kind":"direct","last_message_at":"2026-10-12T07:38:14.293Z","member_count":2,"name":"Alice","provider":"mock"}],"meta":{"provider":"mock","generated_at":"2026-10-12T07:38:14.293Z"}}

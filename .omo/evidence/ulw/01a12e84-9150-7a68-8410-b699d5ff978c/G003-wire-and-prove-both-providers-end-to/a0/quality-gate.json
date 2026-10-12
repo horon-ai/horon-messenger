@@ -1,0 +1,124 @@
+{
+  "manualQa": {
+    "by": "main-session",
+    "status": "passed",
+    "evidence": "Ran the CLI, HTTP and MCP proofs myself against local mock APIs at frozen tree 324249f.",
+    "surfaceEvidence": [
+      {
+        "id": "surface-cli-discord",
+        "criterionRef": "G001-C001",
+        "surface": "cli",
+        "invocation": "hyper-messenger whoami/chats/messages discord with HYPER_MESSENGER_DISCORD_API_BASE=http://127.0.0.1:8771",
+        "verdict": "passed",
+        "artifactRefs": ["artifact-cli"]
+      },
+      {
+        "id": "surface-cli-channeltalk",
+        "criterionRef": "G002-C001",
+        "surface": "cli",
+        "invocation": "hyper-messenger whoami/chats/messages channeltalk with HYPER_MESSENGER_CHANNELTALK_API_BASE=http://127.0.0.1:8772",
+        "verdict": "passed",
+        "artifactRefs": ["artifact-cli"]
+      },
+      {
+        "id": "surface-http",
+        "criterionRef": "G003-C001",
+        "surface": "http",
+        "invocation": "curl -s localhost:8799/v1/providers/{discord,channeltalk}/chats",
+        "verdict": "passed",
+        "artifactRefs": ["artifact-http"]
+      },
+      {
+        "id": "surface-mcp",
+        "criterionRef": "G003-C002",
+        "surface": "cli",
+        "invocation": "hyper-messenger-mcp stdio tools/call list_chats {provider: discord|channeltalk}",
+        "verdict": "passed",
+        "artifactRefs": ["artifact-mcp"]
+      },
+      {
+        "id": "surface-data",
+        "criterionRef": "G003-C003",
+        "surface": "data",
+        "invocation": "hyper-messenger providers (registry shows all five kinds incl. mock)",
+        "verdict": "passed",
+        "artifactRefs": ["artifact-data"]
+      }
+    ],
+    "adversarialCases": [
+      {
+        "id": "adv-malformed-chatref",
+        "criterionRef": "G002-C001",
+        "scenario": "Channel Talk chat id malformed: ws1/g1, ws1/bad/g1, //",
+        "expectedBehavior": "ChatRef::parse returns INVALID_INPUT; unit test chat_ref_rejects_malformed_input passes",
+        "verdict": "passed",
+        "artifactRefs": ["artifact-cli"]
+      },
+      {
+        "id": "adv-auth-failure",
+        "criterionRef": "G001-C002",
+        "scenario": "wrong Discord token / Channel Talk cookie",
+        "expectedBehavior": "envelope error.code AUTH_FAILED, non-zero exit",
+        "verdict": "passed",
+        "artifactRefs": ["artifact-cli"]
+      }
+    ],
+    "artifactRefs": [
+      {
+        "id": "artifact-cli",
+        "kind": "cli-transcript",
+        "description": "Discord and Channel Talk CLI transcripts against mock APIs (read/send/auth-error).",
+        "path": ".omo/evidence/ulw/01a12e84-9150-7a68-8410-b699d5ff978c/G003-wire-and-prove-both-providers-end-to/a0/cli-transcript.txt"
+      },
+      {
+        "id": "artifact-http",
+        "kind": "http-dump",
+        "description": "HTTP server responses for discord/channeltalk/mock chats.",
+        "path": ".omo/evidence/ulw/01a12e84-9150-7a68-8410-b699d5ff978c/G003-wire-and-prove-both-providers-end-to/a0/http-dump.txt"
+      },
+      {
+        "id": "artifact-mcp",
+        "kind": "log",
+        "description": "MCP stdio transcript: initialize + list_chats for discord/channeltalk/mock.",
+        "path": ".omo/evidence/ulw/01a12e84-9150-7a68-8410-b699d5ff978c/G003-wire-and-prove-both-providers-end-to/a0/mcp-transcript.txt"
+      },
+      {
+        "id": "artifact-data",
+        "kind": "data-diff",
+        "description": "Provider registry output listing every registered provider kind.",
+        "path": ".omo/evidence/ulw/01a12e84-9150-7a68-8410-b699d5ff978c/G003-wire-and-prove-both-providers-end-to/a0/provider-registry.txt"
+      }
+    ]
+  },
+  "gateReview": {
+    "by": "category:deep-high",
+    "recommendation": "APPROVE",
+    "reportPath": ".omo/evidence/ulw/01a12e84-9150-7a68-8410-b699d5ff978c/G003-wire-and-prove-both-providers-end-to/a0/gate-review.md",
+    "evidence": "Independent deep-high reviewer confirmed tree 324249f == HEAD 83dd9fb; Discord and Channel Talk clients, Provider/AuthProvider mapping, sdk wiring and evidence integrity all PASS; no library unwrap/panic; no irreversible change. RECOMMENDATION: APPROVE.",
+    "blockers": [],
+    "notes": [
+      "Non-blocking: rate-limit buckets are not shared across operations (a fresh client per call).",
+      "Non-blocking: Discord search index-not-ready (110000) retry is not ported.",
+      "Non-blocking: search_messages and mark_read have no dedicated evidence artifact (not among the plan criteria).",
+      "Non-blocking: no automated HTTP-path test; 3 unit tests per crate."
+    ]
+  },
+  "iteration": {
+    "fullRerun": true,
+    "status": "passed",
+    "rerunCommands": [
+      "cargo test --workspace --all-features",
+      "cargo clippy --workspace --all-features --all-targets -- -D warnings",
+      "cargo fmt --all --check"
+    ],
+    "evidence": "All green at frozen tree 324249f (discord/discord-regression.txt, channeltalk/channeltalk-regression.txt)."
+  },
+  "criteriaCoverage": {
+    "totalCriteria": 9,
+    "passCount": 9,
+    "originalIntent": "Port the Discord and Channel Talk providers from the agent-messenger TypeScript reference to Rust in the hyper-messenger workspace.",
+    "desiredOutcome": "Both providers implement the core Provider/AuthProvider contract and are reachable through the CLI, MCP server and HTTP server, proven on real surfaces.",
+    "userOutcomeReview": "CLI, HTTP and MCP all return seeded data for discord and channeltalk against mock APIs; sends return server_accepted; auth failures map to AUTH_FAILED; the full workspace suite is green.",
+    "adversarialClassesCovered": ["malformed_input", "auth_failure"]
+  }
+}

@@ -1,0 +1,3 @@
+$ hyper-messenger send channeltalk ws1/group/g1 'qa hello ct'
+{"ok":true,"data":{"accepted":true,"chat_id":"ws1/group/g1","delivery":"server_accepted","message_id":"msg2","provider":"channeltalk","sent_at":"2023-11-14T22:13:20.000Z"},"meta":{"provider":"channeltalk","generated_at":"2026-10-12T07:37:09.943Z"}}
+exit=0

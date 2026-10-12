@@ -1,0 +1,3 @@
+$ HYPER_MESSENGER_CHANNELTALK_ACCOUNT_COOKIE=wrong hyper-messenger chats channeltalk
+{"ok":false,"error":{"code":"AUTH_FAILED","message":"authentication failed for provider channeltalk: unauthorized","retryable":false,"provider":"channeltalk"},"meta":{"provider":"channeltalk","generated_at":"2026-10-12T07:37:09.949Z"}}
+exit=1

@@ -1,0 +1,9 @@
+$ hyper-messenger whoami discord
+{"ok":true,"data":{"account_id":"100000000000000001","display_name":"Alice","provider":"discord","username":"alice"},"meta":{"provider":"discord","generated_at":"2026-10-12T07:40:16.490Z"}}
+exit=0
+$ hyper-messenger chats discord
+{"ok":true,"data":[{"id":"200000000000000001","kind":"channel","name":"Test Guild","provider":"discord"}],"meta":{"provider":"discord","generated_at":"2026-10-12T07:40:16.499Z"}}
+exit=0
+$ hyper-messenger messages discord 300000000000000001
+{"ok":true,"data":{"chat_id":"300000000000000001","has_more":false,"messages":[{"chat_id":"300000000000000001","id":"400000000000000001","provider":"discord","sender_id":"100000000000000001","sender_name":"alice","sent_at":"2026-01-01T00:00:00.000000+00:00","text":"seeded hello from mock discord"}],"newest_first":true,"provider":"discord"},"meta":{"provider":"discord","generated_at":"2026-10-12T07:40:16.508Z"}}
+exit=0
