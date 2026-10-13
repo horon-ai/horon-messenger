@@ -159,6 +159,30 @@ fn register_builtin(registry: &mut ProviderRegistry, paths: &ConfigPaths) {
             hyper_messenger_provider_channeltalk::ChannelTalkProvider::new(paths.clone()),
         ));
     }
+    #[cfg(feature = "telegrambot")]
+    {
+        registry.register(Arc::new(
+            hyper_messenger_provider_telegrambot::TelegramBotProvider::new(paths.clone()),
+        ));
+    }
+    #[cfg(feature = "whatsappbot")]
+    {
+        registry.register(Arc::new(
+            hyper_messenger_provider_whatsappbot::WhatsAppBotProvider::new(paths.clone()),
+        ));
+    }
+    #[cfg(feature = "slackbot")]
+    {
+        registry.register(Arc::new(
+            hyper_messenger_provider_slackbot::SlackBotProvider::new(paths.clone()),
+        ));
+    }
+    #[cfg(feature = "slack")]
+    {
+        registry.register(Arc::new(
+            hyper_messenger_provider_slack::SlackProvider::new(paths.clone()),
+        ));
+    }
     let _ = paths;
 }
 

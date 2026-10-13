@@ -760,10 +760,66 @@ dependencies = [
 ]
 
 [[package]]
+name = "hyper-messenger-provider-slack"
+version = "0.1.0"
+dependencies = [
+ "async-trait",
+ "hyper-messenger-core",
+ "hyper-messenger-provider-common",
+ "reqwest",
+ "serde",
+ "serde_json",
+ "thiserror",
+ "tokio",
+]
+
+[[package]]
+name = "hyper-messenger-provider-slackbot"
+version = "0.1.0"
+dependencies = [
+ "async-trait",
+ "hyper-messenger-core",
+ "hyper-messenger-provider-common",
+ "reqwest",
+ "serde",
+ "serde_json",
+ "thiserror",
+ "tokio",
+]
+
+[[package]]
 name = "hyper-messenger-provider-telegram"
 version = "0.1.0"
 dependencies = [
  "hyper-messenger-core",
+]
+
+[[package]]
+name = "hyper-messenger-provider-telegrambot"
+version = "0.1.0"
+dependencies = [
+ "async-trait",
+ "hyper-messenger-core",
+ "hyper-messenger-provider-common",
+ "reqwest",
+ "serde",
+ "serde_json",
+ "thiserror",
+ "tokio",
+]
+
+[[package]]
+name = "hyper-messenger-provider-whatsappbot"
+version = "0.1.0"
+dependencies = [
+ "async-trait",
+ "hyper-messenger-core",
+ "hyper-messenger-provider-common",
+ "reqwest",
+ "serde",
+ "serde_json",
+ "thiserror",
+ "tokio",
 ]
 
 [[package]]
@@ -775,7 +831,11 @@ dependencies = [
  "hyper-messenger-provider-discord",
  "hyper-messenger-provider-kakaotalk",
  "hyper-messenger-provider-mock",
+ "hyper-messenger-provider-slack",
+ "hyper-messenger-provider-slackbot",
  "hyper-messenger-provider-telegram",
+ "hyper-messenger-provider-telegrambot",
+ "hyper-messenger-provider-whatsappbot",
  "serde",
  "serde_json",
  "tokio",
