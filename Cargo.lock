@@ -778,6 +778,7 @@ name = "hyper-messenger-provider-slackbot"
 version = "0.1.0"
 dependencies = [
  "async-trait",
+ "chrono",
  "hyper-messenger-core",
  "hyper-messenger-provider-common",
  "reqwest",
