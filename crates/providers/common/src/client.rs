@@ -1,4 +1,5 @@
 use std::collections::HashMap;
+use std::sync::{Arc, OnceLock};
 use std::time::{Duration, SystemTime, UNIX_EPOCH};
 
 use horon_messenger_core::{Error, ProviderKind, Result};
@@ -100,10 +101,17 @@ impl Request {
     }
 }
 
+/// The process-global client, built once on first use.
+static SHARED: OnceLock<HttpClient> = OnceLock::new();
+
 /// A retry- and rate-limit-aware HTTP client shared by the messenger providers.
+///
+/// Cloning is cheap and shares the underlying connection pool and the
+/// rate-limit bucket map, so callers reuse one set of connections.
+#[derive(Clone)]
 pub struct HttpClient {
     http: reqwest::Client,
-    buckets: Mutex<HashMap<String, Bucket>>,
+    buckets: Arc<Mutex<HashMap<String, Bucket>>>,
     max_retries: u32,
 }
 
@@ -122,9 +130,25 @@ impl HttpClient {
     pub fn with_client(http: reqwest::Client) -> Self {
         Self {
             http,
-            buckets: Mutex::new(HashMap::new()),
+            buckets: Arc::new(Mutex::new(HashMap::new())),
             max_retries: MAX_RETRIES,
         }
+    }
+
+    /// Returns the process-global client, building it once on first use.
+    ///
+    /// Every returned clone shares one [`reqwest::Client`] connection pool and
+    /// one rate-limit bucket map. Building is infallible: if the fallible
+    /// builder ever fails, the plain [`reqwest::Client::new`] is used instead.
+    pub fn shared() -> Self {
+        SHARED
+            .get_or_init(|| {
+                let http = reqwest::Client::builder()
+                    .build()
+                    .unwrap_or_else(|_| reqwest::Client::new());
+                Self::with_client(http)
+            })
+            .clone()
     }
 
     async fn wait_for_bucket(&self, key: &str) {
@@ -304,7 +328,7 @@ mod tests {
     use super::*;
     use std::sync::Arc;
     use std::sync::atomic::{AtomicUsize, Ordering};
-    use tokio::io::{AsyncReadExt, AsyncWriteExt};
+    use tokio::io::{AsyncBufReadExt, AsyncReadExt, AsyncWriteExt, BufReader};
     use tokio::net::TcpListener;
 
     enum Reply {
@@ -384,6 +408,91 @@ mod tests {
             headers: Vec::new(),
             body: body.to_owned(),
         }
+    }
+
+    /// Accepts connections forever, counting them, and answers every request
+    /// on a kept-alive connection with a `200` JSON body.
+    async fn spawn_keepalive_server() -> (String, Arc<AtomicUsize>) {
+        let listener = TcpListener::bind("127.0.0.1:0").await.unwrap();
+        let base_url = format!("http://{}", listener.local_addr().unwrap());
+        let connections = Arc::new(AtomicUsize::new(0));
+        let counter = Arc::clone(&connections);
+        tokio::spawn(async move {
+            while let Ok((socket, _)) = listener.accept().await {
+                counter.fetch_add(1, Ordering::SeqCst);
+                tokio::spawn(serve_keepalive(socket));
+            }
+        });
+        (base_url, connections)
+    }
+
+    async fn serve_keepalive(socket: tokio::net::TcpStream) {
+        let (read_half, mut write_half) = socket.into_split();
+        let mut reader = BufReader::new(read_half);
+        loop {
+            let mut request_line = String::new();
+            match reader.read_line(&mut request_line).await {
+                Ok(0) | Err(_) => return,
+                Ok(_) => {}
+            }
+            if request_line.trim().is_empty() {
+                continue;
+            }
+            let mut content_length = 0usize;
+            loop {
+                let mut header = String::new();
+                match reader.read_line(&mut header).await {
+                    Ok(0) | Err(_) => return,
+                    Ok(_) => {}
+                }
+                let trimmed = header.trim_end();
+                if trimmed.is_empty() {
+                    break;
+                }
+                let lower = trimmed.to_ascii_lowercase();
+                if let Some(value) = lower.strip_prefix("content-length:") {
+                    content_length = value.trim().parse().unwrap_or(0);
+                }
+            }
+            if content_length > 0 {
+                let mut body = vec![0u8; content_length];
+                if reader.read_exact(&mut body).await.is_err() {
+                    return;
+                }
+            }
+            let body = "{}";
+            let response = format!(
+                "HTTP/1.1 200 OK\r\nContent-Type: application/json\r\nContent-Length: {}\r\n\r\n{body}",
+                body.len()
+            );
+            if write_half.write_all(response.as_bytes()).await.is_err() {
+                return;
+            }
+            let _ = write_half.flush().await;
+        }
+    }
+
+    #[tokio::test]
+    async fn shared_client_reuses_one_connection() {
+        let (base_url, connections) = spawn_keepalive_server().await;
+        for _ in 0..5 {
+            let client = HttpClient::shared();
+            let value: Value = client
+                .get(
+                    format!("{base_url}/ping"),
+                    HeaderMap::new(),
+                    ProviderKind::Mock,
+                    "shared",
+                )
+                .await
+                .unwrap();
+            assert_eq!(value, serde_json::json!({}));
+        }
+        assert_eq!(
+            connections.load(Ordering::SeqCst),
+            1,
+            "five shared() GETs must reuse one keep-alive connection"
+        );
     }
 
     #[tokio::test]
