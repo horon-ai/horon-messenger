@@ -14,6 +14,7 @@ use horon_messenger_core::{
 };
 
 use client::{ChannelTalkClient, ChatRef};
+use horon_messenger_provider_common::HttpClient;
 use models::ChannelMessage;
 
 const PROVIDER: ProviderKind = ProviderKind::ChannelTalk;
@@ -28,10 +29,11 @@ struct Credentials {
 }
 
 /// The Channel Talk provider: operator cookie authentication over the desk API.
-#[derive(Debug, Clone)]
+#[derive(Clone)]
 pub struct ChannelTalkProvider {
     paths: ConfigPaths,
     credentials: FileCredentialStore,
+    http: HttpClient,
 }
 
 impl ChannelTalkProvider {
@@ -39,6 +41,7 @@ impl ChannelTalkProvider {
         Self {
             credentials: FileCredentialStore::new(paths.clone()),
             paths,
+            http: HttpClient::shared(),
         }
     }
 
@@ -81,7 +84,11 @@ impl ChannelTalkProvider {
         let credentials = self
             .resolve()?
             .ok_or(Error::AuthRequired { provider: PROVIDER })?;
-        ChannelTalkClient::new(credentials.account_cookie, credentials.session_cookie)
+        Ok(ChannelTalkClient::new(
+            self.http.clone(),
+            credentials.account_cookie,
+            credentials.session_cookie,
+        ))
     }
 
     fn chat(channel: &models::Channel) -> Chat {

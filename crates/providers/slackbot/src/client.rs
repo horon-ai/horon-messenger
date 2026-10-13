@@ -51,13 +51,13 @@ pub struct SlackBotClient {
 }
 
 impl SlackBotClient {
-    pub fn new(token: impl Into<String>) -> Result<Self> {
+    pub fn new(http: HttpClient, token: impl Into<String>) -> Self {
         let base_url = std::env::var(BASE_URL_ENV).unwrap_or_else(|_| DEFAULT_BASE_URL.to_owned());
-        Ok(Self {
-            http: HttpClient::new()?,
+        Self {
+            http,
             base_url: base_url.trim_end_matches('/').to_owned(),
             token: token.into(),
-        })
+        }
     }
 
     fn headers(&self) -> HeaderMap {
@@ -180,7 +180,7 @@ mod tests {
     #[test]
     fn base_url_honours_the_env_override() {
         unsafe { std::env::set_var(BASE_URL_ENV, "http://127.0.0.1:8813") };
-        let client = SlackBotClient::new("xoxb-test").unwrap();
+        let client = SlackBotClient::new(HttpClient::shared(), "xoxb-test");
         assert_eq!(client.base_url, "http://127.0.0.1:8813");
         unsafe { std::env::remove_var(BASE_URL_ENV) };
     }

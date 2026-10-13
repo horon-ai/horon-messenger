@@ -14,6 +14,7 @@ use horon_messenger_core::{
 };
 
 use client::DiscordClient;
+use horon_messenger_provider_common::HttpClient;
 use models::DiscordMessage;
 
 const PROVIDER: ProviderKind = ProviderKind::Discord;
@@ -22,10 +23,11 @@ const TOKEN_ENV: &str = "HORON_MESSENGER_DISCORD_TOKEN";
 const E2E_TOKEN_ENV: &str = "E2E_DISCORD_TOKEN";
 
 /// The Discord provider: token authentication over the REST v10 API.
-#[derive(Debug, Clone)]
+#[derive(Clone)]
 pub struct DiscordProvider {
     paths: ConfigPaths,
     credentials: FileCredentialStore,
+    http: HttpClient,
 }
 
 impl DiscordProvider {
@@ -33,6 +35,7 @@ impl DiscordProvider {
         Self {
             credentials: FileCredentialStore::new(paths.clone()),
             paths,
+            http: HttpClient::shared(),
         }
     }
 
@@ -67,7 +70,7 @@ impl DiscordProvider {
         let token = self
             .token()?
             .ok_or(Error::AuthRequired { provider: PROVIDER })?;
-        DiscordClient::new(token)
+        Ok(DiscordClient::new(self.http.clone(), token))
     }
 
     fn chat(guild: &models::DiscordGuild) -> Chat {
