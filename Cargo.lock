@@ -873,6 +873,7 @@ dependencies = [
  "horon-messenger-provider-common",
  "serde",
  "serde_json",
+ "tokio",
 ]
 
 [[package]]

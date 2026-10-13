@@ -3,7 +3,7 @@ use std::time::Duration;
 use serde_json::{Value, json};
 
 use horon_messenger_core::{Error, Result};
-use horon_messenger_provider_common::{JsonRpcProcess, SidecarSpec};
+use horon_messenger_provider_common::{SidecarSession, SidecarSpec};
 
 use crate::PROVIDER;
 use crate::models::{
@@ -21,15 +21,16 @@ const AUTH_HINTS: [&str; 6] = [
 ];
 const NOT_FOUND_HINTS: [&str; 2] = ["not_found", "not found"];
 
-/// A live LINE sidecar child, spoken to over line-delimited JSON-RPC.
+/// A reusable handle to the LINE sidecar child, spoken to over line-delimited JSON-RPC.
+#[derive(Debug, Clone)]
 pub(crate) struct LineClient {
-    rpc: JsonRpcProcess,
+    session: SidecarSession,
 }
 
 impl LineClient {
     pub(crate) async fn connect(spec: SidecarSpec, timeout: Duration) -> Result<Self> {
         Ok(Self {
-            rpc: JsonRpcProcess::start_with_timeout(spec, timeout).await?,
+            session: SidecarSession::new(spec, timeout),
         })
     }
 
@@ -79,12 +80,15 @@ impl LineClient {
         serde_json::from_value(value).map_err(payload_error)
     }
 
-    pub(crate) async fn shutdown(&mut self) -> Result<()> {
-        self.rpc.shutdown().await
+    pub(crate) async fn shutdown(&self) -> Result<()> {
+        self.session.shutdown().await
     }
 
-    async fn call(&mut self, method: &str, params: Value) -> Result<Value> {
-        self.rpc.call(method, params).await.map_err(classify)
+    async fn call(&self, method: &str, params: Value) -> Result<Value> {
+        self.session
+            .call(method, params, false)
+            .await
+            .map_err(classify)
     }
 }
 

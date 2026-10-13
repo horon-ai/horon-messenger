@@ -15,10 +15,12 @@
 mod client;
 mod models;
 
+use std::sync::Arc;
 use std::time::Duration;
 
 use async_trait::async_trait;
 use serde_json::{Value, json};
+use tokio::sync::Mutex;
 
 use horon_messenger_core::{
     AccountSummary, AuthMethod, AuthProvider, AuthStatus, Capabilities, Chat, ChatKind, ChatQuery,
@@ -48,6 +50,7 @@ pub struct LineProvider {
     credentials: FileCredentialStore,
     sidecar: Option<SidecarSpec>,
     timeout: Duration,
+    session: Arc<Mutex<Option<LineClient>>>,
 }
 
 impl LineProvider {
@@ -58,6 +61,7 @@ impl LineProvider {
             paths,
             sidecar: None,
             timeout: DEFAULT_TIMEOUT,
+            session: Arc::new(Mutex::new(None)),
         }
     }
 
@@ -88,6 +92,16 @@ impl LineProvider {
     }
 
     async fn session(&self) -> Result<LineClient> {
+        let mut guard = self.session.lock().await;
+        if let Some(client) = guard.as_ref() {
+            return Ok(client.clone());
+        }
+        let client = self.connect_and_login().await?;
+        *guard = Some(client.clone());
+        Ok(client)
+    }
+
+    async fn connect_and_login(&self) -> Result<LineClient> {
         let account = self.current_account()?;
         let stored = self
             .credentials
@@ -111,6 +125,11 @@ impl LineProvider {
         }
         client.login(params).await?;
         Ok(client)
+    }
+
+    async fn invalidate(&self) {
+        let mut guard = self.session.lock().await;
+        *guard = None;
     }
 
     fn chat(chat: &LineChat) -> Chat {
@@ -169,6 +188,7 @@ impl LineProvider {
             paths,
             sidecar: Some(spec),
             timeout,
+            session: Arc::new(Mutex::new(None)),
         };
         if seed {
             provider
@@ -212,8 +232,12 @@ impl Provider for LineProvider {
 
     async fn whoami(&self) -> Result<Profile> {
         let mut client = self.session().await?;
-        let result = client.whoami().await;
-        let _ = client.shutdown().await;
+        let mut result = client.whoami().await;
+        if matches!(&result, Err(Error::Network { .. })) {
+            self.invalidate().await;
+            client = self.session().await?;
+            result = client.whoami().await;
+        }
         let profile = result?;
         Ok(Profile {
             provider: PROVIDER,
@@ -230,8 +254,12 @@ impl Provider for LineProvider {
     async fn list_chats(&self, query: &ChatQuery) -> Result<Vec<Chat>> {
         let limit = query.limit.unwrap_or(DEFAULT_LIMIT);
         let mut client = self.session().await?;
-        let result = client.list_chats(limit).await;
-        let _ = client.shutdown().await;
+        let mut result = client.list_chats(limit).await;
+        if matches!(&result, Err(Error::Network { .. })) {
+            self.invalidate().await;
+            client = self.session().await?;
+            result = client.list_chats(limit).await;
+        }
         let mut chats: Vec<Chat> = result?.iter().map(Self::chat).collect();
         if let Some(search) = &query.search {
             let needle = search.to_lowercase();
@@ -245,8 +273,12 @@ impl Provider for LineProvider {
 
     async fn get_chat(&self, chat_id: &str) -> Result<Chat> {
         let mut client = self.session().await?;
-        let result = client.list_chats(CHAT_SCAN_LIMIT).await;
-        let _ = client.shutdown().await;
+        let mut result = client.list_chats(CHAT_SCAN_LIMIT).await;
+        if matches!(&result, Err(Error::Network { .. })) {
+            self.invalidate().await;
+            client = self.session().await?;
+            result = client.list_chats(CHAT_SCAN_LIMIT).await;
+        }
         result?
             .iter()
             .find(|chat| chat.chat_id == chat_id)
@@ -260,8 +292,12 @@ impl Provider for LineProvider {
     async fn list_messages(&self, chat_id: &str, query: &MessageQuery) -> Result<MessagePage> {
         let count = query.limit.unwrap_or(DEFAULT_LIMIT);
         let mut client = self.session().await?;
-        let result = client.list_messages(chat_id, count).await;
-        let _ = client.shutdown().await;
+        let mut result = client.list_messages(chat_id, count).await;
+        if matches!(&result, Err(Error::Network { .. })) {
+            self.invalidate().await;
+            client = self.session().await?;
+            result = client.list_messages(chat_id, count).await;
+        }
         let messages = result?;
         let has_more = messages.len() >= count;
         let mut mapped: Vec<Message> = messages
@@ -284,7 +320,9 @@ impl Provider for LineProvider {
     async fn send_message(&self, request: &SendRequest) -> Result<SendResult> {
         let mut client = self.session().await?;
         let result = client.send(&request.chat_id, &request.text).await;
-        let _ = client.shutdown().await;
+        if matches!(&result, Err(Error::Network { .. })) {
+            self.invalidate().await;
+        }
         let response = result?;
         let sent_at = response
             .sent_at
@@ -304,8 +342,12 @@ impl Provider for LineProvider {
 
     async fn list_members(&self, chat_id: &str) -> Result<Vec<Member>> {
         let mut client = self.session().await?;
-        let result = client.list_members(chat_id).await;
-        let _ = client.shutdown().await;
+        let mut result = client.list_members(chat_id).await;
+        if matches!(&result, Err(Error::Network { .. })) {
+            self.invalidate().await;
+            client = self.session().await?;
+            result = client.list_members(chat_id).await;
+        }
         Ok(result?
             .into_iter()
             .map(|member| Member {
@@ -888,5 +930,140 @@ sys.exit(0)
         let accounts = vec!["u_a".to_owned(), "u_b".to_owned()];
         let error = select_account(None, &accounts).unwrap_err();
         assert!(matches!(error, Error::Ambiguous { .. }), "got {error:?}");
+    }
+
+    const STUB: &str = r#"
+import sys, os, json
+pidfile = sys.argv[1]
+limit = int(sys.argv[2])
+with open(pidfile, 'a') as f:
+    f.write(str(os.getpid()) + '\n')
+answered = 0
+for line in sys.stdin:
+    line = line.strip()
+    if not line:
+        continue
+    req = json.loads(line)
+    m = req.get('method')
+    if m == 'auth.login':
+        result = {'authenticated': True, 'account_id': 'u_self', 'display_name': 'Self', 'device': 'ANDROIDSECONDARY', 'auth_token': 'returned-token'}
+    elif m == 'chats.list':
+        result = {'chats': []}
+    else:
+        result = {}
+    sys.stdout.write(json.dumps({'jsonrpc': '2.0', 'id': req['id'], 'result': result}) + '\n')
+    sys.stdout.flush()
+    answered += 1
+    if limit and answered >= limit:
+        break
+"#;
+
+    fn stub_spec(pid_file: &std::path::Path, limit: u32) -> SidecarSpec {
+        SidecarSpec::new(
+            PROVIDER,
+            "python3",
+            vec![
+                "-c".to_owned(),
+                STUB.to_owned(),
+                pid_file.to_string_lossy().into_owned(),
+                limit.to_string(),
+            ],
+        )
+    }
+
+    fn temp_pid_file(name: &str) -> std::path::PathBuf {
+        let path =
+            std::env::temp_dir().join(format!("hm-line-sidecar-{name}-{}.txt", std::process::id()));
+        let _ = std::fs::remove_file(&path);
+        path
+    }
+
+    fn recorded_pids(path: &std::path::Path) -> Vec<u32> {
+        std::fs::read_to_string(path)
+            .unwrap_or_default()
+            .lines()
+            .filter_map(|line| line.trim().parse::<u32>().ok())
+            .collect()
+    }
+
+    fn process_alive(pid: u32) -> bool {
+        std::process::Command::new("kill")
+            .arg("-0")
+            .arg(pid.to_string())
+            .stdout(std::process::Stdio::null())
+            .stderr(std::process::Stdio::null())
+            .status()
+            .map(|status| status.success())
+            .unwrap_or(false)
+    }
+
+    async fn wait_until_dead(pid: u32) {
+        for _ in 0..500 {
+            if !process_alive(pid) {
+                return;
+            }
+            tokio::time::sleep(Duration::from_millis(10)).await;
+        }
+        panic!("child process {pid} was still alive after the drop");
+    }
+
+    #[tokio::test]
+    async fn sidecar_process_is_reused() {
+        let pid_file = temp_pid_file("reused");
+        let provider =
+            LineProvider::for_test(stub_spec(&pid_file, 0), Duration::from_secs(5), true);
+        for _ in 0..3 {
+            provider.list_chats(&ChatQuery::default()).await.unwrap();
+        }
+        let pids = recorded_pids(&pid_file);
+        assert_eq!(
+            pids.len(),
+            1,
+            "three operations must reuse one sidecar process: {pids:?}"
+        );
+        drop(provider);
+        let _ = std::fs::remove_file(&pid_file);
+    }
+
+    #[tokio::test]
+    async fn sidecar_restarts_after_death() {
+        let pid_file = temp_pid_file("restart");
+        let provider =
+            LineProvider::for_test(stub_spec(&pid_file, 2), Duration::from_secs(5), true);
+        provider.list_chats(&ChatQuery::default()).await.unwrap();
+        let first = recorded_pids(&pid_file);
+        assert_eq!(
+            first.len(),
+            1,
+            "the first call starts one process: {first:?}"
+        );
+
+        provider.list_chats(&ChatQuery::default()).await.unwrap();
+        let after = recorded_pids(&pid_file);
+        assert!(
+            after.len() >= 2,
+            "the call after a death must start a new process: {after:?}"
+        );
+        assert_ne!(
+            after[after.len() - 1],
+            first[0],
+            "the restarted process must have a new pid: {after:?}"
+        );
+        drop(provider);
+        let _ = std::fs::remove_file(&pid_file);
+    }
+
+    #[tokio::test]
+    async fn sidecar_child_is_reaped_on_drop() {
+        let pid_file = temp_pid_file("reaped");
+        let provider =
+            LineProvider::for_test(stub_spec(&pid_file, 0), Duration::from_secs(5), true);
+        provider.list_chats(&ChatQuery::default()).await.unwrap();
+        let pids = recorded_pids(&pid_file);
+        assert_eq!(pids.len(), 1, "expected one live process: {pids:?}");
+        let child = pids[0];
+        drop(provider);
+        wait_until_dead(child).await;
+        let _ = std::fs::remove_file(&pid_file);
     }
 }

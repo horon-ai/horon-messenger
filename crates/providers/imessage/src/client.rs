@@ -3,7 +3,7 @@ use std::time::Duration;
 use serde_json::{Value, json};
 
 use horon_messenger_core::{Error, Result};
-use horon_messenger_provider_common::{JsonRpcProcess, SidecarSpec};
+use horon_messenger_provider_common::{SidecarSession, SidecarSpec};
 
 use crate::PROVIDER;
 use crate::models::{ChatsList, ImsgChat, ImsgMessage, MessagesHistory, SendResponse};
@@ -15,19 +15,23 @@ const FULL_DISK_ACCESS_HINTS: [&str; 3] = [
 ];
 const AUTOMATION_HINTS: [&str; 2] = ["not authorized to send", "apple events"];
 
-/// A live `imsg rpc` child, spoken to over line-delimited JSON-RPC.
+/// A reusable handle to the `imsg rpc` child, spoken to over line-delimited JSON-RPC.
+#[derive(Debug, Clone)]
 pub(crate) struct IMessageClient {
-    rpc: JsonRpcProcess,
+    session: SidecarSession,
 }
 
 impl IMessageClient {
     pub(crate) async fn connect(spec: SidecarSpec, timeout: Duration) -> Result<Self> {
-        let rpc = JsonRpcProcess::start_with_timeout(spec, timeout).await?;
-        Ok(Self { rpc })
+        Ok(Self {
+            session: SidecarSession::new(spec, timeout),
+        })
     }
 
     pub(crate) async fn list_chats(&mut self, limit: usize) -> Result<Vec<ImsgChat>> {
-        let value = self.call("chats.list", json!({ "limit": limit })).await?;
+        let value = self
+            .call("chats.list", json!({ "limit": limit }), true)
+            .await?;
         let parsed: ChatsList = serde_json::from_value(value).map_err(payload_error)?;
         Ok(parsed.chats)
     }
@@ -42,22 +46,21 @@ impl IMessageClient {
         if let Some(start) = start {
             params["start"] = Value::String(start.to_owned());
         }
-        let value = self.call("messages.history", params).await?;
+        let value = self.call("messages.history", params, true).await?;
         let parsed: MessagesHistory = serde_json::from_value(value).map_err(payload_error)?;
         Ok(parsed.messages)
     }
 
     pub(crate) async fn send(&mut self, params: Value) -> Result<SendResponse> {
-        let value = self.call("send", params).await?;
+        let value = self.call("send", params, false).await?;
         serde_json::from_value(value).map_err(payload_error)
     }
 
-    pub(crate) async fn shutdown(&mut self) -> Result<()> {
-        self.rpc.shutdown().await
-    }
-
-    async fn call(&mut self, method: &str, params: Value) -> Result<Value> {
-        self.rpc.call(method, params).await.map_err(classify)
+    async fn call(&self, method: &str, params: Value, idempotent: bool) -> Result<Value> {
+        self.session
+            .call(method, params, idempotent)
+            .await
+            .map_err(classify)
     }
 }
 
