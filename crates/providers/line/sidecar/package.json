@@ -1,0 +1,16 @@
+{
+  "name": "hyper-messenger-line-sidecar",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "description": "linejs-backed JSON-RPC sidecar for the hyper-messenger LINE provider.",
+  "bin": {
+    "hyper-messenger-line-sidecar": "./index.js"
+  },
+  "engines": {
+    "node": ">=20"
+  },
+  "dependencies": {
+    "@jsr/evex__linejs": "2.3.7"
+  }
+}
