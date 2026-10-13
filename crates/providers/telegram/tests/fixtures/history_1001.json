@@ -1,0 +1,48 @@
+{
+  "@type": "messages",
+  "total_count": 2,
+  "messages": [
+    {
+      "@type": "message",
+      "id": 502,
+      "chat_id": 1001,
+      "date": 1700002000,
+      "edit_date": 1700002100,
+      "is_outgoing": false,
+      "sender_id": { "@type": "messageSenderUser", "user_id": 777000 },
+      "reply_to": { "@type": "messageReplyToMessage", "message_id": 500 },
+      "content": {
+        "@type": "messagePhoto",
+        "caption": { "@type": "formattedText", "text": "look at this", "entities": [] },
+        "photo": {
+          "has_stickers": false,
+          "sizes": [
+            {
+              "type": "m",
+              "width": 320,
+              "height": 240,
+              "photo": {
+                "id": 900,
+                "size": 2048,
+                "expected_size": 2048,
+                "local": { "path": "/tmp/photo.jpg", "can_be_downloaded": true }
+              }
+            }
+          ]
+        }
+      }
+    },
+    {
+      "@type": "message",
+      "id": 500,
+      "chat_id": 1001,
+      "date": 1700000000,
+      "is_outgoing": false,
+      "sender_id": { "@type": "messageSenderUser", "user_id": 777000 },
+      "content": {
+        "@type": "messageText",
+        "text": { "@type": "formattedText", "text": "see you soon", "entities": [] }
+      }
+    }
+  ]
+}

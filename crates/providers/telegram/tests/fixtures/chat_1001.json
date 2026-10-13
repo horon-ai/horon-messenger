@@ -1,0 +1,19 @@
+{
+  "@type": "chat",
+  "id": 1001,
+  "title": "Ada Lovelace",
+  "type": { "@type": "chatTypePrivate", "user_id": 777000 },
+  "unread_count": 3,
+  "last_message": {
+    "@type": "message",
+    "id": 500,
+    "chat_id": 1001,
+    "date": 1700000000,
+    "is_outgoing": false,
+    "sender_id": { "@type": "messageSenderUser", "user_id": 777000 },
+    "content": {
+      "@type": "messageText",
+      "text": { "@type": "formattedText", "text": "see you soon", "entities": [] }
+    }
+  }
+}

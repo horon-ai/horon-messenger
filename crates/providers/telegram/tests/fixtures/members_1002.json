@@ -1,0 +1,29 @@
+{
+  "@type": "chatMembers",
+  "total_count": 2,
+  "members": [
+    {
+      "@type": "chatMember",
+      "member_id": { "@type": "messageSenderUser", "user_id": 777000 },
+      "status": { "@type": "chatMemberStatusMember" },
+      "user": {
+        "@type": "user",
+        "id": 777000,
+        "first_name": "Ada",
+        "last_name": "Lovelace",
+        "usernames": { "@type": "usernames", "editable_username": "ada" }
+      }
+    },
+    {
+      "@type": "chatMember",
+      "member_id": { "@type": "messageSenderUser", "user_id": 42 },
+      "status": { "@type": "chatMemberStatusMember" },
+      "user": {
+        "@type": "user",
+        "id": 42,
+        "first_name": "Grace",
+        "last_name": "Hopper"
+      }
+    }
+  ]
+}

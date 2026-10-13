@@ -8,5 +8,20 @@ license.workspace = true
 repository.workspace = true
 authors.workspace = true
 
+[features]
+default = []
+qa-fake = []
+tdlib = ["dep:tdlib-rs"]
+
 [dependencies]
 hyper-messenger-core.workspace = true
+async-trait.workspace = true
+chrono.workspace = true
+libloading = "0.8"
+serde.workspace = true
+serde_json.workspace = true
+thiserror.workspace = true
+tdlib-rs = { version = "1", optional = true }
+
+[dev-dependencies]
+tokio.workspace = true

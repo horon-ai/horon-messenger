@@ -1,0 +1,30 @@
+{
+  "@type": "messages",
+  "total_count": 2,
+  "messages": [
+    {
+      "@type": "message",
+      "id": 501,
+      "chat_id": 1002,
+      "date": 1700001000,
+      "is_outgoing": true,
+      "sender_id": { "@type": "messageSenderUser", "user_id": 777000 },
+      "content": {
+        "@type": "messageText",
+        "text": { "@type": "formattedText", "text": "standup in 5", "entities": [] }
+      }
+    },
+    {
+      "@type": "message",
+      "id": 500,
+      "chat_id": 1002,
+      "date": 1700000000,
+      "is_outgoing": false,
+      "sender_id": { "@type": "messageSenderUser", "user_id": 42 },
+      "content": {
+        "@type": "messageText",
+        "text": { "@type": "formattedText", "text": "good morning", "entities": [] }
+      }
+    }
+  ]
+}

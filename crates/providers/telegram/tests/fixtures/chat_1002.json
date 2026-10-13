@@ -1,0 +1,19 @@
+{
+  "@type": "chat",
+  "id": 1002,
+  "title": "Team Standup",
+  "type": { "@type": "chatTypeSupergroup", "supergroup_id": 55, "is_channel": false, "member_count": 5 },
+  "unread_count": 0,
+  "last_message": {
+    "@type": "message",
+    "id": 501,
+    "chat_id": 1002,
+    "date": 1700001000,
+    "is_outgoing": true,
+    "sender_id": { "@type": "messageSenderUser", "user_id": 777000 },
+    "content": {
+      "@type": "messageText",
+      "text": { "@type": "formattedText", "text": "standup in 5", "entities": [] }
+    }
+  }
+}

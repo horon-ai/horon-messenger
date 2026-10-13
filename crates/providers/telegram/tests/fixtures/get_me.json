@@ -1,0 +1,12 @@
+{
+  "@type": "user",
+  "id": 777000,
+  "first_name": "Ada",
+  "last_name": "Lovelace",
+  "usernames": {
+    "@type": "usernames",
+    "editable_username": "ada",
+    "active_usernames": ["ada"]
+  },
+  "phone_number": "+821000000000"
+}
