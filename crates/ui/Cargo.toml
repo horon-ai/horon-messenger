@@ -12,6 +12,23 @@ authors.workspace = true
 name = "horon-messenger-tui"
 path = "src/main.rs"
 
+[features]
+default = ["mock"]
+mock = ["horon-messenger-sdk/mock"]
+kakaotalk = ["horon-messenger-sdk/kakaotalk"]
+discord = ["horon-messenger-sdk/discord"]
+telegram = ["horon-messenger-sdk/telegram"]
+channeltalk = ["horon-messenger-sdk/channeltalk"]
+telegrambot = ["horon-messenger-sdk/telegrambot"]
+whatsappbot = ["horon-messenger-sdk/whatsappbot"]
+slackbot = ["horon-messenger-sdk/slackbot"]
+slack = ["horon-messenger-sdk/slack"]
+imessage = ["horon-messenger-sdk/imessage"]
+whatsapp = ["horon-messenger-sdk/whatsapp"]
+line = ["horon-messenger-sdk/line"]
+instagram = ["horon-messenger-sdk/instagram"]
+all = ["mock", "kakaotalk", "discord", "telegram", "channeltalk", "telegrambot", "whatsappbot", "slackbot", "slack", "imessage", "whatsapp", "line", "instagram"]
+
 [dependencies]
 horon-messenger-sdk.workspace = true
 anyhow.workspace = true

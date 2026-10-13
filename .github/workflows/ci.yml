@@ -23,3 +23,5 @@ jobs:
         run: cargo build --workspace --all-features
       - name: Test
         run: cargo test --workspace --all-features
+      - name: Cross-surface QA
+        run: bash scripts/qa/cross-surface.sh
