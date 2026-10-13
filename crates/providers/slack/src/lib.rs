@@ -24,20 +24,11 @@ const TOKEN_ENV: &str = "HORON_MESSENGER_SLACK_TOKEN";
 const COOKIE_ENV: &str = "HORON_MESSENGER_SLACK_COOKIE";
 
 /// The Slack provider, authenticated with a user token plus `d=` cookie.
-#[derive(Clone)]
+#[derive(Debug, Clone)]
 pub struct SlackProvider {
     paths: ConfigPaths,
     credentials: FileCredentialStore,
     http: HttpClient,
-}
-
-impl std::fmt::Debug for SlackProvider {
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        f.debug_struct("SlackProvider")
-            .field("paths", &self.paths)
-            .field("credentials", &self.credentials)
-            .finish()
-    }
 }
 
 impl SlackProvider {

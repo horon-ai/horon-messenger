@@ -29,20 +29,11 @@ const DEVICE_ID_ENV: &str = "HORON_MESSENGER_INSTAGRAM_DEVICE_ID";
 const CSRFTOKEN_ENV: &str = "HORON_MESSENGER_INSTAGRAM_CSRFTOKEN";
 
 /// The Instagram provider: account authentication over the Instagram mobile API.
-#[derive(Clone)]
+#[derive(Debug, Clone)]
 pub struct InstagramProvider {
     paths: ConfigPaths,
     credentials: FileCredentialStore,
     http: HttpClient,
-}
-
-impl std::fmt::Debug for InstagramProvider {
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        f.debug_struct("InstagramProvider")
-            .field("paths", &self.paths)
-            .field("credentials", &self.credentials)
-            .finish()
-    }
 }
 
 impl InstagramProvider {

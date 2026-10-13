@@ -29,7 +29,7 @@ struct Credentials {
 }
 
 /// The Channel Talk provider: operator cookie authentication over the desk API.
-#[derive(Clone)]
+#[derive(Debug, Clone)]
 pub struct ChannelTalkProvider {
     paths: ConfigPaths,
     credentials: FileCredentialStore,

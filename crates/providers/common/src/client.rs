@@ -108,7 +108,7 @@ static SHARED: OnceLock<HttpClient> = OnceLock::new();
 ///
 /// Cloning is cheap and shares the underlying connection pool and the
 /// rate-limit bucket map, so callers reuse one set of connections.
-#[derive(Clone)]
+#[derive(Debug, Clone)]
 pub struct HttpClient {
     http: reqwest::Client,
     buckets: Arc<Mutex<HashMap<String, Bucket>>>,

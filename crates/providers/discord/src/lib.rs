@@ -23,7 +23,7 @@ const TOKEN_ENV: &str = "HORON_MESSENGER_DISCORD_TOKEN";
 const E2E_TOKEN_ENV: &str = "E2E_DISCORD_TOKEN";
 
 /// The Discord provider: token authentication over the REST v10 API.
-#[derive(Clone)]
+#[derive(Debug, Clone)]
 pub struct DiscordProvider {
     paths: ConfigPaths,
     credentials: FileCredentialStore,

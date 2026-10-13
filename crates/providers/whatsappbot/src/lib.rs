@@ -30,20 +30,11 @@ struct Credentials {
 }
 
 /// The WhatsApp Bot provider: Cloud API bearer authentication.
-#[derive(Clone)]
+#[derive(Debug, Clone)]
 pub struct WhatsAppBotProvider {
     paths: ConfigPaths,
     credentials: FileCredentialStore,
     http: HttpClient,
-}
-
-impl std::fmt::Debug for WhatsAppBotProvider {
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        f.debug_struct("WhatsAppBotProvider")
-            .field("paths", &self.paths)
-            .field("credentials", &self.credentials)
-            .finish()
-    }
 }
 
 impl WhatsAppBotProvider {

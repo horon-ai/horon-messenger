@@ -23,7 +23,7 @@ const DEFAULT_ACCOUNT: &str = "default";
 const TOKEN_ENV: &str = "HORON_MESSENGER_SLACKBOT_TOKEN";
 
 /// The Slack Bot provider: bot-token authentication over the Slack Web API.
-#[derive(Clone)]
+#[derive(Debug, Clone)]
 pub struct SlackBotProvider {
     paths: ConfigPaths,
     credentials: FileCredentialStore,

@@ -29,7 +29,7 @@ const DEFAULT_ACCOUNT: &str = "default";
 const TOKEN_ENV: &str = "HORON_MESSENGER_TELEGRAMBOT_TOKEN";
 
 /// The Telegram Bot provider, authenticated with a bot token.
-#[derive(Clone)]
+#[derive(Debug, Clone)]
 pub struct TelegramBotProvider {
     paths: ConfigPaths,
     credentials: FileCredentialStore,
