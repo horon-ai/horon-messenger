@@ -183,6 +183,18 @@ fn register_builtin(registry: &mut ProviderRegistry, paths: &ConfigPaths) {
             hyper_messenger_provider_slack::SlackProvider::new(paths.clone()),
         ));
     }
+    #[cfg(feature = "imessage")]
+    {
+        registry.register(Arc::new(
+            hyper_messenger_provider_imessage::IMessageProvider::new(paths.clone()),
+        ));
+    }
+    #[cfg(feature = "whatsapp")]
+    {
+        registry.register(Arc::new(
+            hyper_messenger_provider_whatsapp::WhatsAppProvider::new(paths.clone()),
+        ));
+    }
     let _ = paths;
 }
 

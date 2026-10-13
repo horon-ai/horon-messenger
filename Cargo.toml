@@ -17,6 +17,8 @@ members = [
   "crates/providers/whatsappbot",
   "crates/providers/slackbot",
   "crates/providers/slack",
+  "crates/providers/imessage",
+  "crates/providers/whatsapp",
 ]
 
 [workspace.package]
@@ -41,6 +43,8 @@ hyper-messenger-provider-telegrambot = { path = "crates/providers/telegrambot", 
 hyper-messenger-provider-whatsappbot = { path = "crates/providers/whatsappbot", version = "0.1.0" }
 hyper-messenger-provider-slackbot = { path = "crates/providers/slackbot", version = "0.1.0" }
 hyper-messenger-provider-slack = { path = "crates/providers/slack", version = "0.1.0" }
+hyper-messenger-provider-imessage = { path = "crates/providers/imessage", version = "0.1.0" }
+hyper-messenger-provider-whatsapp = { path = "crates/providers/whatsapp", version = "0.1.0" }
 
 anyhow = "1"
 async-trait = "0.1"
