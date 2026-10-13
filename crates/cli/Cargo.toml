@@ -12,6 +12,9 @@ authors.workspace = true
 name = "hyper-messenger"
 path = "src/main.rs"
 
+[features]
+discord = ["hyper-messenger-sdk/discord"]
+
 [dependencies]
 hyper-messenger-sdk.workspace = true
 clap.workspace = true

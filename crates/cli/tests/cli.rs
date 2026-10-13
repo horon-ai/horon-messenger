@@ -80,6 +80,7 @@ fn unknown_provider_is_a_non_zero_envelope() {
     assert_eq!(envelope["error"]["code"], "INVALID_INPUT");
 }
 
+#[cfg(feature = "discord")]
 #[test]
 fn platform_provider_without_credentials_requires_auth() {
     let (ok, envelope) = run(&["chats", "discord"]);
