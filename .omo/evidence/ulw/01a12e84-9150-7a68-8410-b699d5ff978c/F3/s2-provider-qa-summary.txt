@@ -1,0 +1,9 @@
+telegrambot exit=0
+whatsappbot exit=0
+slackbot exit=0
+slack exit=0
+imessage exit=0
+telegram exit=0
+whatsapp exit=0
+line exit=0
+instagram exit=0

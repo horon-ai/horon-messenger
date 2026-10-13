@@ -1,0 +1,99 @@
+TASK 13 — document the expanded platform set (docs only)
+========================================================
+Worktree: /Users/alpox/Desktop/dev/alpox/hyper-messenger-wt/w3-docs
+Branch:   ulw/w3-docs (created from dev @ 7e410e6)
+Base:     7e410e6 feat(telegram): implement the Telegram user provider via runtime libtdjson loading
+
+Changed files (git status --porcelain):
+ M README.md
+ M docs/architecture.md
+ M docs/providers.md
+
+git diff --stat:
+ README.md            | 71 +++++++++++++++++++++++++++++++++++++++++++++++++++++------------------
+ docs/architecture.md |  5 ++++-
+ docs/providers.md    | 32 ++++++++++++++++++++++++++------
+ 3 files changed, 83 insertions(+), 25 deletions(-)
+
+No code changed: providers/, crates/, Cargo.toml all untouched.
+
+--------------------------------------------------------
+AUTOMATED VERIFICATION 1 — provider names present
+--------------------------------------------------------
+$ cd /Users/alpox/Desktop/dev/alpox/hyper-messenger-wt/w3-docs
+$ for p in telegrambot whatsappbot slackbot slack imessage telegram whatsapp line instagram; do grep -q "$p" docs/providers.md || exit 1; done; echo ALL_PRESENT
+ALL_PRESENT
+
+--------------------------------------------------------
+AUTOMATED VERIFICATION 2 — workspace build still green
+--------------------------------------------------------
+$ cd /Users/alpox/Desktop/dev/alpox/hyper-messenger-wt/w3-docs
+$ cargo build --workspace --all-features
+   Compiling hyper-messenger-provider-telegrambot v0.1.0 (...)
+   Compiling hyper-messenger-provider-line v0.1.0 (...)
+   Compiling hyper-messenger-provider-channeltalk v0.1.0 (...)
+   Compiling hyper-messenger-provider-slackbot v0.1.0 (...)
+   Compiling hyper-messenger-provider-instagram v0.1.0 (...)
+   Compiling hyper-messenger-provider-discord v0.1.0 (...)
+   Compiling hyper-messenger-provider-whatsappbot v0.1.0 (...)
+   Compiling hyper-messenger-provider-slack v0.1.0 (...)
+   Compiling hyper-messenger-provider-whatsapp v0.1.0 (...)
+   Compiling hyper-messenger-provider-telegram v0.1.0 (...)
+   Compiling hyper-messenger-sdk v0.1.0 (...)
+   Compiling hyper-messenger-server v0.1.0 (...)
+   Compiling hyper-messenger-ui v0.1.0 (...)
+   Compiling hyper-messenger-cli v0.1.0 (...)
+   Compiling hyper-messenger-mcp v0.1.0 (...)
+    Finished `dev` profile [unoptimized + debuginfo] target(s) in 53.22s
+BUILD_EXIT=0
+
+--------------------------------------------------------
+MANUAL QA — line count and new table rows
+--------------------------------------------------------
+$ grep -c '' docs/providers.md
+93
+
+New docs/providers.md platform table (all 13 providers):
+
+| Provider | Auth | Transport | Prerequisites |
+|----------|------|-----------|---------------|
+| Mock (`mock`) | none | in-memory | none |
+| KakaoTalk (`kakaotalk`, skeleton) | desktop session and a derived DB key; tablet LOCO session for send (planned) | local SQLCipher DB read, LOCO over TLS for send, macOS Accessibility for UI-only actions (planned) | macOS; operations are not implemented yet |
+| Discord (`discord`) | user token from `HYPER_MESSENGER_DISCORD_TOKEN` or `auth login --param token=...` | HTTP REST, base override `HYPER_MESSENGER_DISCORD_API_BASE` | none |
+| Channel Talk (`channeltalk`) | operator cookies (`account_cookie`, optional `session_cookie`) via `auth login --param` or `HYPER_MESSENGER_CHANNELTALK_ACCOUNT_COOKIE` / `_SESSION_COOKIE` | HTTP REST, base override `HYPER_MESSENGER_CHANNELTALK_API_BASE` | none |
+| Telegram Bot (`telegrambot`) | bot token from `HYPER_MESSENGER_TELEGRAMBOT_TOKEN` or `auth login --param token=...` | HTTP, base override `HYPER_MESSENGER_TELEGRAMBOT_API_BASE` | none |
+| WhatsApp Bot (`whatsappbot`) | phone number id and access token from `HYPER_MESSENGER_WHATSAPPBOT_PHONE_NUMBER_ID` / `_ACCESS_TOKEN` or `auth login --param` | HTTP, base override `HYPER_MESSENGER_WHATSAPPBOT_API_BASE` | none |
+| Slack Bot (`slackbot`) | bot token from `HYPER_MESSENGER_SLACKBOT_TOKEN` or `auth login --param token=...` | HTTP, base override `HYPER_MESSENGER_SLACKBOT_API_BASE` | none |
+| Slack (`slack`) | user token and cookie from `HYPER_MESSENGER_SLACK_TOKEN` / `_COOKIE` or `auth login --param token=... --param cookie=...` | HTTP, base override `HYPER_MESSENGER_SLACK_API_BASE` | none |
+| iMessage (`imessage`) | none; reads the local Messages app | sidecar over JSON-RPC (spawns `imsg`) | macOS, the `imsg` binary (`HYPER_MESSENGER_IMSG_BIN`) and Full Disk Access |
+| Telegram (`telegram`) | phone-code sign-in via TDLib (`api_id`, `api_hash`, phone) | TDLib native `libtdjson`, loaded at run time | `libtdjson` on the library path or `TDLIB_PATH` |
+| WhatsApp (`whatsapp`) | device pairing (QR or pairing code) through the sidecar | Node sidecar over JSON-RPC (`@whiskeysockets/baileys`) | Node 20+, `npm ci` in `crates/providers/whatsapp/sidecar/`, env `HYPER_MESSENGER_WHATSAPP_SIDECAR` and `HYPER_MESSENGER_NODE_BIN` |
+| LINE (`line`) | token or email and password sign-in through the sidecar | Node sidecar over JSON-RPC (linejs) | Node 20+, `npm install` in `crates/providers/line/sidecar/`, env `HYPER_MESSENGER_LINE_SIDECAR` |
+| Instagram (`instagram`) | session cookie (`sessionid`, `ds_user_id`) via `auth login --param` or `HYPER_MESSENGER_INSTAGRAM_SESSIONID` / `_DS_USER_ID` | HTTP with a session `Cookie` header, base override `HYPER_MESSENGER_INSTAGRAM_API_BASE` | none |
+
+--------------------------------------------------------
+ACCURACY SOURCES (read from code in the worktree)
+--------------------------------------------------------
+- BASE_URL_ENV constants per HTTP provider: discord, channeltalk, telegrambot,
+  whatsappbot, slackbot, slack, instagram (client.rs files).
+- Token/cookie env vars: HYPER_MESSENGER_{DISCORD,SLACK,SLACKBOT,TELEGRAMBOT}_TOKEN,
+  HYPER_MESSENGER_WHATSAPPBOT_{PHONE_NUMBER_ID,ACCESS_TOKEN},
+  HYPER_MESSENGER_{CHANNELTALK_ACCOUNT_COOKIE,CHANNELTALK_SESSION_COOKIE},
+  HYPER_MESSENGER_{INSTAGRAM_SESSIONID,INSTAGRAM_DS_USER_ID}.
+- capabilities(): whatsappbot = WHOAMI | SEND_MESSAGE only; others wider.
+- imessage: DEFAULT_BIN "imsg", BIN_ENV HYPER_MESSENGER_IMSG_BIN, sidecar JSON-RPC.
+- telegram: Cargo has libloading + optional tdlib-rs; tdlib_library.rs loads
+  libtdjson at run time, TDLIB_PATH override; no build-time download.
+- whatsapp/line sidecar READMEs: npm ci / npm install, Node 20+, sidecar env vars.
+- ProviderKind::ALL = 13 variants; sdk `all` feature lists all 13.
+
+Out-of-scope claims avoided: no provider claims a realtime listener (the only
+`listen` capability is on the Telegram user provider, which is not claimed as
+realtime here), and no provider claims desktop-app credential extraction.
+
+--------------------------------------------------------
+CLEANUP
+--------------------------------------------------------
+The worktree is left in place with the change uncommitted (task forbids commit).
+No build artifacts need removing beyond target/ (git-ignored, reusable).
+No other worktree or file was touched.

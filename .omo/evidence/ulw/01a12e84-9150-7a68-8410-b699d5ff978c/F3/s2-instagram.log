@@ -1,0 +1,14 @@
+########## instagram ##########
+# building the CLI with all features
+# whoami instagram
+ok:true whoami account_id=4242
+# chats instagram
+ok:true chats name=Bob Lee
+# messages instagram
+ok:true messages seeded chronological first
+# send instagram
+ok:true send accepted id=ig-sent-1
+# adversarial: wrong session -> HTTP 401 -> AUTH_FAILED
+ok:true 401 mapped to AUTH_FAILED
+instagram qa done
+cleanup: mock_instagram pid=85820 killed; temp config /var/folders/6z/00znjmd54_v5r_ccgckhkz6r0000gn/T/tmp.StcbtYOVEi removed

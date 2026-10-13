@@ -1,0 +1,4 @@
+initialize serverInfo: hyper-messenger
+list_chats isError: False
+list_chats ok: True count: 3 names: ['#general', 'Team Standup', 'Alice']
+MCP_DRIVER_DONE

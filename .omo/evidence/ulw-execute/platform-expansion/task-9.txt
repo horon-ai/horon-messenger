@@ -1,0 +1,100 @@
+=========== TASK 9 EVIDENCE: Telegram user provider (hyper-messenger-provider-telegram) ===========
+worktree: /Users/alpox/Desktop/dev/alpox/hyper-messenger-wt/w2-telegram
+branch: ulw/w2-telegram
+head: 226893ac58de071ac3a6cfdbaf9c708ddd7ad1b9
+date: 2026-10-14 05:14:14 KST
+changed files (untracked + modified under crates/providers/telegram):
+ M Cargo.lock
+ M crates/providers/telegram/Cargo.toml
+ M crates/providers/telegram/src/lib.rs
+?? crates/providers/telegram/src/mapping.rs
+?? crates/providers/telegram/src/qa_fake.rs
+?? crates/providers/telegram/src/tdlib.rs
+?? crates/providers/telegram/src/tdlib_library.rs
+?? crates/providers/telegram/src/transport.rs
+?? crates/providers/telegram/tests/
+
+########## 1. cargo build -p hyper-messenger-provider-telegram --all-features ##########
+   Compiling hyper-messenger-provider-telegram v0.1.0 (/Users/alpox/Desktop/dev/alpox/hyper-messenger-wt/w2-telegram/crates/providers/telegram)
+    Finished `dev` profile [unoptimized + debuginfo] target(s) in 0.95s
+exit=0
+
+########## 2. cargo clippy -p hyper-messenger-provider-telegram --all-targets -- -D warnings ##########
+    Finished `dev` profile [unoptimized + debuginfo] target(s) in 0.10s
+exit=0
+
+########## 3. cargo test -p hyper-messenger-provider-telegram ##########
+running 12 tests
+test tests::backend_absent_is_a_typed_error_not_a_panic ... ok
+test tests::message_sender_chat_id_is_used_when_present ... ok
+test tests::a_message_missing_its_id_is_a_protocol_error ... ok
+test tests::account_id_derives_from_a_phone_number ... ok
+test tests::malformed_json_is_a_protocol_error ... ok
+test tests::missing_library_load_returns_a_typed_error_without_panicking ... ok
+test tests::chat_maps_private_group_and_channel_kinds ... ok
+test tests::chat_ids_are_read_from_a_chats_object ... ok
+test tests::message_maps_text_reply_edit_and_photo_attachment ... ok
+test tests::member_marks_self_and_reads_usernames ... ok
+test tests::authorization_state_summarizes_the_flow ... ok
+test tests::profile_maps_display_name_and_username ... ok
+test result: ok. 12 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+running 0 tests
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+exit=0
+
+########## 3b. cargo test -p hyper-messenger-provider-telegram --features qa-fake ##########
+running 14 tests
+test tests::account_id_derives_from_a_phone_number ... ok
+test tests::message_sender_chat_id_is_used_when_present ... ok
+test tests::a_message_missing_its_id_is_a_protocol_error ... ok
+test tests::authorization_state_summarizes_the_flow ... ok
+test tests::message_maps_text_reply_edit_and_photo_attachment ... ok
+test tests::chat_ids_are_read_from_a_chats_object ... ok
+test tests::member_marks_self_and_reads_usernames ... ok
+test tests::malformed_json_is_a_protocol_error ... ok
+test tests::chat_maps_private_group_and_channel_kinds ... ok
+test tests::missing_library_load_returns_a_typed_error_without_panicking ... ok
+test tests::profile_maps_display_name_and_username ... ok
+test tests::fake_malformed_fixture_is_a_protocol_error ... ok
+test tests::stale_closed_state_returns_auth_required ... ok
+test tests::qa_fake_replays_fixtures_through_the_provider ... ok
+test result: ok. 14 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+running 0 tests
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+exit=0
+
+########## 4. cargo fmt --all && cargo fmt --all --check ##########
+exit=0
+
+########## 5. cargo build --workspace --all-features ##########
+    Finished `dev` profile [unoptimized + debuginfo] target(s) in 0.13s
+exit=0
+
+########## 6. cargo clippy --workspace --all-features --all-targets -- -D warnings ##########
+    Checking hyper-messenger-cli v0.1.0 (/Users/alpox/Desktop/dev/alpox/hyper-messenger-wt/w2-telegram/crates/cli)
+    Checking hyper-messenger-mcp v0.1.0 (/Users/alpox/Desktop/dev/alpox/hyper-messenger-wt/w2-telegram/crates/mcp)
+    Finished `dev` profile [unoptimized + debuginfo] target(s) in 1.51s
+exit=0
+
+########## 7. cargo test --workspace --all-features (aggregate) ##########
+ok-result-lines: 35
+FAILED lines (empty = none):
+
+########## 8. MANUAL QA: bash crates/providers/telegram/tests/qa/run.sh ##########
+# building the CLI with the qa-fake telegram backend (fixtures, no libtdjson)
+# building the CLI with no telegram backend (no qa-fake, no tdlib)
+# whoami telegram
+ok:true whoami Ada Lovelace 777000 @ada
+# chats telegram
+ok:true chats 1001 direct, 1002 group
+# messages telegram 1001
+ok:true messages look at this with photo attachment
+# adversarial: stale closed state -> AUTH_REQUIRED
+ok:true closed state -> AUTH_REQUIRED
+# adversarial: malformed fixture -> PROTOCOL
+ok:true malformed json -> PROTOCOL
+# adversarial: no qa-fake and no TDLib library -> typed CONFIG error, non-zero exit, no panic
+ok:true no library -> CONFIG, non-zero exit, no panic
+telegram qa done
+cleanup: qa binaries and temp config /var/folders/6z/00znjmd54_v5r_ccgckhkz6r0000gn/T/tmp.MVGLtCaERo removed
+exit=0

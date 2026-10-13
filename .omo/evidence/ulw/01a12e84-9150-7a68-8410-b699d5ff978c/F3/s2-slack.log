@@ -1,0 +1,14 @@
+########## slack ##########
+# building the CLI with all features
+# whoami slack
+ok:true whoami alice
+# chats slack
+ok:true chats general
+# messages slack
+ok:true messages seeded
+# send slack
+ok:true send accepted
+# adversarial: missing cookie -> ok:false invalid_auth at HTTP 200 -> AUTH_FAILED
+ok:true missing cookie mapped to AUTH_FAILED
+slack qa done
+cleanup: mock_slack pid=84903 killed; temp config /var/folders/6z/00znjmd54_v5r_ccgckhkz6r0000gn/T/tmp.ZDMtlwV8Lf removed

@@ -1,0 +1,110 @@
+TASK: platform-expansion checkbox 14 - `auth login --param key=value` (provider-agnostic)
+WORKTREE: /Users/alpox/Desktop/dev/alpox/hyper-messenger-wt/platform-expansion-w0
+BRANCH: ulw/platform-expansion-w0
+DATE: 2026-10-13
+
+CHANGED FILES
+  crates/cli/src/main.rs   (+29/-1): repeatable `--param KEY=VALUE` on AuthCommand::Login,
+                                     parse_param + params_value helpers, LoginOptions.params wired.
+  crates/cli/tests/cli.rs  (+30):    run_status helper, login_with_params_authenticates_the_mock_provider,
+                                     login_with_a_param_without_an_equals_is_a_usage_error.
+
+DESIGN
+  - `--param` is `Vec<(String, String)>` with `value_parser = parse_param`.
+  - parse_param splits on the FIRST `=`; key must be non-empty; value may contain `=`.
+  - No `=` (or empty key) -> Err -> clap usage error -> exit code 2.
+  - No `--param` -> params_value returns Value::Null (current behaviour preserved).
+  - >=1 `--param` -> Value::Object of the key/value pairs (values as JSON strings).
+  - No per-provider flags added; no other command touched.
+
+================================================================================
+AUTOMATED VERIFICATION
+================================================================================
+
+$ cargo build -p hyper-messenger-cli --all-features
+   Compiling hyper-messenger-cli v0.1.0 (.../crates/cli)
+    Finished `dev` profile [unoptimized + debuginfo] target(s) in 4.77s
+EXIT: 0
+
+$ cargo test -p hyper-messenger-cli
+running 8 tests
+test login_with_a_param_without_an_equals_is_a_usage_error ... ok
+test providers_lists_the_mock_provider ... ok
+test chats_returns_seeded_chats ... ok
+test send_reports_acceptance ... ok
+test platform_provider_without_credentials_requires_auth ... FAILED   <-- PRE-EXISTING (see below)
+test unknown_provider_is_a_non_zero_envelope ... ok
+test messages_returns_seeded_messages ... ok
+test login_with_params_authenticates_the_mock_provider ... ok
+failures:
+---- platform_provider_without_credentials_requires_auth stdout ----
+panicked at crates/cli/tests/cli.rs:88:5:
+assertion `left == right` failed
+  left: String("NOT_REGISTERED")
+ right: "AUTH_REQUIRED"
+test result: FAILED. 7 passed; 1 failed
+TEST_EXIT: 101
+
+  BOTH NEW TESTS PASS. The one failure is pre-existing and unrelated to this change.
+
+  Pre-existing proof (stash only the two cli files, run at HEAD):
+    $ git stash push -- crates/cli/src/main.rs crates/cli/tests/cli.rs
+    $ cargo test -p hyper-messenger-cli --test cli platform_provider_without_credentials_requires_auth
+      panicked at crates/cli/tests/cli.rs:74:5:
+      left: String("NOT_REGISTERED")  right: "AUTH_REQUIRED"
+      HEAD_TEST_EXIT: 101
+    $ git stash pop   # my changes restored (30/30 diff lines back)
+
+  Cause: the test asserts `discord` returns AUTH_REQUIRED, but `discord` is only
+  registered under sdk `#[cfg(feature = "discord")]` (crates/sdk/src/lib.rs:144) and
+  cli depends on sdk with default features (mock only). `cargo test -p hyper-messenger-cli
+  --all-features` still fails (cli has no `discord` feature to forward), so this test can
+  only pass under a workspace-wide `--all-features`. Not caused by, and out of scope for,
+  this change; left untouched per "fix only issues your changes caused".
+
+$ cargo clippy -p hyper-messenger-cli --all-targets -- -D warnings
+    Finished `dev` profile ... in 2.77s
+CLIPPY_EXIT: 0
+
+$ cargo fmt --all && cargo fmt --all --check
+FMT_EXIT: 0
+
+================================================================================
+MANUAL QA (target/debug/hyper-messenger, HYPER_MESSENGER_CONFIG_DIR=/tmp/hyper-messenger-cli-qa)
+================================================================================
+
+$ target/debug/hyper-messenger auth login mock --param token=abc
+{"ok":true,"data":{"account_id":"mock-user","authenticated":true,"message":"the mock provider is always authenticated","provider":"mock"},"meta":{"provider":"mock","generated_at":"2026-10-13T18:33:35.054Z"}}
+QA1_EXIT: 0
+
+$ target/debug/hyper-messenger auth status mock
+{"ok":true,"data":{"accounts":[{"account_id":"mock-user","current":true,"display_name":"Mock User","method":"extract"}],"authenticated":true,"current":"mock-user","provider":"mock"},"meta":{"provider":"mock","generated_at":"2026-10-13T18:33:35.062Z"}}
+QA2_EXIT: 0   (ok:true, authenticated:true)
+
+$ target/debug/hyper-messenger auth login mock --param foo
+error: invalid value 'foo' for '--param <KEY=VALUE>': expected `key=value`, got `foo`
+For more information, try '--help'.
+QA3_EXIT: 2
+
+================================================================================
+ADVERSARIAL PROBES
+================================================================================
+P1 no --param (preserve Null):          exit=0
+P2 value contains '=' (a=b=c):          exit=0   (split on FIRST '=')
+P3 repeatable (--param a=1 --param b=2): exit=0
+P4 empty key (--param =x):              error: invalid value '=x' ... expected `key=value`; exit=2
+P5 auth login --help:
+     --param <KEY=VALUE>  Provider-specific credential field, as `key=value`; repeatable
+
+Classes probed:
+  - malformed input (no '=' and empty key) -> exit 2. PASS.
+  - misleading success: mock status independently re-queried (`auth status mock`) and reports
+    authenticated:true; success is not inferred from the login envelope alone. PASS.
+  - others (concurrency/state, network, data-loss) not applicable to this surface.
+
+================================================================================
+RESULT
+================================================================================
+  All in-scope checks pass: build, clippy -D warnings, fmt, both new tests, all three manual QA,
+  all adversarial probes. One pre-existing, unrelated test failure is documented above.
+  No git commit made. Cleanup: QA config dir /tmp/hyper-messenger-cli-qa is a throwaway under /tmp.

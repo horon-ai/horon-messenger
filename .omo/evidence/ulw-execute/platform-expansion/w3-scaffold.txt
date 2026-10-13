@@ -1,0 +1,791 @@
+# w3-scaffold verification 2026-10-13T19:33:53Z
+worktree: /Users/alpox/Desktop/dev/alpox/hyper-messenger-wt/w3-scaffold  branch: ulw/w3-scaffold  head: 226893a
+
+### cargo build --workspace --all-features
+   Compiling proc-macro2 v1.0.107
+   Compiling quote v1.0.47
+   Compiling unicode-ident v1.0.27
+   Compiling libc v0.2.190
+   Compiling cfg-if v1.0.5
+   Compiling itoa v1.0.18
+   Compiling smallvec v1.16.3
+   Compiling log v0.4.34
+   Compiling pin-project-lite v0.2.17
+   Compiling serde_core v1.0.229
+   Compiling parking_lot_core v0.9.12
+   Compiling futures-core v0.3.34
+   Compiling memchr v2.8.3
+   Compiling bytes v1.12.1
+   Compiling stable_deref_trait v1.2.1
+   Compiling scopeguard v1.2.0
+   Compiling once_cell v1.21.4
+   Compiling zmij v1.0.23
+   Compiling lock_api v0.4.14
+   Compiling serde v1.0.229
+   Compiling futures-sink v0.3.34
+   Compiling tracing-core v0.1.36
+   Compiling futures-channel v0.3.34
+   Compiling shlex v2.0.1
+   Compiling futures-io v0.3.34
+   Compiling futures-task v0.3.34
+   Compiling find-msvc-tools v0.1.14
+   Compiling serde_json v1.0.154
+   Compiling autocfg v1.5.1
+   Compiling slab v0.4.12
+   Compiling http v1.5.0
+   Compiling cc v1.8.0
+   Compiling litemap v0.8.3
+   Compiling syn v3.0.8
+   Compiling syn v2.0.119
+   Compiling writeable v0.6.4
+   Compiling utf8_iter v1.0.4
+   Compiling num-traits v0.2.19
+   Compiling icu_properties_data v2.3.0
+   Compiling ref-cast v1.0.27
+   Compiling core-foundation-sys v0.8.7
+   Compiling icu_normalizer_data v2.3.0
+   Compiling percent-encoding v2.3.2
+   Compiling iana-time-zone v0.1.65
+   Compiling httparse v1.10.1
+   Compiling tower-service v0.3.3
+   Compiling thiserror v2.0.21
+   Compiling zeroize v1.9.1
+   Compiling http-body v1.1.0
+   Compiling rustls-pki-types v1.15.1
+   Compiling errno v0.3.14
+   Compiling signal-hook-registry v1.4.8
+   Compiling mio v1.2.4
+   Compiling parking_lot v0.12.5
+   Compiling socket2 v0.6.5
+   Compiling getrandom v0.2.17
+   Compiling try-lock v0.2.5
+   Compiling dyn-clone v1.0.20
+   Compiling option-ext v0.2.0
+   Compiling untrusted v0.9.0
+   Compiling dirs-sys v0.5.0
+   Compiling want v0.3.2
+   Compiling form_urlencoded v1.2.2
+   Compiling sync_wrapper v1.0.2
+   Compiling ryu v1.0.23
+   Compiling atomic-waker v1.1.2
+   Compiling base64 v0.23.1
+   Compiling bitflags v2.13.2
+   Compiling httpdate v1.0.3
+   Compiling rustls v0.23.45
+   Compiling tower-layer v0.3.3
+   Compiling dirs v6.0.0
+   Compiling subtle v2.6.1
+   Compiling ipnet v2.12.2
+   Compiling http-body-util v0.1.5
+   Compiling webpki-roots v1.0.9
+   Compiling base64 v0.22.1
+   Compiling strsim v0.11.1
+   Compiling ident_case v1.0.1
+   Compiling ring v0.17.14
+   Compiling heck v0.5.0
+   Compiling rustversion v1.0.23
+   Compiling equivalent v1.0.2
+   Compiling utf8parse v0.2.2
+   Compiling anstyle-parse v1.0.0
+   Compiling anstyle v1.0.14
+   Compiling colorchoice v1.0.5
+   Compiling signal-hook v0.3.18
+   Compiling anstyle-query v1.1.5
+   Compiling is_terminal_polyfill v1.70.2
+   Compiling regex-syntax v0.8.11
+   Compiling anstream v1.0.0
+   Compiling getrandom v0.4.3
+   Compiling clap_lex v1.1.1
+   Compiling rustix v0.38.44
+   Compiling anyhow v1.0.104
+   Compiling clap_builder v4.6.7
+   Compiling either v1.19.0
+   Compiling allocator-api2 v0.2.21
+   Compiling lazy_static v1.5.1
+   Compiling paste v1.0.15
+   Compiling foldhash v0.1.5
+   Compiling sharded-slab v0.1.7
+   Compiling hashbrown v0.15.5
+   Compiling itertools v0.13.0
+   Compiling regex-automata v0.4.18
+   Compiling signal-hook-mio v0.2.5
+   Compiling castaway v0.2.4
+   Compiling tracing-log v0.2.0
+   Compiling thread_local v1.1.10
+   Compiling unicode-width v0.1.14
+   Compiling static_assertions v1.1.0
+   Compiling nu-ansi-term v0.50.3
+   Compiling unicode-segmentation v1.13.3
+   Compiling hashbrown v0.17.1
+   Compiling synstructure v0.14.0
+   Compiling serde_derive_internals v0.30.0
+   Compiling darling_core v0.24.1
+   Compiling indoc v2.0.8
+   Compiling rmcp v3.5.1
+   Compiling tracing-attributes v0.1.31
+   Compiling strum_macros v0.26.4
+   Compiling mime v0.3.17
+   Compiling indexmap v2.14.2
+   Compiling unicode-truncate v1.1.0
+   Compiling compact_str v0.8.2
+   Compiling zerofrom-derive v0.1.8
+   Compiling yoke-derive v0.8.4
+   Compiling zerovec-derive v0.11.6
+   Compiling displaydoc v0.2.7
+   Compiling serde_derive v1.0.229
+   Compiling tokio-macros v2.7.2
+   Compiling zerofrom v0.1.8
+   Compiling futures-macro v0.3.34
+   Compiling tracing v0.1.44
+   Compiling yoke v0.8.3
+   Compiling ref-cast-impl v1.0.27
+   Compiling zerotrie v0.2.5
+   Compiling schemars_derive v1.2.2
+   Compiling zerovec v0.11.8
+   Compiling thiserror-impl v2.0.21
+   Compiling rustls-webpki v0.103.15
+   Compiling async-trait v0.1.92
+   Compiling tokio v1.53.2
+   Compiling futures-util v0.3.34
+   Compiling clap_derive v4.6.7
+   Compiling tinystr v0.8.4
+   Compiling icu_locale_core v2.3.0
+   Compiling potential_utf v0.1.6
+   Compiling icu_collections v2.3.0
+   Compiling darling_macro v0.24.1
+   Compiling matchers v0.2.0
+   Compiling tracing-subscriber v0.3.23
+   Compiling axum-core v0.5.6
+   Compiling darling v0.24.1
+   Compiling rmcp-macros v3.5.1
+   Compiling instability v0.3.14
+   Compiling icu_provider v2.3.1
+   Compiling clap v4.6.7
+   Compiling strum v0.26.3
+   Compiling icu_normalizer v2.3.0
+   Compiling icu_properties v2.3.0
+   Compiling crossterm v0.28.1
+   Compiling uuid v1.28.0
+   Compiling lru v0.12.5
+   Compiling serde_path_to_error v0.1.20
+   Compiling chrono v0.4.45
+   Compiling serde_urlencoded v0.7.1
+   Compiling cassowary v0.3.0
+   Compiling matchit v0.8.4
+   Compiling unicode-width v0.2.0
+   Compiling pastey v0.2.3
+   Compiling ratatui v0.29.0
+   Compiling idna_adapter v1.2.2
+   Compiling idna v1.1.0
+   Compiling futures-executor v0.3.34
+   Compiling futures v0.3.34
+   Compiling url v2.5.8
+   Compiling schemars v1.2.2
+   Compiling hyper-messenger-core v0.1.0 (/Users/alpox/Desktop/dev/alpox/hyper-messenger-wt/w3-scaffold/crates/core)
+   Compiling hyper v1.12.0
+   Compiling tower v0.5.3
+   Compiling tokio-rustls v0.26.6
+   Compiling tokio-util v0.7.20
+   Compiling hyper-messenger-provider-kakaotalk v0.1.0 (/Users/alpox/Desktop/dev/alpox/hyper-messenger-wt/w3-scaffold/crates/providers/kakaotalk)
+   Compiling hyper-messenger-provider-mock v0.1.0 (/Users/alpox/Desktop/dev/alpox/hyper-messenger-wt/w3-scaffold/crates/providers/mock)
+   Compiling hyper-messenger-provider-telegram v0.1.0 (/Users/alpox/Desktop/dev/alpox/hyper-messenger-wt/w3-scaffold/crates/providers/telegram)
+   Compiling tower-http v0.6.11
+   Compiling hyper-util v0.1.21
+   Compiling hyper-rustls v0.27.10
+   Compiling axum v0.8.9
+   Compiling reqwest v0.12.28
+   Compiling hyper-messenger-provider-common v0.1.0 (/Users/alpox/Desktop/dev/alpox/hyper-messenger-wt/w3-scaffold/crates/providers/common)
+   Compiling hyper-messenger-provider-channeltalk v0.1.0 (/Users/alpox/Desktop/dev/alpox/hyper-messenger-wt/w3-scaffold/crates/providers/channeltalk)
+   Compiling hyper-messenger-provider-discord v0.1.0 (/Users/alpox/Desktop/dev/alpox/hyper-messenger-wt/w3-scaffold/crates/providers/discord)
+   Compiling hyper-messenger-provider-whatsapp v0.1.0 (/Users/alpox/Desktop/dev/alpox/hyper-messenger-wt/w3-scaffold/crates/providers/whatsapp)
+   Compiling hyper-messenger-provider-whatsappbot v0.1.0 (/Users/alpox/Desktop/dev/alpox/hyper-messenger-wt/w3-scaffold/crates/providers/whatsappbot)
+   Compiling hyper-messenger-provider-imessage v0.1.0 (/Users/alpox/Desktop/dev/alpox/hyper-messenger-wt/w3-scaffold/crates/providers/imessage)
+   Compiling hyper-messenger-provider-instagram v0.1.0 (/Users/alpox/Desktop/dev/alpox/hyper-messenger-wt/w3-scaffold/crates/providers/instagram)
+   Compiling hyper-messenger-provider-line v0.1.0 (/Users/alpox/Desktop/dev/alpox/hyper-messenger-wt/w3-scaffold/crates/providers/line)
+   Compiling hyper-messenger-provider-slackbot v0.1.0 (/Users/alpox/Desktop/dev/alpox/hyper-messenger-wt/w3-scaffold/crates/providers/slackbot)
+   Compiling hyper-messenger-provider-telegrambot v0.1.0 (/Users/alpox/Desktop/dev/alpox/hyper-messenger-wt/w3-scaffold/crates/providers/telegrambot)
+   Compiling hyper-messenger-provider-slack v0.1.0 (/Users/alpox/Desktop/dev/alpox/hyper-messenger-wt/w3-scaffold/crates/providers/slack)
+   Compiling hyper-messenger-sdk v0.1.0 (/Users/alpox/Desktop/dev/alpox/hyper-messenger-wt/w3-scaffold/crates/sdk)
+   Compiling hyper-messenger-ui v0.1.0 (/Users/alpox/Desktop/dev/alpox/hyper-messenger-wt/w3-scaffold/crates/ui)
+   Compiling hyper-messenger-cli v0.1.0 (/Users/alpox/Desktop/dev/alpox/hyper-messenger-wt/w3-scaffold/crates/cli)
+   Compiling hyper-messenger-server v0.1.0 (/Users/alpox/Desktop/dev/alpox/hyper-messenger-wt/w3-scaffold/crates/server)
+   Compiling hyper-messenger-mcp v0.1.0 (/Users/alpox/Desktop/dev/alpox/hyper-messenger-wt/w3-scaffold/crates/mcp)
+    Finished `dev` profile [unoptimized + debuginfo] target(s) in 27.37s
+EXIT=0
+
+### cargo clippy --workspace --all-features --all-targets -- -D warnings
+    Checking itoa v1.0.18
+    Checking cfg-if v1.0.5
+    Checking memchr v2.8.3
+    Checking smallvec v1.16.3
+    Checking log v0.4.34
+    Checking libc v0.2.190
+    Checking serde_core v1.0.229
+    Checking pin-project-lite v0.2.17
+    Checking futures-core v0.3.34
+    Checking zerofrom v0.1.8
+    Checking stable_deref_trait v1.2.1
+    Checking scopeguard v1.2.0
+    Checking bytes v1.12.1
+    Checking zmij v1.0.23
+    Checking yoke v0.8.3
+    Checking lock_api v0.4.14
+    Checking once_cell v1.21.4
+    Checking core-foundation-sys v0.8.7
+    Checking num-traits v0.2.19
+    Checking zerovec v0.11.8
+    Checking futures-sink v0.3.34
+    Checking tracing-core v0.1.36
+    Checking ref-cast v1.0.27
+    Checking iana-time-zone v0.1.65
+    Checking option-ext v0.2.0
+    Checking dyn-clone v1.0.20
+    Checking thiserror v2.0.21
+    Checking futures-channel v0.3.34
+    Checking futures-io v0.3.34
+    Checking futures-task v0.3.34
+    Checking slab v0.4.12
+    Checking writeable v0.6.4
+    Checking litemap v0.8.3
+    Checking zerotrie v0.2.5
+    Checking tracing v0.1.44
+    Checking futures-util v0.3.34
+    Checking percent-encoding v2.3.2
+    Checking utf8_iter v1.0.4
+    Checking zeroize v1.9.1
+    Checking tower-service v0.3.3
+    Checking icu_normalizer_data v2.3.0
+    Checking icu_properties_data v2.3.0
+    Checking http v1.5.0
+    Checking untrusted v0.9.0
+    Checking rustls-pki-types v1.15.1
+    Checking try-lock v0.2.5
+    Checking httparse v1.10.1
+    Checking want v0.3.2
+    Checking form_urlencoded v1.2.2
+    Checking sync_wrapper v1.0.2
+    Checking base64 v0.23.1
+    Checking httpdate v1.0.3
+    Checking tinystr v0.8.4
+    Checking potential_utf v0.1.6
+    Checking tower-layer v0.3.3
+    Checking atomic-waker v1.1.2
+    Checking icu_collections v2.3.0
+    Checking bitflags v2.13.2
+    Checking ryu v1.0.23
+    Checking icu_locale_core v2.3.0
+    Checking subtle v2.6.1
+    Checking ipnet v2.12.2
+    Checking webpki-roots v1.0.9
+    Checking base64 v0.22.1
+   Compiling strsim v0.11.1
+    Checking utf8parse v0.2.2
+    Checking anstyle-parse v1.0.0
+   Compiling darling_core v0.24.1
+    Checking anstyle v1.0.14
+    Checking is_terminal_polyfill v1.70.2
+    Checking anstyle-query v1.1.5
+    Checking colorchoice v1.0.5
+    Checking clap_lex v1.1.1
+    Checking equivalent v1.0.2
+    Checking anstream v1.0.0
+    Checking regex-syntax v0.8.11
+    Checking anyhow v1.0.104
+    Checking lazy_static v1.5.1
+    Checking sharded-slab v0.1.7
+    Checking clap_builder v4.6.7
+    Checking tracing-log v0.2.0
+    Checking http-body v1.1.0
+    Checking http-body-util v0.1.5
+    Checking thread_local v1.1.10
+    Checking allocator-api2 v0.2.21
+    Checking icu_provider v2.3.1
+    Checking nu-ansi-term v0.50.3
+    Checking foldhash v0.1.5
+    Checking either v1.19.0
+    Checking icu_normalizer v2.3.0
+    Checking icu_properties v2.3.0
+   Compiling serde_json v1.0.154
+    Checking itertools v0.13.0
+    Checking hashbrown v0.15.5
+    Checking regex-automata v0.4.18
+    Checking castaway v0.2.4
+    Checking serde v1.0.229
+    Checking errno v0.3.14
+    Checking parking_lot_core v0.9.12
+    Checking signal-hook-registry v1.4.8
+    Checking mio v1.2.4
+    Checking parking_lot v0.12.5
+    Checking chrono v0.4.45
+    Checking socket2 v0.6.5
+    Checking dirs-sys v0.5.0
+    Checking getrandom v0.2.17
+    Checking dirs v6.0.0
+    Checking idna_adapter v1.2.2
+    Checking ring v0.17.14
+    Checking tokio v1.53.2
+    Checking idna v1.1.0
+    Checking serde_urlencoded v0.7.1
+    Checking url v2.5.8
+    Checking clap v4.6.7
+    Checking signal-hook v0.3.18
+    Checking rustix v0.38.44
+    Checking signal-hook-mio v0.2.5
+    Checking getrandom v0.4.3
+    Checking unicode-width v0.1.14
+    Checking static_assertions v1.1.0
+    Checking hashbrown v0.17.1
+    Checking unicode-segmentation v1.13.3
+    Checking futures-executor v0.3.34
+    Checking mime v0.3.17
+    Checking futures v0.3.34
+    Checking compact_str v0.8.2
+    Checking axum-core v0.5.6
+    Checking unicode-truncate v1.1.0
+    Checking crossterm v0.28.1
+    Checking uuid v1.28.0
+    Checking serde_path_to_error v0.1.20
+    Checking matchers v0.2.0
+    Checking strum v0.26.3
+    Checking schemars v1.2.2
+    Checking tracing-subscriber v0.3.23
+    Checking lru v0.12.5
+    Checking indexmap v2.14.2
+    Checking cassowary v0.3.0
+    Checking unicode-width v0.2.0
+   Compiling darling_macro v0.24.1
+    Checking matchit v0.8.4
+    Checking rustls-webpki v0.103.15
+   Compiling darling v0.24.1
+   Compiling rmcp-macros v3.5.1
+   Compiling instability v0.3.14
+    Checking hyper-messenger-core v0.1.0 (/Users/alpox/Desktop/dev/alpox/hyper-messenger-wt/w3-scaffold/crates/core)
+    Checking rustls v0.23.45
+    Checking ratatui v0.29.0
+    Checking hyper-messenger-provider-telegram v0.1.0 (/Users/alpox/Desktop/dev/alpox/hyper-messenger-wt/w3-scaffold/crates/providers/telegram)
+    Checking hyper-messenger-provider-mock v0.1.0 (/Users/alpox/Desktop/dev/alpox/hyper-messenger-wt/w3-scaffold/crates/providers/mock)
+    Checking hyper-messenger-provider-kakaotalk v0.1.0 (/Users/alpox/Desktop/dev/alpox/hyper-messenger-wt/w3-scaffold/crates/providers/kakaotalk)
+    Checking hyper v1.12.0
+    Checking tower v0.5.3
+    Checking tokio-util v0.7.20
+    Checking tokio-rustls v0.26.6
+    Checking rmcp v3.5.1
+    Checking tower-http v0.6.11
+    Checking hyper-util v0.1.21
+    Checking hyper-rustls v0.27.10
+    Checking axum v0.8.9
+    Checking reqwest v0.12.28
+    Checking hyper-messenger-provider-common v0.1.0 (/Users/alpox/Desktop/dev/alpox/hyper-messenger-wt/w3-scaffold/crates/providers/common)
+    Checking hyper-messenger-provider-instagram v0.1.0 (/Users/alpox/Desktop/dev/alpox/hyper-messenger-wt/w3-scaffold/crates/providers/instagram)
+    Checking hyper-messenger-provider-slackbot v0.1.0 (/Users/alpox/Desktop/dev/alpox/hyper-messenger-wt/w3-scaffold/crates/providers/slackbot)
+    Checking hyper-messenger-provider-discord v0.1.0 (/Users/alpox/Desktop/dev/alpox/hyper-messenger-wt/w3-scaffold/crates/providers/discord)
+    Checking hyper-messenger-provider-slack v0.1.0 (/Users/alpox/Desktop/dev/alpox/hyper-messenger-wt/w3-scaffold/crates/providers/slack)
+    Checking hyper-messenger-provider-line v0.1.0 (/Users/alpox/Desktop/dev/alpox/hyper-messenger-wt/w3-scaffold/crates/providers/line)
+    Checking hyper-messenger-provider-telegrambot v0.1.0 (/Users/alpox/Desktop/dev/alpox/hyper-messenger-wt/w3-scaffold/crates/providers/telegrambot)
+    Checking hyper-messenger-provider-whatsappbot v0.1.0 (/Users/alpox/Desktop/dev/alpox/hyper-messenger-wt/w3-scaffold/crates/providers/whatsappbot)
+    Checking hyper-messenger-provider-whatsapp v0.1.0 (/Users/alpox/Desktop/dev/alpox/hyper-messenger-wt/w3-scaffold/crates/providers/whatsapp)
+    Checking hyper-messenger-provider-imessage v0.1.0 (/Users/alpox/Desktop/dev/alpox/hyper-messenger-wt/w3-scaffold/crates/providers/imessage)
+    Checking hyper-messenger-provider-channeltalk v0.1.0 (/Users/alpox/Desktop/dev/alpox/hyper-messenger-wt/w3-scaffold/crates/providers/channeltalk)
+    Checking hyper-messenger-sdk v0.1.0 (/Users/alpox/Desktop/dev/alpox/hyper-messenger-wt/w3-scaffold/crates/sdk)
+    Checking hyper-messenger-cli v0.1.0 (/Users/alpox/Desktop/dev/alpox/hyper-messenger-wt/w3-scaffold/crates/cli)
+    Checking hyper-messenger-ui v0.1.0 (/Users/alpox/Desktop/dev/alpox/hyper-messenger-wt/w3-scaffold/crates/ui)
+    Checking hyper-messenger-server v0.1.0 (/Users/alpox/Desktop/dev/alpox/hyper-messenger-wt/w3-scaffold/crates/server)
+    Checking hyper-messenger-mcp v0.1.0 (/Users/alpox/Desktop/dev/alpox/hyper-messenger-wt/w3-scaffold/crates/mcp)
+    Finished `dev` profile [unoptimized + debuginfo] target(s) in 13.53s
+EXIT=0
+
+### cargo test --workspace --all-features
+   Compiling hyper-messenger-cli v0.1.0 (/Users/alpox/Desktop/dev/alpox/hyper-messenger-wt/w3-scaffold/crates/cli)
+   Compiling hyper-messenger-sdk v0.1.0 (/Users/alpox/Desktop/dev/alpox/hyper-messenger-wt/w3-scaffold/crates/sdk)
+   Compiling hyper-messenger-mcp v0.1.0 (/Users/alpox/Desktop/dev/alpox/hyper-messenger-wt/w3-scaffold/crates/mcp)
+   Compiling hyper-messenger-ui v0.1.0 (/Users/alpox/Desktop/dev/alpox/hyper-messenger-wt/w3-scaffold/crates/ui)
+   Compiling hyper-messenger-server v0.1.0 (/Users/alpox/Desktop/dev/alpox/hyper-messenger-wt/w3-scaffold/crates/server)
+   Compiling hyper-messenger-provider-slack v0.1.0 (/Users/alpox/Desktop/dev/alpox/hyper-messenger-wt/w3-scaffold/crates/providers/slack)
+   Compiling hyper-messenger-provider-channeltalk v0.1.0 (/Users/alpox/Desktop/dev/alpox/hyper-messenger-wt/w3-scaffold/crates/providers/channeltalk)
+   Compiling hyper-messenger-provider-whatsappbot v0.1.0 (/Users/alpox/Desktop/dev/alpox/hyper-messenger-wt/w3-scaffold/crates/providers/whatsappbot)
+   Compiling hyper-messenger-provider-line v0.1.0 (/Users/alpox/Desktop/dev/alpox/hyper-messenger-wt/w3-scaffold/crates/providers/line)
+   Compiling hyper-messenger-provider-slackbot v0.1.0 (/Users/alpox/Desktop/dev/alpox/hyper-messenger-wt/w3-scaffold/crates/providers/slackbot)
+   Compiling hyper-messenger-provider-whatsapp v0.1.0 (/Users/alpox/Desktop/dev/alpox/hyper-messenger-wt/w3-scaffold/crates/providers/whatsapp)
+   Compiling hyper-messenger-provider-discord v0.1.0 (/Users/alpox/Desktop/dev/alpox/hyper-messenger-wt/w3-scaffold/crates/providers/discord)
+   Compiling hyper-messenger-provider-telegrambot v0.1.0 (/Users/alpox/Desktop/dev/alpox/hyper-messenger-wt/w3-scaffold/crates/providers/telegrambot)
+   Compiling hyper-messenger-provider-imessage v0.1.0 (/Users/alpox/Desktop/dev/alpox/hyper-messenger-wt/w3-scaffold/crates/providers/imessage)
+   Compiling hyper-messenger-provider-instagram v0.1.0 (/Users/alpox/Desktop/dev/alpox/hyper-messenger-wt/w3-scaffold/crates/providers/instagram)
+   Compiling hyper-messenger-provider-common v0.1.0 (/Users/alpox/Desktop/dev/alpox/hyper-messenger-wt/w3-scaffold/crates/providers/common)
+   Compiling hyper-messenger-provider-kakaotalk v0.1.0 (/Users/alpox/Desktop/dev/alpox/hyper-messenger-wt/w3-scaffold/crates/providers/kakaotalk)
+   Compiling hyper-messenger-provider-mock v0.1.0 (/Users/alpox/Desktop/dev/alpox/hyper-messenger-wt/w3-scaffold/crates/providers/mock)
+   Compiling hyper-messenger-core v0.1.0 (/Users/alpox/Desktop/dev/alpox/hyper-messenger-wt/w3-scaffold/crates/core)
+   Compiling hyper-messenger-provider-telegram v0.1.0 (/Users/alpox/Desktop/dev/alpox/hyper-messenger-wt/w3-scaffold/crates/providers/telegram)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 3.83s
+     Running unittests src/main.rs (target/debug/deps/hyper_messenger-69fb1c1c489f2e02)
+
+running 0 tests
+
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+     Running tests/cli.rs (target/debug/deps/cli-36521d98a62e6fa8)
+
+running 8 tests
+test login_with_a_param_without_an_equals_is_a_usage_error ... ok
+test send_reports_acceptance ... ok
+test chats_returns_seeded_chats ... ok
+test login_with_params_authenticates_the_mock_provider ... ok
+test messages_returns_seeded_messages ... ok
+test platform_provider_without_credentials_requires_auth ... ok
+test providers_lists_the_mock_provider ... ok
+test unknown_provider_is_a_non_zero_envelope ... ok
+
+test result: ok. 8 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.04s
+
+     Running unittests src/lib.rs (target/debug/deps/hyper_messenger_core-b623927b1031e39d)
+
+running 0 tests
+
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+     Running tests/contracts.rs (target/debug/deps/contracts-c6204e1fa7408527)
+
+running 6 tests
+test capabilities_report_their_names ... ok
+test capability_gate_distinguishes_unbuilt_from_unsupported ... ok
+test provider_kind_round_trips_through_strings ... ok
+test envelope_renders_success_and_failure_shapes ... ok
+test credential_files_are_owner_only ... ok
+test credential_store_round_trips_and_rejects_escaping_ids ... ok
+
+test result: ok. 6 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+     Running unittests src/main.rs (target/debug/deps/hyper_messenger_mcp-c8ee77dba42b9894)
+
+running 0 tests
+
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+     Running unittests src/lib.rs (target/debug/deps/hyper_messenger_provider_channeltalk-4b1f317beead1a5b)
+
+running 3 tests
+test client::tests::chat_ref_parses_the_composite_form ... ok
+test client::tests::chat_ref_rejects_malformed_input ... ok
+test client::tests::base_url_honours_the_env_override ... ok
+
+test result: ok. 3 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+     Running unittests src/lib.rs (target/debug/deps/hyper_messenger_provider_common-d09835d9df923597)
+
+running 13 tests
+test client::tests::error_message_prefers_the_top_level_message ... ok
+test client::tests::map_http_status_covers_every_class ... ok
+test sidecar::tests::resolve_reports_a_missing_binary ... ok
+test sidecar::tests::call_after_shutdown_returns_a_typed_error ... ok
+test sidecar::tests::resolve_rejects_an_env_var_that_points_nowhere ... ok
+test sidecar::tests::start_on_a_missing_binary_returns_a_typed_error ... ok
+test client::tests::non_idempotent_send_is_not_retried_on_truncated_body ... ok
+test client::tests::non_idempotent_send_is_not_retried_on_transport_failure ... ok
+test client::tests::too_many_requests_retries_then_succeeds ... ok
+test sidecar::tests::request_response_round_trip ... ok
+test sidecar::tests::non_json_output_is_a_protocol_error ... ok
+test client::tests::idempotent_get_is_retried_on_transport_failure ... ok
+test sidecar::tests::call_times_out_when_the_child_never_replies ... ok
+
+test result: ok. 13 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.32s
+
+     Running unittests src/lib.rs (target/debug/deps/hyper_messenger_provider_discord-11eeb31ee7d1cf72)
+
+running 3 tests
+test client::tests::urlencode_escapes_spaces_and_symbols ... ok
+test client::tests::bucket_key_normalizes_ids ... ok
+test client::tests::base_url_honours_the_env_override ... ok
+
+test result: ok. 3 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+     Running unittests src/lib.rs (target/debug/deps/hyper_messenger_provider_imessage-b0a81c683fe4a414)
+
+running 0 tests
+
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+     Running unittests src/lib.rs (target/debug/deps/hyper_messenger_provider_instagram-c72036b58e8e2571)
+
+running 0 tests
+
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+     Running unittests src/lib.rs (target/debug/deps/hyper_messenger_provider_kakaotalk-29617e7f53434d27)
+
+running 0 tests
+
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+     Running unittests src/lib.rs (target/debug/deps/hyper_messenger_provider_line-b1c25398262cf464)
+
+running 0 tests
+
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+     Running unittests src/lib.rs (target/debug/deps/hyper_messenger_provider_mock-b2317516ff9fe464)
+
+running 0 tests
+
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+     Running unittests src/lib.rs (target/debug/deps/hyper_messenger_provider_slack-b366547bbce3d93e)
+
+running 10 tests
+test client::tests::ok_true_passes_and_missing_ok_is_protocol ... ok
+test mappers::tests::search_page_handles_an_empty_messages_block ... ok
+test client::tests::ok_false_at_http_200_maps_to_typed_errors ... ok
+test client::tests::cookie_header_accepts_a_prefixed_pair ... ok
+test mappers::tests::chat_maps_im_and_channel_kinds ... ok
+test client::tests::missing_required_field_decodes_to_protocol ... ok
+test mappers::tests::search_response_maps_to_a_message_page ... ok
+test client::tests::headers_carry_bearer_token_and_cookie ... ok
+test client::tests::base_url_honours_the_env_override ... ok
+test client::tests::headers_omit_cookie_when_absent ... ok
+
+test result: ok. 10 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+     Running unittests src/lib.rs (target/debug/deps/hyper_messenger_provider_slackbot-c0b4d36a54a7cabc)
+
+running 7 tests
+test tests::bot_token_prefix_is_accepted ... ok
+test client::tests::ok_true_passes_the_body_through ... ok
+test tests::non_bot_tokens_are_invalid_input ... ok
+test client::tests::ok_false_maps_other_codes_to_protocol ... ok
+test client::tests::missing_ok_is_protocol ... ok
+test client::tests::ok_false_maps_auth_codes_to_auth_failed ... ok
+test client::tests::base_url_honours_the_env_override ... ok
+
+test result: ok. 7 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+     Running unittests src/lib.rs (target/debug/deps/hyper_messenger_provider_telegram-91abd25a5fc6b15b)
+
+running 0 tests
+
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+     Running unittests src/lib.rs (target/debug/deps/hyper_messenger_provider_telegrambot-d7cbf47a40f60901)
+
+running 10 tests
+test tests::chat_kind_maps_bot_api_types ... ok
+test client::tests::rate_limit_carries_retry_after ... ok
+test client::tests::ok_true_envelope_yields_the_result ... ok
+test client::tests::ok_false_maps_to_typed_errors ... ok
+test tests::caption_is_used_when_text_is_absent ... ok
+test tests::message_mapping_uses_text_and_reply ... ok
+test tests::chat_mapping_prefers_title_then_name ... ok
+test client::tests::malformed_bodies_map_to_protocol_errors ... ok
+test tests::token_precedence_env_over_stored_over_absent ... ok
+test client::tests::base_url_honours_the_env_override ... ok
+
+test result: ok. 10 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+     Running unittests src/lib.rs (target/debug/deps/hyper_messenger_provider_whatsapp-267c64ee320693de)
+
+running 0 tests
+
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+     Running unittests src/lib.rs (target/debug/deps/hyper_messenger_provider_whatsappbot-0f52ea6019f72b53)
+
+running 5 tests
+test tests::capabilities_are_exactly_whoami_and_send_message ... ok
+test tests::stored_credentials_require_both_fields ... ok
+test tests::env_credentials_take_precedence_over_stored_credentials ... ok
+test client::tests::base_url_honours_the_env_override ... ok
+test client::tests::a_graph_error_body_maps_unauthorized_to_auth_failed ... ok
+
+test result: ok. 5 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+     Running unittests src/lib.rs (target/debug/deps/hyper_messenger_sdk-e2ed322d37c89142)
+
+running 0 tests
+
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+     Running tests/client.rs (target/debug/deps/client-f9a2960ae71bd17f)
+
+running 5 tests
+test an_empty_registry_reports_not_registered ... ok
+test default_client_registers_the_mock_provider ... ok
+test send_message_is_visible_on_the_next_read ... ok
+test chat_search_filters_by_name ... ok
+test whoami_and_list_chats_answer_from_memory ... ok
+
+test result: ok. 5 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+     Running unittests src/main.rs (target/debug/deps/hyper_messenger_server-7409d6ea961ddc14)
+
+running 0 tests
+
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+     Running unittests src/main.rs (target/debug/deps/hyper_messenger_tui-d9b927f1fa198f40)
+
+running 0 tests
+
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+   Doc-tests hyper_messenger_core
+
+running 0 tests
+
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+   Doc-tests hyper_messenger_provider_channeltalk
+
+running 0 tests
+
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+   Doc-tests hyper_messenger_provider_common
+
+running 0 tests
+
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+   Doc-tests hyper_messenger_provider_discord
+
+running 0 tests
+
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+   Doc-tests hyper_messenger_provider_imessage
+
+running 0 tests
+
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+   Doc-tests hyper_messenger_provider_instagram
+
+running 0 tests
+
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+   Doc-tests hyper_messenger_provider_kakaotalk
+
+running 0 tests
+
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+   Doc-tests hyper_messenger_provider_line
+
+running 0 tests
+
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+   Doc-tests hyper_messenger_provider_mock
+
+running 0 tests
+
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+   Doc-tests hyper_messenger_provider_slack
+
+running 0 tests
+
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+   Doc-tests hyper_messenger_provider_slackbot
+
+running 0 tests
+
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+   Doc-tests hyper_messenger_provider_telegram
+
+running 0 tests
+
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+   Doc-tests hyper_messenger_provider_telegrambot
+
+running 0 tests
+
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+   Doc-tests hyper_messenger_provider_whatsapp
+
+running 0 tests
+
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+   Doc-tests hyper_messenger_provider_whatsappbot
+
+running 0 tests
+
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+   Doc-tests hyper_messenger_sdk
+
+running 0 tests
+
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+EXIT=0
+
+### cargo fmt --all
+EXIT=0
+
+### cargo fmt --all --check
+EXIT=0
+
+### cargo build -p hyper-messenger-cli --features hyper-messenger-sdk/all
+   Compiling libc v0.2.190
+   Compiling serde_core v1.0.229
+   Compiling serde v1.0.229
+   Compiling serde_json v1.0.154
+   Compiling memchr v2.8.3
+   Compiling slab v0.4.12
+   Compiling futures-task v0.3.34
+   Compiling tracing-core v0.1.36
+   Compiling futures-channel v0.3.34
+   Compiling bitflags v2.13.2
+   Compiling log v0.4.34
+   Compiling futures-util v0.3.34
+   Compiling tracing v0.1.44
+   Compiling parking_lot_core v0.9.12
+   Compiling errno v0.3.14
+   Compiling mio v1.2.4
+   Compiling socket2 v0.6.5
+   Compiling getrandom v0.2.17
+   Compiling dirs-sys v0.5.0
+   Compiling dirs v6.0.0
+   Compiling signal-hook-registry v1.4.8
+   Compiling ring v0.17.14
+   Compiling parking_lot v0.12.5
+   Compiling tokio v1.53.2
+   Compiling rustls-webpki v0.103.15
+   Compiling chrono v0.4.45
+   Compiling serde_urlencoded v0.7.1
+   Compiling rustls v0.23.45
+   Compiling hyper-messenger-core v0.1.0 (/Users/alpox/Desktop/dev/alpox/hyper-messenger-wt/w3-scaffold/crates/core)
+   Compiling hyper-messenger-provider-telegram v0.1.0 (/Users/alpox/Desktop/dev/alpox/hyper-messenger-wt/w3-scaffold/crates/providers/telegram)
+   Compiling hyper-messenger-provider-mock v0.1.0 (/Users/alpox/Desktop/dev/alpox/hyper-messenger-wt/w3-scaffold/crates/providers/mock)
+   Compiling hyper-messenger-provider-kakaotalk v0.1.0 (/Users/alpox/Desktop/dev/alpox/hyper-messenger-wt/w3-scaffold/crates/providers/kakaotalk)
+   Compiling hyper v1.12.0
+   Compiling tower v0.5.3
+   Compiling tower-http v0.6.11
+   Compiling tokio-rustls v0.26.6
+   Compiling hyper-util v0.1.21
+   Compiling hyper-rustls v0.27.10
+   Compiling reqwest v0.12.28
+   Compiling hyper-messenger-provider-common v0.1.0 (/Users/alpox/Desktop/dev/alpox/hyper-messenger-wt/w3-scaffold/crates/providers/common)
+   Compiling hyper-messenger-provider-channeltalk v0.1.0 (/Users/alpox/Desktop/dev/alpox/hyper-messenger-wt/w3-scaffold/crates/providers/channeltalk)
+   Compiling hyper-messenger-provider-whatsappbot v0.1.0 (/Users/alpox/Desktop/dev/alpox/hyper-messenger-wt/w3-scaffold/crates/providers/whatsappbot)
+   Compiling hyper-messenger-provider-instagram v0.1.0 (/Users/alpox/Desktop/dev/alpox/hyper-messenger-wt/w3-scaffold/crates/providers/instagram)
+   Compiling hyper-messenger-provider-line v0.1.0 (/Users/alpox/Desktop/dev/alpox/hyper-messenger-wt/w3-scaffold/crates/providers/line)
+   Compiling hyper-messenger-provider-discord v0.1.0 (/Users/alpox/Desktop/dev/alpox/hyper-messenger-wt/w3-scaffold/crates/providers/discord)
+   Compiling hyper-messenger-provider-whatsapp v0.1.0 (/Users/alpox/Desktop/dev/alpox/hyper-messenger-wt/w3-scaffold/crates/providers/whatsapp)
+   Compiling hyper-messenger-provider-imessage v0.1.0 (/Users/alpox/Desktop/dev/alpox/hyper-messenger-wt/w3-scaffold/crates/providers/imessage)
+   Compiling hyper-messenger-provider-slackbot v0.1.0 (/Users/alpox/Desktop/dev/alpox/hyper-messenger-wt/w3-scaffold/crates/providers/slackbot)
+   Compiling hyper-messenger-provider-telegrambot v0.1.0 (/Users/alpox/Desktop/dev/alpox/hyper-messenger-wt/w3-scaffold/crates/providers/telegrambot)
+   Compiling hyper-messenger-provider-slack v0.1.0 (/Users/alpox/Desktop/dev/alpox/hyper-messenger-wt/w3-scaffold/crates/providers/slack)
+   Compiling hyper-messenger-sdk v0.1.0 (/Users/alpox/Desktop/dev/alpox/hyper-messenger-wt/w3-scaffold/crates/sdk)
+   Compiling hyper-messenger-cli v0.1.0 (/Users/alpox/Desktop/dev/alpox/hyper-messenger-wt/w3-scaffold/crates/cli)
+    Finished `dev` profile [unoptimized + debuginfo] target(s) in 9.85s
+EXIT=0
+
+### manual QA: hyper-messenger providers
+CONFIG_DIR=/var/folders/6z/00znjmd54_v5r_ccgckhkz6r0000gn/T/tmp.AwBsTh8zeO
+{"ok":true,"data":[{"capabilities":["whoami","list_chats","get_chat","list_messages","search_messages","send_message","send_media","mark_read","list_members","snapshot"],"description":"KakaoTalk, driven from the local desktop app's session and database","kind":"kakaotalk","name":"KakaoTalk"},{"capabilities":["whoami","list_chats","get_chat","list_messages","search_messages","send_message","mark_read","list_members","snapshot"],"description":"Discord, as your user account or a bot token","kind":"discord","name":"Discord"},{"capabilities":["whoami","list_chats","get_chat","list_messages","search_messages","send_message","send_media","mark_read","list_members","snapshot","listen"],"description":"Telegram, as your user account or a bot token","kind":"telegram","name":"Telegram"},{"capabilities":["whoami","list_chats","get_chat","list_messages","search_messages","send_message","list_members","snapshot"],"description":"Channel Talk, as an operator or with API credentials","kind":"channeltalk","name":"Channel Talk"},{"capabilities":["whoami","list_chats","get_chat","list_messages","search_messages","send_message","list_members","snapshot"],"description":"An in-memory provider used for development and tests","kind":"mock","name":"Mock"},{"capabilities":["whoami","list_chats","get_chat","list_messages","search_messages","send_message","list_members","snapshot"],"description":"Slack, as your user account or a bot token","kind":"slack","name":"Slack"},{"capabilities":["whoami","list_chats","get_chat","list_messages","send_message","list_members","snapshot"],"description":"Slack, as a bot user","kind":"slackbot","name":"Slack Bot"},{"capabilities":["whoami","list_chats","get_chat","list_messages","send_message","list_members","snapshot"],"description":"Telegram, as a bot token","kind":"telegrambot","name":"Telegram Bot"},{"capabilities":["whoami","list_chats","get_chat","list_messages","send_message","list_members","snapshot"],"description":"WhatsApp, as your user account","kind":"whatsapp","name":"WhatsApp"},{"capabilities":["whoami","send_message"],"description":"WhatsApp, as a bot number","kind":"whatsappbot","name":"WhatsApp Bot"},{"capabilities":["whoami","list_chats","get_chat","list_messages","send_message","list_members","snapshot"],"description":"LINE, as your user account","kind":"line","name":"LINE"},{"capabilities":["whoami","list_chats","get_chat","list_messages","send_message","list_members","snapshot"],"description":"iMessage, driven from the local Messages app","kind":"imessage","name":"iMessage"},{"capabilities":["whoami","list_chats","get_chat","list_messages","search_messages","send_message","list_members","snapshot"],"description":"Instagram, as your user account","kind":"instagram","name":"Instagram"}],"meta":{"generated_at":"2026-10-13T19:34:50.246Z"}}
+EXIT=0
+# done 2026-10-13T19:34:50Z

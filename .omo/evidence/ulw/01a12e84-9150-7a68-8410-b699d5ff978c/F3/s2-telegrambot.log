@@ -1,0 +1,18 @@
+########## telegrambot ##########
+# building the CLI with all features
+# whoami telegrambot
+ok:true whoami mock_bot 123456789
+# chats telegrambot
+ok:true chats Ada Lovelace
+# messages telegrambot
+ok:true messages seeded
+# members telegrambot
+ok:true members Ada Lovelace
+# send telegrambot
+ok:true send created message_id 9001
+# adversarial: non-JSON success body maps to PROTOCOL
+ok:true malformed body -> PROTOCOL
+# adversarial: wrong token maps ok:false 401 to AUTH_FAILED
+ok:true wrong token -> AUTH_FAILED
+telegrambot qa done
+cleanup: mock_telegrambot pid=84229 killed; temp config /var/folders/6z/00znjmd54_v5r_ccgckhkz6r0000gn/T/tmp.Vmk55vIEji removed

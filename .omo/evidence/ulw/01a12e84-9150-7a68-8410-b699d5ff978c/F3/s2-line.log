@@ -1,0 +1,18 @@
+########## line ##########
+# building the CLI with the line provider
+# happy: auth login line (stub over HYPER_MESSENGER_LINE_SIDECAR)
+ok:true account_id=u_self
+# happy: chats line
+ok:true chats=2 first=Friend kind=direct
+# happy: send line u_friend hi (asserts a real message id)
+ok:true message_id=sent-1 accepted
+# happy: members line g_crew
+ok:true members=1
+# adversarial: auth failure -> AUTH_FAILED, non-zero exit
+{"ok":false,"error":{"code":"AUTH_FAILED","message":"authentication failed for provider line: sidecar returned an error response: {\"code\":-32000,\"data\":\"AUTH_FAILED: invalid token\",\"message\":\"login failed\"}","retryable":false,"provider":"line"},"meta":{"provider":"line","generated_at":"2026-10-13T20:30:50.453Z"}}
+# adversarial: malformed stub output -> PROTOCOL, non-zero exit
+{"ok":false,"error":{"code":"PROTOCOL","message":"protocol error for provider line: sidecar returned non-JSON output: expected ident at line 1 column 2","retryable":false,"provider":"line"},"meta":{"provider":"line","generated_at":"2026-10-13T20:30:50.488Z"}}
+# failure: no credentials -> AUTH_REQUIRED, non-zero exit
+{"ok":false,"error":{"code":"AUTH_REQUIRED","message":"authentication is required for provider line","retryable":false,"provider":"line"},"meta":{"provider":"line","generated_at":"2026-10-13T20:30:50.503Z"}}
+QA PASSED
+cleanup: temp config /var/folders/6z/00znjmd54_v5r_ccgckhkz6r0000gn/T/tmp.Xw1ZqJhEGy removed; no background processes started

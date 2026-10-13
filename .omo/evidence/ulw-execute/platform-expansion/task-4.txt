@@ -1,0 +1,128 @@
+TASK: ULW plan checkbox 4 - Telegram Bot provider (hyper-messenger-provider-telegrambot)
+WORKTREE: /Users/alpox/Desktop/dev/alpox/hyper-messenger-wt/w1-telegrambot (branch ulw/w1-telegrambot)
+DATE: 2026-10-13
+DO NOT COMMIT: respected (no git commit run).
+
+========================================================================
+CHANGED FILES (worktree)
+========================================================================
+ M crates/providers/telegrambot/Cargo.toml        (added chrono.workspace = true)
+ M crates/providers/telegrambot/src/lib.rs         (Provider + AuthProvider impl + tests)
+ A crates/providers/telegrambot/src/client.rs      (TelegramBotClient over common HttpClient/Request + tests)
+ A crates/providers/telegrambot/src/models.rs      (Bot API JSON models)
+ A crates/providers/telegrambot/tests/qa/run.sh
+ A crates/providers/telegrambot/tests/qa/mock_telegrambot.py
+ M Cargo.lock                                      (chrono edge for the telegrambot crate)
+
+$ git status --porcelain
+ M Cargo.lock
+ M crates/providers/telegrambot/Cargo.toml
+ M crates/providers/telegrambot/src/lib.rs
+?? crates/providers/telegrambot/src/client.rs
+?? crates/providers/telegrambot/src/models.rs
+?? crates/providers/telegrambot/tests/
+
+========================================================================
+OPERATION MAPPING
+========================================================================
+whoami      -> getMe
+list_chats  -> distinct chats derived from getUpdates
+get_chat    -> getChat
+list_messages -> best-effort from getUpdates (crate doc states Bot API has no history)
+send_message -> sendMessage (non-idempotent, never auto-retried; Delivery::ServerAccepted)
+list_members -> getChatAdministrators
+snapshot    -> getMe + list_chats
+AuthProvider -> methods() = &[AuthMethod::Token]; env HYPER_MESSENGER_TELEGRAMBOT_TOKEN
+                else FileCredentialStore account "default" field "token"
+Base URL    -> HYPER_MESSENGER_TELEGRAMBOT_API_BASE, default https://api.telegram.org
+ok:false    -> typed Error (401/403 AuthFailed, 404 NotFound, 429 RateLimited, else Protocol)
+
+========================================================================
+AUTOMATED VERIFICATION (worktree, exact commands)
+========================================================================
+### cargo build -p hyper-messenger-provider-telegrambot --all-features
+    Finished `dev` profile [unoptimized + debuginfo] target(s) in 0.17s
+
+### cargo clippy -p hyper-messenger-provider-telegrambot --all-targets -- -D warnings
+    Finished `dev` profile [unoptimized + debuginfo] target(s) in 0.14s
+    (no warnings)
+
+### cargo test -p hyper-messenger-provider-telegrambot
+running 10 tests
+test tests::chat_kind_maps_bot_api_types ... ok
+test client::tests::ok_true_envelope_yields_the_result ... ok
+test client::tests::ok_false_maps_to_typed_errors ... ok
+test client::tests::rate_limit_carries_retry_after ... ok
+test tests::caption_is_used_when_text_is_absent ... ok
+test client::tests::malformed_bodies_map_to_protocol_errors ... ok
+test tests::message_mapping_uses_text_and_reply ... ok
+test tests::token_precedence_env_over_stored_over_absent ... ok
+test tests::chat_mapping_prefers_title_then_name ... ok
+test client::tests::base_url_honours_the_env_override ... ok
+test result: ok. 10 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.01s
+
+### cargo fmt --all && cargo fmt --all --check
+fmt: OK (no diff)
+
+========================================================================
+MANUAL QA (worktree, exact command + output)
+========================================================================
+$ bash crates/providers/telegrambot/tests/qa/run.sh
+# building the CLI with all features
+# whoami telegrambot
+ok:true whoami mock_bot 123456789
+# chats telegrambot
+ok:true chats Ada Lovelace
+# messages telegrambot
+ok:true messages seeded
+# members telegrambot
+ok:true members Ada Lovelace
+# send telegrambot
+ok:true send created message_id 9001
+# adversarial: non-JSON success body maps to PROTOCOL
+ok:true malformed body -> PROTOCOL
+# adversarial: wrong token maps ok:false 401 to AUTH_FAILED
+ok:true wrong token -> AUTH_FAILED
+telegrambot qa done
+cleanup: mock_telegrambot pid=67685 killed; temp config /var/folders/6z/00znjmd54_v5r_ccgckhkz6r0000gn/T/tmp.cok0VGHoSG removed
+
+Mock: crates/providers/telegrambot/tests/qa/mock_telegrambot.py on port 8811, seeds getMe/getChat/
+getUpdates/getChatAdministrators/sendMessage. Binary built with:
+  cargo build -p hyper-messenger-cli --features hyper-messenger-sdk/all
+Invocation: HYPER_MESSENGER_TELEGRAMBOT_API_BASE=http://127.0.0.1:8811
+            HYPER_MESSENGER_TELEGRAMBOT_TOKEN=mock target/debug/hyper-messenger <cmd> telegrambot ...
+
+========================================================================
+ADVERSARIAL CLASSES
+========================================================================
+1. malformed input (bad JSON response -> Protocol error): PASS.
+   Mock returns a non-JSON 200 body for text "__BADJSON__"; client maps it to
+   Error::Protocol (CLI error.code == "PROTOCOL"). Unit test
+   client::tests::malformed_bodies_map_to_protocol_errors covers Null/{} /missing-ok.
+2. misleading success (assert the created message id, not just ok): PASS.
+   run.sh asserts data.message_id == "9001" (the seeded created id), not only ok:true.
+3. Others n/a:
+   - retry/idempotency storm n/a: sendMessage is the only non-idempotent call and the
+     shared client never retries a transmitted non-idempotent request.
+   - concurrency n/a: the provider holds no shared mutable state (a fresh client per call).
+   - silent data loss n/a: list_messages is explicitly documented best-effort and
+     returns has_more=false rather than claiming completeness.
+
+========================================================================
+CLEANUP RECEIPTS
+========================================================================
+- mock_telegrambot.py process (pid 67685) killed by the run.sh EXIT trap; "cleanup:" line printed.
+- temp config dir removed: /var/folders/6z/00jn.../T/tmp.cok0VGHoSG.
+- leftover listener check: `lsof -nP -iTCP:8811 -sTCP:LISTEN` -> none.
+- no build artifacts added to the repo tree; target/ is the normal cargo cache.
+
+========================================================================
+RISKS / LIMITATIONS
+========================================================================
+- list_messages is best-effort from getUpdates (Bot API has no history); the crate doc
+  states this. It only sees unconfirmed updates and only chats the bot can see.
+- 403 is mapped to AuthFailed (there is no Forbidden code in core); documented by the test.
+- getUpdates requires no webhook to be set (Telegram returns 409 otherwise); not exercised.
+- The provider was not run against the live Bot API (no real bot token available);
+  verified against the mock only.
+- Cargo.lock changed (chrono edge); left uncommitted per the no-commit instruction.

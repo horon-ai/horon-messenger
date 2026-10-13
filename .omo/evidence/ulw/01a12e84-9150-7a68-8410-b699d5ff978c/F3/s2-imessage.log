@@ -1,0 +1,20 @@
+########## imessage ##########
+# building the CLI with the imessage provider
+# happy: chats imessage (stub over HYPER_MESSENGER_IMSG_BIN)
+ok:true chats=2 first=Jane kind=direct
+# happy: messages imessage 42 (oldest first)
+ok:true messages=2 ordered=m1,m2
+# happy: members imessage 43
+ok:true members=2
+# happy: auth status imessage (no login needed)
+ok:true auth status authenticated
+# adversarial: malformed stub output -> PROTOCOL, non-zero exit
+{"ok":false,"error":{"code":"PROTOCOL","message":"protocol error for provider imessage: sidecar returned non-JSON output: expected ident at line 1 column 2","retryable":false,"provider":"imessage"},"meta":{"provider":"imessage","generated_at":"2026-10-13T20:30:41.361Z"}}
+# adversarial: Full Disk Access denied -> AUTH_FAILED naming the permission, non-zero exit
+{"ok":false,"error":{"code":"AUTH_FAILED","message":"authentication failed for provider imessage: imsg cannot read the Messages database; grant Full Disk Access to the app that launched hyper-messenger (System Settings -> Privacy & Security -> Full Disk Access)","retryable":false,"provider":"imessage"},"meta":{"provider":"imessage","generated_at":"2026-10-13T20:30:41.403Z"}}
+# failure: invalid binary (env points nowhere, PATH has no imsg) -> CONFIG, non-zero exit
+{"ok":false,"error":{"code":"CONFIG","message":"configuration error: sidecar binary `imsg` was not found; set `HYPER_MESSENGER_IMSG_BIN` to its path","retryable":false},"meta":{"provider":"imessage","generated_at":"2026-10-13T20:30:41.420Z"}}
+# failure: unset binary and no imsg on PATH -> CONFIG, non-zero exit
+{"ok":false,"error":{"code":"CONFIG","message":"configuration error: sidecar binary `imsg` was not found; set `HYPER_MESSENGER_IMSG_BIN` to its path","retryable":false},"meta":{"provider":"imessage","generated_at":"2026-10-13T20:30:41.434Z"}}
+QA PASSED
+cleanup: temp config /var/folders/6z/00znjmd54_v5r_ccgckhkz6r0000gn/T/tmp.oYwl5tvYS1 removed; no background processes started

@@ -1,0 +1,14 @@
+$ curl -i http://127.0.0.1:8799/v1/providers/discord/chats
+HTTP/1.1 200 OK
+content-type: application/json
+content-length: 178
+date: Tue, 13 Oct 2026 20:33:24 GMT
+
+{"ok":true,"data":[{"id":"200000000000000001","kind":"channel","name":"Test Guild","provider":"discord"}],"meta":{"provider":"discord","generated_at":"2026-10-13T20:33:24.467Z"}}
+$ curl -i http://127.0.0.1:8799/health
+HTTP/1.1 200 OK
+content-type: application/json
+content-length: 85
+date: Tue, 13 Oct 2026 20:33:24 GMT
+
+{"ok":true,"data":{"status":"ok"},"meta":{"generated_at":"2026-10-13T20:33:24.480Z"}}

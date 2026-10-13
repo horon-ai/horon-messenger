@@ -1,0 +1,10 @@
+$ final cleanup receipt 2026-10-13T20:34:35Z
+port 8771 listeners=0
+port 8799 listeners=0
+port 8811 listeners=0
+port 8812 listeners=0
+port 8813 listeners=0
+port 8814 listeners=0
+port 8831 listeners=0
+-- stray procs --
+(none)

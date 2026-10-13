@@ -1,0 +1,104 @@
+# Task 6 — Slack Bot provider (plan checkbox 6)
+
+Worktree: /Users/alpox/Desktop/dev/alpox/hyper-messenger-wt/w1-slackbot
+Branch:   ulw/w1-slackbot
+Scope:    crates/providers/slackbot/** (+ Cargo.lock, workspace chrono dep)
+Status:   PASS (build, clippy, test, fmt, manual QA)
+
+## Deliverable
+
+Filled the skeleton `crates/providers/slackbot` crate. `SlackBotClient` (client.rs) drives
+`https://slack.com/api` through `hyper-messenger-provider-common`'s `HttpClient`/`Request`.
+Bot token `xoxb-...` from env `HYPER_MESSENGER_SLACKBOT_TOKEN` or `FileCredentialStore`
+account `default`; prefix validated (else `Error::InvalidInput`). Base URL from env
+`HYPER_MESSENGER_SLACKBOT_API_BASE`, default `https://slack.com/api`.
+
+Operations mapped (no SEARCH_MESSAGES advertised):
+  whoami         -> auth.test
+  list_chats     -> conversations.list
+  get_chat       -> conversations.info
+  list_messages  -> conversations.history
+  send_message   -> chat.postMessage (non-idempotent)
+  list_members   -> conversations.members + users.info
+  snapshot       -> auth.test + conversations.list
+`AuthProvider` implemented (BotToken method, status/login/logout).
+
+Slack returns HTTP 200 with `{ok:false,error}`; `check_response` maps `ok:false`/absent `ok`
+to a typed Error: `invalid_auth`/`not_authed`/`account_inactive` -> AuthFailed, else Protocol.
+No Socket Mode. No `anyhow` in the library. One-line public doc comments only.
+
+## Changed files
+
+  M Cargo.lock                                            (slackbot now depends on chrono)
+  M crates/providers/slackbot/Cargo.toml                  (+ chrono.workspace = true)
+  M crates/providers/slackbot/src/lib.rs                  (provider + AuthProvider + unit tests)
+  ? crates/providers/slackbot/src/client.rs               (new: HTTP client + error mapping + tests)
+  ? crates/providers/slackbot/src/models.rs               (new: response structs)
+  ? crates/providers/slackbot/tests/qa/run.sh             (new: QA harness)
+  ? crates/providers/slackbot/tests/qa/mock_slack.py      (new: mock Slack on port 8813)
+
+## Automated verification (worktree)
+
+$ cargo build -p hyper-messenger-provider-slackbot --all-features
+BUILD_EXIT=0   Finished `dev` profile [unoptimized + debuginfo]
+
+$ cargo clippy -p hyper-messenger-provider-slackbot --all-targets -- -D warnings
+CLIPPY_EXIT=0  Finished `dev` profile
+
+$ cargo test -p hyper-messenger-provider-slackbot
+TEST_EXIT=0
+running 7 tests
+test tests::non_bot_tokens_are_invalid_input ... ok
+test client::tests::ok_true_passes_the_body_through ... ok
+test tests::bot_token_prefix_is_accepted ... ok
+test client::tests::missing_ok_is_protocol ... ok
+test client::tests::ok_false_maps_other_codes_to_protocol ... ok
+test client::tests::ok_false_maps_auth_codes_to_auth_failed ... ok
+test client::tests::base_url_honours_the_env_override ... ok
+test result: ok. 7 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out
+
+$ cargo fmt --all && cargo fmt --all --check
+FMT_EXIT=0   FMTCHECK_EXIT=0
+
+## Manual QA (worktree, python mock Slack on port 8813)
+
+$ cargo build -p hyper-messenger-cli --features hyper-messenger-sdk/all
+$ bash crates/providers/slackbot/tests/qa/run.sh
+QA_SCRIPT_EXIT=0
+== whoami slackbot ==
+{"ok":true,"data":{"account_id":"UBOT","display_name":"TestWorkspace","extra":{"bot_id":"B1","team_id":"T1"},"provider":"slackbot","username":"botuser"},"meta":{"provider":"slackbot","generated_at":"..."}}
+== chats slackbot ==
+{"ok":true,"data":[{"id":"C1","kind":"channel","member_count":3,"name":"general","provider":"slackbot"}],"meta":{...}}
+== send slackbot C1 hi ==
+{"ok":true,"data":{"accepted":true,"chat_id":"C1","delivery":"server_accepted","message_id":"1700000000.000200","provider":"slackbot","sent_at":"2023-11-14T22:13:20.000Z"},"meta":{...}}
+== malformed: ok:true with missing messages -> PROTOCOL ==
+{"ok":false,"error":{"code":"PROTOCOL","message":"protocol error for provider slackbot: missing field `messages`","retryable":false,"provider":"slackbot"},"meta":{...}}
+== auth failure: ok:false invalid_auth at HTTP 200 ==
+{"ok":false,"error":{"code":"AUTH_FAILED","message":"authentication failed for provider slackbot: slack: invalid_auth","retryable":false,"provider":"slackbot"},"meta":{...}}
+QA PASSED
+cleanup: mock pid 62394 stopped, config dir removed
+
+## Adversarial classes
+
+- malformed input (missing fields -> Protocol): covered by unit test
+  `client::tests::missing_ok_is_protocol` and the QA malformed probe (conversations.history
+  returns `{"ok":true}` with no `messages` -> PROTOCOL, exit non-zero).
+- misleading success (ok:false at HTTP 200 must be an error): covered by unit tests
+  `ok_false_maps_auth_codes_to_auth_failed` / `ok_false_maps_other_codes_to_protocol` and the
+  QA auth-failure probe (HTTP 200 `{"ok":false,"error":"invalid_auth"}` -> AUTH_FAILED,
+  exit non-zero).
+- other classes n/a: no file/media upload, no interactive/socket surface, no partial-write path.
+
+## Cleanup receipts
+
+- Mock process killed at teardown; temp config dir removed (see `cleanup:` line above).
+- No worktree directories created or removed; work stayed in w1-slackbot.
+
+## Risks / notes
+
+- Requests use POST with a JSON body for every endpoint. Slack accepts JSON bodies for these
+  classic Web API methods; the mock accepts any body. Form-encoding was not needed.
+- `list_members` fails fast if any single `users.info` call fails (one bad member aborts the list).
+- Timestamps parse the integer-seconds part of Slack's `ts`; sub-second precision is kept to ms.
+- The workspace `Cargo.lock` changed because `chrono` was added to the slackbot crate.
+- No commit made (per task instruction).
