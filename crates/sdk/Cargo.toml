@@ -21,7 +21,9 @@ slackbot = ["dep:hyper-messenger-provider-slackbot"]
 slack = ["dep:hyper-messenger-provider-slack"]
 imessage = ["dep:hyper-messenger-provider-imessage"]
 whatsapp = ["dep:hyper-messenger-provider-whatsapp"]
-all = ["mock", "kakaotalk", "discord", "telegram", "channeltalk", "telegrambot", "whatsappbot", "slackbot", "slack", "imessage", "whatsapp"]
+line = ["dep:hyper-messenger-provider-line"]
+instagram = ["dep:hyper-messenger-provider-instagram"]
+all = ["mock", "kakaotalk", "discord", "telegram", "channeltalk", "telegrambot", "whatsappbot", "slackbot", "slack", "imessage", "whatsapp", "line", "instagram"]
 schemars = ["hyper-messenger-core/schemars"]
 
 [dependencies]
@@ -37,6 +39,8 @@ hyper-messenger-provider-slackbot = { workspace = true, optional = true }
 hyper-messenger-provider-slack = { workspace = true, optional = true }
 hyper-messenger-provider-imessage = { workspace = true, optional = true }
 hyper-messenger-provider-whatsapp = { workspace = true, optional = true }
+hyper-messenger-provider-line = { workspace = true, optional = true }
+hyper-messenger-provider-instagram = { workspace = true, optional = true }
 serde.workspace = true
 serde_json.workspace = true
 

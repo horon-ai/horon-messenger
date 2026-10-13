@@ -758,10 +758,38 @@ dependencies = [
 ]
 
 [[package]]
+name = "hyper-messenger-provider-instagram"
+version = "0.1.0"
+dependencies = [
+ "async-trait",
+ "hyper-messenger-core",
+ "hyper-messenger-provider-common",
+ "reqwest",
+ "serde",
+ "serde_json",
+ "thiserror",
+ "tokio",
+]
+
+[[package]]
 name = "hyper-messenger-provider-kakaotalk"
 version = "0.1.0"
 dependencies = [
  "hyper-messenger-core",
+]
+
+[[package]]
+name = "hyper-messenger-provider-line"
+version = "0.1.0"
+dependencies = [
+ "async-trait",
+ "hyper-messenger-core",
+ "hyper-messenger-provider-common",
+ "reqwest",
+ "serde",
+ "serde_json",
+ "thiserror",
+ "tokio",
 ]
 
 [[package]]
@@ -860,7 +888,9 @@ dependencies = [
  "hyper-messenger-provider-channeltalk",
  "hyper-messenger-provider-discord",
  "hyper-messenger-provider-imessage",
+ "hyper-messenger-provider-instagram",
  "hyper-messenger-provider-kakaotalk",
+ "hyper-messenger-provider-line",
  "hyper-messenger-provider-mock",
  "hyper-messenger-provider-slack",
  "hyper-messenger-provider-slackbot",

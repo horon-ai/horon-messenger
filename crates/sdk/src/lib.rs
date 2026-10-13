@@ -195,6 +195,18 @@ fn register_builtin(registry: &mut ProviderRegistry, paths: &ConfigPaths) {
             hyper_messenger_provider_whatsapp::WhatsAppProvider::new(paths.clone()),
         ));
     }
+    #[cfg(feature = "line")]
+    {
+        registry.register(Arc::new(hyper_messenger_provider_line::LineProvider::new(
+            paths.clone(),
+        )));
+    }
+    #[cfg(feature = "instagram")]
+    {
+        registry.register(Arc::new(
+            hyper_messenger_provider_instagram::InstagramProvider::new(paths.clone()),
+        ));
+    }
     let _ = paths;
 }
 
