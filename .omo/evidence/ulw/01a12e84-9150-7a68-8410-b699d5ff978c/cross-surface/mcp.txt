@@ -1,4 +1,0 @@
-initialize serverInfo: hyper-messenger
-tools/call id=4 -> ['#general', 'Team Standup', 'Alice']
-tools/call id=3 -> ['Test Workspace']
-tools/call id=2 -> ['Test Guild']

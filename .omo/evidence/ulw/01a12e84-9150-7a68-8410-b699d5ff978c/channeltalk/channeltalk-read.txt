@@ -1,9 +1,0 @@
-$ hyper-messenger whoami channeltalk
-{"ok":true,"data":{"account_id":"acc1","display_name":"Operator","provider":"channeltalk","username":"op@example.com"},"meta":{"provider":"channeltalk","generated_at":"2026-10-12T07:37:09.920Z"}}
-exit=0
-$ hyper-messenger chats channeltalk
-{"ok":true,"data":[{"id":"ws1","kind":"channel","name":"Test Workspace","provider":"channeltalk"}],"meta":{"provider":"channeltalk","generated_at":"2026-10-12T07:37:09.928Z"}}
-exit=0
-$ hyper-messenger messages channeltalk ws1/group/g1
-{"ok":true,"data":{"chat_id":"ws1/group/g1","has_more":false,"messages":[{"chat_id":"ws1/group/g1","id":"msg1","provider":"channeltalk","sender_name":"manager","sent_at":"2023-11-14T22:13:20.000Z","text":"seeded hello from mock channel talk"}],"newest_first":true,"provider":"channeltalk"},"meta":{"provider":"channeltalk","generated_at":"2026-10-12T07:37:09.935Z"}}
-exit=0
