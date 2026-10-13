@@ -41,11 +41,13 @@ echo "== chats slackbot =="
 out="$("$BIN" chats slackbot)"
 echo "$out"
 echo "$out" | grep -q '"ok":true' || { echo "ASSERT FAILED: chats ok:true"; fail=1; }
+echo "$out" | grep -q '"name":"general"' || { echo "ASSERT FAILED: chats seeded channel name general"; fail=1; }
 
 echo "== send slackbot C1 hi =="
 out="$("$BIN" send slackbot C1 hi)"
 echo "$out"
 echo "$out" | grep -q '"ok":true' || { echo "ASSERT FAILED: send ok:true"; fail=1; }
+echo "$out" | grep -q '"message_id":"1700000000.000200"' || { echo "ASSERT FAILED: send seeded message_id"; fail=1; }
 
 echo "== malformed: ok:true with missing messages -> PROTOCOL =="
 curl -sf -X POST "$BASE/__mode/malformed" >/dev/null

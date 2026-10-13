@@ -1,4 +1,6 @@
 //! Slack Bot provider: a bot-token (`xoxb-`) client over the Slack Web API.
+//!
+//! A thin `reqwest` client is used instead of `slack-morphism` to keep the workspace dependency-light while hitting the same Slack Web API endpoints.
 
 mod client;
 mod models;
