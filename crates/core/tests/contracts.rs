@@ -17,6 +17,27 @@ fn provider_kind_round_trips_through_strings() {
         "Channel-Talk".parse::<ProviderKind>().unwrap(),
         ProviderKind::ChannelTalk
     );
+    assert_eq!(ProviderKind::ALL.len(), 13);
+
+    let aliases = [
+        ("slack", ProviderKind::Slack),
+        ("slackbot", ProviderKind::SlackBot),
+        ("slack-bot", ProviderKind::SlackBot),
+        ("telegrambot", ProviderKind::TelegramBot),
+        ("telegram-bot", ProviderKind::TelegramBot),
+        ("whatsapp", ProviderKind::WhatsApp),
+        ("whatsappbot", ProviderKind::WhatsAppBot),
+        ("whatsapp-bot", ProviderKind::WhatsAppBot),
+        ("line", ProviderKind::Line),
+        ("imessage", ProviderKind::IMessage),
+        ("i-message", ProviderKind::IMessage),
+        ("instagram", ProviderKind::Instagram),
+        ("ig", ProviderKind::Instagram),
+    ];
+    for (text, expected) in aliases {
+        assert_eq!(text.parse::<ProviderKind>().unwrap(), expected, "{text}");
+    }
+
     assert!("myspace".parse::<ProviderKind>().is_err());
 }
 
