@@ -24,6 +24,20 @@ fn run(args: &[&str]) -> (bool, Value) {
     (output.status.success(), value)
 }
 
+fn run_status(args: &[&str]) -> i32 {
+    Command::new(env!("CARGO_BIN_EXE_hyper-messenger"))
+        .args(args)
+        .env(
+            "HYPER_MESSENGER_CONFIG_DIR",
+            "/tmp/hyper-messenger-cli-test",
+        )
+        .output()
+        .expect("run the cli")
+        .status
+        .code()
+        .expect("the cli exited via a signal")
+}
+
 #[test]
 fn providers_lists_the_mock_provider() {
     let (ok, envelope) = run(&["providers"]);
@@ -72,4 +86,20 @@ fn platform_provider_without_credentials_requires_auth() {
     assert!(!ok);
     assert_eq!(envelope["error"]["provider"], "discord");
     assert_eq!(envelope["error"]["code"], "AUTH_REQUIRED");
+}
+
+#[test]
+fn login_with_params_authenticates_the_mock_provider() {
+    let (ok, envelope) = run(&["auth", "login", "mock", "--param", "token=abc"]);
+    assert!(ok);
+    assert_eq!(envelope["ok"], true);
+    assert_eq!(envelope["data"]["authenticated"], true);
+    let (ok, status) = run(&["auth", "status", "mock"]);
+    assert!(ok);
+    assert_eq!(status["data"]["authenticated"], true);
+}
+
+#[test]
+fn login_with_a_param_without_an_equals_is_a_usage_error() {
+    assert_eq!(run_status(&["auth", "login", "mock", "--param", "foo"]), 2);
 }

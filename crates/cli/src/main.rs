@@ -6,6 +6,7 @@ use hyper_messenger_sdk::{
     ChatQuery, Client, DynProvider, Envelope, Error, LoginOptions, MessageQuery, Meta,
     ProviderKind, SendRequest,
 };
+use serde_json::{Map, Value};
 
 #[derive(Debug, Parser)]
 #[command(
@@ -93,6 +94,9 @@ enum AuthCommand {
         provider: String,
         #[arg(long)]
         account: Option<String>,
+        /// Provider-specific credential field, as `key=value`; repeatable.
+        #[arg(long = "param", value_name = "KEY=VALUE", value_parser = parse_param)]
+        params: Vec<(String, String)>,
     },
     /// Sign out.
     Logout {
@@ -140,6 +144,25 @@ fn build_client(cli: &Cli) -> Result<Client, Error> {
 
 fn resolve(provider: &str) -> Result<ProviderKind, Error> {
     provider.parse::<ProviderKind>()
+}
+
+fn parse_param(input: &str) -> Result<(String, String), String> {
+    match input.split_once('=') {
+        Some((key, value)) if !key.is_empty() => Ok((key.to_owned(), value.to_owned())),
+        _ => Err(format!("expected `key=value`, got `{input}`")),
+    }
+}
+
+fn params_value(params: Vec<(String, String)>) -> Value {
+    if params.is_empty() {
+        return Value::Null;
+    }
+    Value::Object(
+        params
+            .into_iter()
+            .map(|(key, value)| (key, Value::String(value)))
+            .collect::<Map<String, Value>>(),
+    )
 }
 
 async fn dispatch(client: &Client, command: Command) -> Envelope {
@@ -238,7 +261,11 @@ async fn dispatch_auth(client: &Client, args: AuthArgs) -> Envelope {
                 Err(error) => Envelope::failure(&error, Meta::now(Some(kind))),
             }
         }
-        AuthCommand::Login { provider, account } => {
+        AuthCommand::Login {
+            provider,
+            account,
+            params,
+        } => {
             let kind = match resolve(&provider) {
                 Ok(kind) => kind,
                 Err(error) => return Envelope::failure(&error, Meta::now(None)),
@@ -248,6 +275,7 @@ async fn dispatch_auth(client: &Client, args: AuthArgs) -> Envelope {
                     let auth = instance.auth().expect("auth_for checked auth");
                     let options = LoginOptions {
                         account_id: account,
+                        params: params_value(params),
                         ..LoginOptions::default()
                     };
                     Envelope::from_result(auth.login(&options).await, Meta::now(Some(kind)))
