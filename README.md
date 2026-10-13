@@ -1,8 +1,9 @@
 # hyper-messenger
 
-One bridge for every messenger, written in Rust. KakaoTalk, Discord, Telegram,
-Channel Talk and anything else, behind a single provider contract and four
-surfaces: a CLI, an SDK, an MCP server and an HTTP API server, plus a terminal UI.
+One bridge for every messenger, written in Rust. KakaoTalk, Discord, Slack,
+Telegram, WhatsApp, LINE, Instagram, iMessage, Channel Talk and anything else,
+behind a single provider contract and four surfaces: a CLI, an SDK, an MCP server
+and an HTTP API server, plus a terminal UI.
 
 Agent Messenger ([agent-messenger](https://github.com/agent-messenger/agent-messenger))
 proved the shape: your agent messages **as you**, not as a bot, with credentials
@@ -12,21 +13,30 @@ platform is an independent adapter and each surface is a thin consumer of one SD
 
 ## Status
 
-This is the project scaffold. The contract, the four surfaces and the provider
-layout are in place and build; the platform adapters are being filled in.
+The contract, the four surfaces and the provider layout are in place and build.
+Thirteen providers are wired in; KakaoTalk is the one remaining skeleton.
 
 | Provider | Crate | State |
 |----------|-------|-------|
 | Mock | `crates/providers/mock` | Complete: in-memory, answers every operation |
 | KakaoTalk | `crates/providers/kakaotalk` | Skeleton: capabilities declared, operations `NotImplemented` |
-| Discord | `crates/providers/discord` | Skeleton |
-| Telegram | `crates/providers/telegram` | Skeleton |
-| Channel Talk | `crates/providers/channeltalk` | Skeleton |
+| Discord | `crates/providers/discord` | Implemented: HTTP REST |
+| Channel Talk | `crates/providers/channeltalk` | Implemented: HTTP REST |
+| Telegram Bot | `crates/providers/telegrambot` | Implemented: HTTP |
+| WhatsApp Bot | `crates/providers/whatsappbot` | Implemented: HTTP (`whoami` and `send_message`) |
+| Slack Bot | `crates/providers/slackbot` | Implemented: HTTP |
+| Slack | `crates/providers/slack` | Implemented: HTTP |
+| iMessage | `crates/providers/imessage` | Implemented: macOS, `imsg` sidecar |
+| Telegram | `crates/providers/telegram` | Implemented: TDLib loaded at run time |
+| WhatsApp | `crates/providers/whatsapp` | Implemented: Node sidecar (Baileys) |
+| LINE | `crates/providers/line` | Implemented: Node sidecar (linejs) |
+| Instagram | `crates/providers/instagram` | Implemented: HTTP session cookie |
 
-The KakaoTalk adapter is the first to be completed: its implementation moves here
-from `~/Desktop/dev/alpox/kakaotalk-bridge`. A skeleton returns
-`NotImplemented` for every operation it advertises, so a caller can tell "not
-built yet" from "never supported" (`Unsupported`).
+KakaoTalk declares its capabilities and returns `NotImplemented` until its
+implementation moves here from `~/Desktop/dev/alpox/kakaotalk-bridge`. A skeleton
+returns `NotImplemented` for every operation it advertises, so a caller can tell
+"not built yet" from "never supported" (`Unsupported`). The per-provider auth,
+transport and prerequisites are in [docs/providers.md](docs/providers.md).
 
 ## Workspace
 
@@ -39,11 +49,20 @@ crates/
 ├── server/                   hyper-messenger-server   HTTP API server
 ├── ui/                       hyper-messenger-tui      Terminal UI
 └── providers/
+    ├── common/               sidecar JSON-RPC client and shared helpers
     ├── mock/                 in-memory provider for development and tests
-    ├── kakaotalk/
-    ├── discord/
-    ├── telegram/
-    └── channeltalk/
+    ├── kakaotalk/            skeleton
+    ├── discord/              HTTP REST
+    ├── channeltalk/          HTTP REST
+    ├── telegrambot/          HTTP (Bot API)
+    ├── whatsappbot/          HTTP (Cloud API)
+    ├── slackbot/             HTTP (Web API)
+    ├── slack/                HTTP (Web API)
+    ├── imessage/             macOS, imsg sidecar
+    ├── telegram/             TDLib loaded at run time
+    ├── whatsapp/             Node sidecar (Baileys)
+    ├── line/                 Node sidecar (linejs)
+    └── instagram/            HTTP session cookie
 ```
 
 Every surface depends only on `sdk`; `sdk` depends only on `core` and the
@@ -116,7 +135,23 @@ relocate everything (sandboxes, CI, non-default homes). Files are owner-only
 
 ## Adding a provider
 
-See [docs/providers.md](docs/providers.md) and
+Every provider above followed the same steps, so adding the next platform is the
+same drill:
+
+1. Add the crate under `crates/providers/<name>/` and list it in the root
+   `Cargo.toml` `members`.
+2. Add a `hyper-messenger-provider-<name>` entry to `[workspace.dependencies]`.
+3. Add an optional dependency and a feature in `crates/sdk/Cargo.toml`, and
+   include it in `all`.
+4. Register it in `crates/sdk/src/lib.rs::register_builtin` behind
+   `#[cfg(feature = "<name>")]`.
+5. Add a `ProviderKind` variant if the platform is new.
+
+A provider that needs a helper process (iMessage, WhatsApp, LINE) also ships a
+sidecar under `crates/providers/<name>/sidecar/` and speaks line-delimited
+JSON-RPC 2.0 through `hyper-messenger-provider-common`.
+
+Full detail is in [docs/providers.md](docs/providers.md) and
 [docs/architecture.md](docs/architecture.md).
 
 ## License

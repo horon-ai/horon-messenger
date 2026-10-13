@@ -46,12 +46,32 @@ compiles it even when `sdk` does not re-export it.
 
 ## Platform notes
 
-| Provider | Auth | Transport |
-|----------|------|-----------|
-| KakaoTalk | desktop session + derived DB key; tablet LOCO session for send | local SQLCipher DB read, LOCO over TLS for send, macOS Accessibility for UI-only actions |
-| Discord | user token extracted from the desktop app or browser, or QR sign-in; bot token for server use | REST + gateway websocket for `listen` |
-| Telegram | phone-code sign-in via TDLib; bot token for server use | TDLib (or Bot API) |
-| Channel Talk | operator cookies, or API credentials | REST + websocket |
+Every provider below is a workspace member, so `cargo build --workspace` compiles
+it; `cargo build --workspace --all-features` wires all of them into `sdk`.
+
+| Provider | Auth | Transport | Prerequisites |
+|----------|------|-----------|---------------|
+| Mock (`mock`) | none | in-memory | none |
+| KakaoTalk (`kakaotalk`, skeleton) | desktop session and a derived DB key; tablet LOCO session for send (planned) | local SQLCipher DB read, LOCO over TLS for send, macOS Accessibility for UI-only actions (planned) | macOS; operations are not implemented yet |
+| Discord (`discord`) | user token from `HYPER_MESSENGER_DISCORD_TOKEN` or `auth login --param token=...` | HTTP REST, base override `HYPER_MESSENGER_DISCORD_API_BASE` | none |
+| Channel Talk (`channeltalk`) | operator cookies (`account_cookie`, optional `session_cookie`) via `auth login --param` or `HYPER_MESSENGER_CHANNELTALK_ACCOUNT_COOKIE` / `_SESSION_COOKIE` | HTTP REST, base override `HYPER_MESSENGER_CHANNELTALK_API_BASE` | none |
+| Telegram Bot (`telegrambot`) | bot token from `HYPER_MESSENGER_TELEGRAMBOT_TOKEN` or `auth login --param token=...` | HTTP, base override `HYPER_MESSENGER_TELEGRAMBOT_API_BASE` | none |
+| WhatsApp Bot (`whatsappbot`) | phone number id and access token from `HYPER_MESSENGER_WHATSAPPBOT_PHONE_NUMBER_ID` / `_ACCESS_TOKEN` or `auth login --param` | HTTP, base override `HYPER_MESSENGER_WHATSAPPBOT_API_BASE` | none |
+| Slack Bot (`slackbot`) | bot token from `HYPER_MESSENGER_SLACKBOT_TOKEN` or `auth login --param token=...` | HTTP, base override `HYPER_MESSENGER_SLACKBOT_API_BASE` | none |
+| Slack (`slack`) | user token and cookie from `HYPER_MESSENGER_SLACK_TOKEN` / `_COOKIE` or `auth login --param token=... --param cookie=...` | HTTP, base override `HYPER_MESSENGER_SLACK_API_BASE` | none |
+| iMessage (`imessage`) | none; reads the local Messages app | sidecar over JSON-RPC (spawns `imsg`) | macOS, the `imsg` binary (`HYPER_MESSENGER_IMSG_BIN`) and Full Disk Access |
+| Telegram (`telegram`) | phone-code sign-in via TDLib (`api_id`, `api_hash`, phone) | TDLib native `libtdjson`, loaded at run time | `libtdjson` on the library path or `TDLIB_PATH` |
+| WhatsApp (`whatsapp`) | device pairing (QR or pairing code) through the sidecar | Node sidecar over JSON-RPC (`@whiskeysockets/baileys`) | Node 20+, `npm ci` in `crates/providers/whatsapp/sidecar/`, env `HYPER_MESSENGER_WHATSAPP_SIDECAR` and `HYPER_MESSENGER_NODE_BIN` |
+| LINE (`line`) | token or email and password sign-in through the sidecar | Node sidecar over JSON-RPC (linejs) | Node 20+, `npm install` in `crates/providers/line/sidecar/`, env `HYPER_MESSENGER_LINE_SIDECAR` |
+| Instagram (`instagram`) | session cookie (`sessionid`, `ds_user_id`) via `auth login --param` or `HYPER_MESSENGER_INSTAGRAM_SESSIONID` / `_DS_USER_ID` | HTTP with a session `Cookie` header, base override `HYPER_MESSENGER_INSTAGRAM_API_BASE` | none |
+
+Every HTTP provider takes `HYPER_MESSENGER_<NAME>_API_BASE` to point at a
+different API base (tests, proxies). WhatsApp Bot advertises only `whoami` and
+`send_message`.
+
+Realtime listeners and desktop-app credential extraction are out of scope for
+this expansion, so no provider above claims either. A provider reads credentials
+you supply or runs its own sign-in flow.
 
 ## KakaoTalk port
 

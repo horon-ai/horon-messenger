@@ -5,9 +5,12 @@
 ```
 surfaces   cli ─┐
            mcp ─┤
-         server ─┼──► sdk ──► core ◄── providers (mock, kakaotalk, discord, telegram, channeltalk)
+         server ─┼──► sdk ──► core ◄── providers (one crate per platform)
             ui ─┘
 ```
+
+The providers are mock, kakaotalk, discord, channeltalk, telegrambot,
+whatsappbot, slackbot, slack, imessage, telegram, whatsapp, line and instagram.
 
 - **core** defines the contracts and owns no platform logic: the `Provider` trait,
   the domain model, `Capabilities`, config and credential paths, and the `Envelope`
