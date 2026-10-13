@@ -7,6 +7,7 @@ members = [
   "crates/mcp",
   "crates/server",
   "crates/ui",
+  "crates/providers/common",
   "crates/providers/mock",
   "crates/providers/kakaotalk",
   "crates/providers/discord",
@@ -26,6 +27,7 @@ description = "Multi-messenger bridge for AI agents: one CLI, SDK, MCP server an
 [workspace.dependencies]
 hyper-messenger-core = { path = "crates/core", version = "0.1.0" }
 hyper-messenger-sdk = { path = "crates/sdk", version = "0.1.0" }
+hyper-messenger-provider-common = { path = "crates/providers/common", version = "0.1.0" }
 hyper-messenger-provider-mock = { path = "crates/providers/mock", version = "0.1.0" }
 hyper-messenger-provider-kakaotalk = { path = "crates/providers/kakaotalk", version = "0.1.0" }
 hyper-messenger-provider-discord = { path = "crates/providers/discord", version = "0.1.0" }

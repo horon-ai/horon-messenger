@@ -1,0 +1,17 @@
+# Discord provider QA
+
+Re-runnable smoke test for `hyper-messenger-provider-discord`. It boots a mock
+Discord REST API (`mock_discord.py`, `127.0.0.1:8771`), drives the real
+`hyper-messenger` CLI over it with `HYPER_MESSENGER_DISCORD_API_BASE` and
+`HYPER_MESSENGER_DISCORD_TOKEN`, asserts each `{ok,data,meta}` envelope with
+`python3 -c`, then kills the mock and prints a `cleanup:` line.
+
+```bash
+bash crates/providers/discord/tests/qa/run.sh
+```
+
+Covered: `whoami`, `chats`, `messages`, `send`, and an adversarial send whose
+response is truncated mid-body. The truncated send must surface
+`error.code == NETWORK` with an "unknown" outcome message and must be sent
+exactly once (the mock asserts the POST count is 1), proving the non-idempotent
+send is never auto-retried.

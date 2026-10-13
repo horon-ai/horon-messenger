@@ -1,0 +1,16 @@
+[package]
+name = "hyper-messenger-provider-common"
+description = "Shared HTTP client, retry, rate-limit and status mapping for hyper-messenger providers."
+version.workspace = true
+edition.workspace = true
+rust-version.workspace = true
+license.workspace = true
+repository.workspace = true
+authors.workspace = true
+
+[dependencies]
+hyper-messenger-core.workspace = true
+reqwest.workspace = true
+serde.workspace = true
+serde_json.workspace = true
+tokio.workspace = true

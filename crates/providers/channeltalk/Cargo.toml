@@ -10,6 +10,7 @@ authors.workspace = true
 
 [dependencies]
 hyper-messenger-core.workspace = true
+hyper-messenger-provider-common.workspace = true
 async-trait.workspace = true
 chrono.workspace = true
 reqwest.workspace = true

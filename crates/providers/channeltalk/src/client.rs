@@ -1,19 +1,19 @@
-use std::time::{Duration, SystemTime, UNIX_EPOCH};
+use std::time::{SystemTime, UNIX_EPOCH};
 
-use reqwest::{Method, StatusCode};
+use reqwest::Method;
+use reqwest::header::{HeaderMap, HeaderValue};
 use serde::de::DeserializeOwned;
 use serde_json::Value;
-use tokio::sync::Mutex;
 
 use hyper_messenger_core::{Error, ProviderKind, Result};
+use hyper_messenger_provider_common::{HttpClient, Request, urlencode};
 
 use crate::models::{Channel, ChannelAccount, ChannelManager, ChannelMessage, SearchHit};
 
 pub const DEFAULT_BASE_URL: &str = "https://desk-api.channel.io";
 pub const BASE_URL_ENV: &str = "HYPER_MESSENGER_CHANNELTALK_API_BASE";
 
-const MAX_RETRIES: u32 = 3;
-const BASE_BACKOFF_MS: u64 = 100;
+const BUCKET_KEY: &str = "channeltalk:global";
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum ChatType {
@@ -73,36 +73,22 @@ impl ChatRef {
     }
 }
 
-fn now_ms() -> u64 {
-    SystemTime::now()
-        .duration_since(UNIX_EPOCH)
-        .map(|d| d.as_millis() as u64)
-        .unwrap_or(0)
-}
-
 /// The Channel Talk desk-api client: cookie auth and rate-limit aware retries.
 pub struct ChannelTalkClient {
-    http: reqwest::Client,
+    http: HttpClient,
     base_url: String,
     account_cookie: String,
     session_cookie: Option<String>,
-    rate_limit: Mutex<(Option<i64>, u64)>,
 }
 
 impl ChannelTalkClient {
     pub fn new(account_cookie: impl Into<String>, session_cookie: Option<String>) -> Result<Self> {
-        let http = reqwest::Client::builder()
-            .build()
-            .map_err(|error| Error::Internal {
-                message: format!("failed to build the Channel Talk HTTP client: {error}"),
-            })?;
         let base_url = std::env::var(BASE_URL_ENV).unwrap_or_else(|_| DEFAULT_BASE_URL.to_owned());
         Ok(Self {
-            http,
+            http: HttpClient::new()?,
             base_url: base_url.trim_end_matches('/').to_owned(),
             account_cookie: account_cookie.into(),
             session_cookie,
-            rate_limit: Mutex::new((None, 0)),
         })
     }
 
@@ -116,69 +102,15 @@ impl ChannelTalkClient {
         }
     }
 
-    async fn wait_for_rate_limit(&self) {
-        let (remaining, reset_at_ms) = { *self.rate_limit.lock().await };
-        if remaining == Some(0) && reset_at_ms > now_ms() {
-            tokio::time::sleep(Duration::from_millis(reset_at_ms - now_ms())).await;
+    fn headers(&self) -> HeaderMap {
+        let mut headers = HeaderMap::new();
+        if let Ok(value) = HeaderValue::from_str(&self.cookie_header()) {
+            headers.insert("cookie", value);
         }
-    }
-
-    async fn update_rate_limit(&self, headers: &reqwest::header::HeaderMap) {
-        let remaining = headers
-            .get("x-ratelimit-remaining")
-            .and_then(|value| value.to_str().ok())
-            .and_then(|value| value.parse::<i64>().ok());
-        let reset = headers
-            .get("x-ratelimit-reset")
-            .and_then(|value| value.to_str().ok())
-            .and_then(|value| value.parse::<f64>().ok());
-        let mut guard = self.rate_limit.lock().await;
-        if let Some(remaining) = remaining {
-            guard.0 = Some(remaining);
+        if let Ok(value) = HeaderValue::from_str("application/json") {
+            headers.insert("content-type", value);
         }
-        if let Some(reset) = reset {
-            let reset_at_ms = if reset > 1_000_000_000_000.0 {
-                reset as u64
-            } else {
-                (reset * 1000.0) as u64
-            };
-            guard.1 = reset_at_ms;
-        }
-    }
-
-    fn map_status(status: StatusCode, message: String) -> Error {
-        match status {
-            StatusCode::UNAUTHORIZED | StatusCode::FORBIDDEN => Error::AuthFailed {
-                provider: ProviderKind::ChannelTalk,
-                message,
-            },
-            StatusCode::NOT_FOUND => Error::NotFound {
-                provider: ProviderKind::ChannelTalk,
-                resource: message,
-            },
-            StatusCode::TOO_MANY_REQUESTS => Error::RateLimited {
-                provider: ProviderKind::ChannelTalk,
-                retry_after_ms: None,
-            },
-            status if status.is_server_error() => Error::Network {
-                provider: ProviderKind::ChannelTalk,
-                message,
-            },
-            _ => Error::Protocol {
-                provider: ProviderKind::ChannelTalk,
-                message,
-            },
-        }
-    }
-
-    fn error_message(body: &Value, status: StatusCode) -> String {
-        body.get("errors")
-            .and_then(Value::as_array)
-            .and_then(|errors| errors.first())
-            .and_then(|first| first.get("message"))
-            .and_then(Value::as_str)
-            .map(str::to_owned)
-            .unwrap_or_else(|| format!("HTTP {status}"))
+        headers
     }
 
     async fn request<T: DeserializeOwned>(
@@ -187,71 +119,35 @@ impl ChannelTalkClient {
         path: &str,
         body: Option<Value>,
         unwrap_key: Option<&str>,
+        idempotent: bool,
     ) -> Result<T> {
         let url = format!("{}{}", self.base_url, path);
-        let mut attempt = 0u32;
-        loop {
-            self.wait_for_rate_limit().await;
-            let mut request = self
-                .http
-                .request(method.clone(), &url)
-                .header("Cookie", self.cookie_header())
-                .header("Content-Type", "application/json");
-            if let Some(body) = &body {
-                request = request.json(body);
-            }
-            let response = request.send().await.map_err(|error| Error::Network {
-                provider: ProviderKind::ChannelTalk,
-                message: error.to_string(),
-            })?;
-            let status = response.status();
-            self.update_rate_limit(response.headers()).await;
-
-            if status == StatusCode::TOO_MANY_REQUESTS && attempt < MAX_RETRIES {
-                let retry_after = response
-                    .headers()
-                    .get("retry-after")
-                    .and_then(|value| value.to_str().ok())
-                    .and_then(|value| value.parse::<f64>().ok())
-                    .unwrap_or(1.0);
-                tokio::time::sleep(Duration::from_millis((retry_after * 1000.0) as u64)).await;
-                attempt += 1;
-                continue;
-            }
-
-            if status.is_server_error() && method == Method::GET && attempt < MAX_RETRIES {
-                tokio::time::sleep(Duration::from_millis(BASE_BACKOFF_MS * 2u64.pow(attempt)))
-                    .await;
-                attempt += 1;
-                continue;
-            }
-
-            let mut value: Value = response.json().await.unwrap_or(Value::Null);
-            if !status.is_success() {
-                return Err(Self::map_status(
-                    status,
-                    Self::error_message(&value, status),
-                ));
-            }
-            if let Some(key) = unwrap_key
-                && let Some(inner) = value.get(key)
-            {
-                value = inner.clone();
-            }
-            return serde_json::from_value(value).map_err(|error| Error::Protocol {
-                provider: ProviderKind::ChannelTalk,
-                message: error.to_string(),
-            });
+        let mut request = Request::new(method, url, ProviderKind::ChannelTalk)
+            .headers(self.headers())
+            .bucket(BUCKET_KEY)
+            .idempotent(idempotent);
+        if let Some(body) = body {
+            request = request.body(body);
         }
+        let mut value = self.http.request_value(request).await?;
+        if let Some(key) = unwrap_key
+            && let Some(inner) = value.get(key)
+        {
+            value = inner.clone();
+        }
+        serde_json::from_value(value).map_err(|error| Error::Protocol {
+            provider: ProviderKind::ChannelTalk,
+            message: error.to_string(),
+        })
     }
 
     pub async fn get_account(&self) -> Result<ChannelAccount> {
-        self.request(Method::GET, "/desk/account", None, Some("account"))
+        self.request(Method::GET, "/desk/account", None, Some("account"), true)
             .await
     }
 
     pub async fn list_channels(&self) -> Result<Vec<Channel>> {
-        self.request(Method::GET, "/desk/channels", None, Some("channels"))
+        self.request(Method::GET, "/desk/channels", None, Some("channels"), true)
             .await
     }
 
@@ -261,6 +157,7 @@ impl ChannelTalkClient {
             &format!("/desk/channels/{channel_id}"),
             None,
             Some("channel"),
+            true,
         )
         .await
     }
@@ -271,6 +168,7 @@ impl ChannelTalkClient {
             &format!("/desk/channels/{channel_id}/managers"),
             None,
             Some("managers"),
+            true,
         )
         .await
     }
@@ -290,6 +188,7 @@ impl ChannelTalkClient {
             ),
             None,
             Some("messages"),
+            true,
         )
         .await
     }
@@ -309,6 +208,7 @@ impl ChannelTalkClient {
             ),
             Some(body),
             Some("message"),
+            false,
         )
         .await
     }
@@ -320,6 +220,7 @@ impl ChannelTalkClient {
             &format!("/desk/channels/{channel_id}/team-chat/message/search?query={encoded}"),
             None,
             Some("hits"),
+            true,
         )
         .await
     }
@@ -331,20 +232,6 @@ fn request_id() -> String {
         .map(|d| d.as_nanos())
         .unwrap_or(0);
     format!("{:x}{:x}", nanos, std::process::id())
-}
-
-fn urlencode(value: &str) -> String {
-    let mut out = String::new();
-    for byte in value.bytes() {
-        match byte {
-            b'A'..=b'Z' | b'a'..=b'z' | b'0'..=b'9' | b'-' | b'_' | b'.' | b'~' => {
-                out.push(byte as char);
-            }
-            b' ' => out.push_str("%20"),
-            other => out.push_str(&format!("%{other:02X}")),
-        }
-    }
-    out
 }
 
 #[cfg(test)]
