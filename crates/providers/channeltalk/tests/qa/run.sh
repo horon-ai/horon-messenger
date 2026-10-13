@@ -5,7 +5,7 @@ ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/../../../../.." && pwd)"
 QA_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 PORT=8772
 CHAT="ws1/group/g1"
-BIN="$ROOT/target/debug/hyper-messenger"
+BIN="$ROOT/target/debug/horon-messenger"
 CFG="$(mktemp -d)"
 MOCK_PID=""
 
@@ -34,9 +34,9 @@ for _ in $(seq 1 60); do
   sleep 0.1
 done
 
-export HYPER_MESSENGER_CONFIG_DIR="$CFG"
-export HYPER_MESSENGER_CHANNELTALK_API_BASE="http://127.0.0.1:$PORT"
-export HYPER_MESSENGER_CHANNELTALK_ACCOUNT_COOKIE="mock-account"
+export HORON_MESSENGER_CONFIG_DIR="$CFG"
+export HORON_MESSENGER_CHANNELTALK_API_BASE="http://127.0.0.1:$PORT"
+export HORON_MESSENGER_CHANNELTALK_ACCOUNT_COOKIE="mock-account"
 
 echo "# whoami channeltalk"
 "$BIN" whoami channeltalk | python3 -c 'import sys,json; d=json.load(sys.stdin); assert d["ok"] is True, d; assert d["data"]["display_name"]=="Operator", d; print("ok:true whoami Operator")'

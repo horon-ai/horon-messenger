@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Mock Telegram Bot API for hyper-messenger QA.
+"""Mock Telegram Bot API for horon-messenger QA.
 
 Answers HTTP 200 for every request, as the real Bot API does: a token other than
 "mock" yields {ok:false, error_code:401, description:"Unauthorized"} so the client

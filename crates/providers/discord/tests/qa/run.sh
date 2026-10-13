@@ -5,7 +5,7 @@ ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/../../../../.." && pwd)"
 QA_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 PORT=8771
 CHANNEL_ID="300000000000000001"
-BIN="$ROOT/target/debug/hyper-messenger"
+BIN="$ROOT/target/debug/horon-messenger"
 CFG="$(mktemp -d)"
 MOCK_PID=""
 
@@ -34,9 +34,9 @@ for _ in $(seq 1 60); do
   sleep 0.1
 done
 
-export HYPER_MESSENGER_CONFIG_DIR="$CFG"
-export HYPER_MESSENGER_DISCORD_API_BASE="http://127.0.0.1:$PORT"
-export HYPER_MESSENGER_DISCORD_TOKEN="mock-token"
+export HORON_MESSENGER_CONFIG_DIR="$CFG"
+export HORON_MESSENGER_DISCORD_API_BASE="http://127.0.0.1:$PORT"
+export HORON_MESSENGER_DISCORD_TOKEN="mock-token"
 
 echo "# whoami discord"
 "$BIN" whoami discord | python3 -c 'import sys,json; d=json.load(sys.stdin); assert d["ok"] is True, d; assert d["data"]["username"]=="alice", d; print("ok:true whoami alice")'

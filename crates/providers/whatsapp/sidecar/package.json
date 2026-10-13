@@ -1,11 +1,11 @@
 {
-  "name": "hyper-messenger-whatsapp-sidecar",
+  "name": "horon-messenger-whatsapp-sidecar",
   "version": "0.1.0",
   "private": true,
-  "description": "Node sidecar that bridges Baileys to the hyper-messenger WhatsApp provider.",
+  "description": "Node sidecar that bridges Baileys to the horon-messenger WhatsApp provider.",
   "type": "module",
   "bin": {
-    "hyper-messenger-whatsapp-sidecar": "index.mjs"
+    "horon-messenger-whatsapp-sidecar": "index.mjs"
   },
   "engines": {
     "node": ">=20"

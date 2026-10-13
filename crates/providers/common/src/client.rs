@@ -1,7 +1,7 @@
 use std::collections::HashMap;
 use std::time::{Duration, SystemTime, UNIX_EPOCH};
 
-use hyper_messenger_core::{Error, ProviderKind, Result};
+use horon_messenger_core::{Error, ProviderKind, Result};
 use reqwest::header::HeaderMap;
 use reqwest::{Method, StatusCode};
 use serde::de::DeserializeOwned;
@@ -473,7 +473,7 @@ mod tests {
 
     #[test]
     fn map_http_status_covers_every_class() {
-        use hyper_messenger_core::ErrorCode;
+        use horon_messenger_core::ErrorCode;
         let provider = ProviderKind::Discord;
         let cases = [
             (StatusCode::UNAUTHORIZED, ErrorCode::AuthFailed),

@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Mock Channel Talk desk API for hyper-messenger QA.
+"""Mock Channel Talk desk API for horon-messenger QA.
 
 401s on a missing account cookie. Serves the routes the Channel Talk provider
 calls, plus two QA-only endpoints: GET /__stats returns per-route request counts

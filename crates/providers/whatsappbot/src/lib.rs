@@ -6,7 +6,7 @@ mod models;
 use async_trait::async_trait;
 use serde_json::Value;
 
-use hyper_messenger_core::{
+use horon_messenger_core::{
     AccountSummary, AuthMethod, AuthProvider, AuthStatus, Capabilities, ConfigPaths,
     CredentialStore, Delivery, Error, FileCredentialStore, LoginOptions, LoginOutcome, Profile,
     Provider, ProviderKind, Result, SendRequest, SendResult, now_rfc3339,
@@ -16,8 +16,8 @@ use client::WhatsAppBotClient;
 
 const PROVIDER: ProviderKind = ProviderKind::WhatsAppBot;
 const DEFAULT_ACCOUNT: &str = "default";
-const PHONE_NUMBER_ID_ENV: &str = "HYPER_MESSENGER_WHATSAPPBOT_PHONE_NUMBER_ID";
-const ACCESS_TOKEN_ENV: &str = "HYPER_MESSENGER_WHATSAPPBOT_ACCESS_TOKEN";
+const PHONE_NUMBER_ID_ENV: &str = "HORON_MESSENGER_WHATSAPPBOT_PHONE_NUMBER_ID";
+const ACCESS_TOKEN_ENV: &str = "HORON_MESSENGER_WHATSAPPBOT_ACCESS_TOKEN";
 const E2E_PHONE_NUMBER_ID_ENV: &str = "E2E_WHATSAPPBOT_PHONE_NUMBER_ID";
 const E2E_ACCESS_TOKEN_ENV: &str = "E2E_WHATSAPPBOT_ACCESS_TOKEN";
 

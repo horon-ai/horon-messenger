@@ -1,5 +1,5 @@
 [package]
-name = "hyper-messenger-provider-mock"
+name = "horon-messenger-provider-mock"
 description = "An in-memory messenger provider used for development, demos and tests."
 version.workspace = true
 edition.workspace = true
@@ -9,6 +9,6 @@ repository.workspace = true
 authors.workspace = true
 
 [dependencies]
-hyper-messenger-core.workspace = true
+horon-messenger-core.workspace = true
 async-trait.workspace = true
 serde_json.workspace = true

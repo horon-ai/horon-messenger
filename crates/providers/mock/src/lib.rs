@@ -3,7 +3,7 @@ use std::sync::{Arc, Mutex};
 use async_trait::async_trait;
 use serde_json::Value;
 
-use hyper_messenger_core::{
+use horon_messenger_core::{
     AccountSummary, AuthMethod, AuthProvider, AuthStatus, Capabilities, Chat, ChatKind, ChatQuery,
     Delivery, Error, LoginOptions, LoginOutcome, Member, Message, MessagePage, MessageQuery,
     Profile, Provider, ProviderKind, Result, SendRequest, SendResult, Snapshot, now_rfc3339,

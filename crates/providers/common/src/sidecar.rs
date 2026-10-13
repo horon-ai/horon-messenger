@@ -4,7 +4,7 @@ use std::path::{Path, PathBuf};
 use std::process::Stdio;
 use std::time::Duration;
 
-use hyper_messenger_core::{Error, ProviderKind, Result};
+use horon_messenger_core::{Error, ProviderKind, Result};
 use serde_json::Value;
 use tokio::io::{AsyncBufReadExt, AsyncWriteExt, BufReader};
 use tokio::process::{Child, ChildStdin, ChildStdout, Command};

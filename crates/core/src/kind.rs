@@ -5,7 +5,7 @@ use serde::{Deserialize, Serialize};
 
 use crate::error::Error;
 
-/// The messenger platforms hyper-messenger can talk to.
+/// The messenger platforms horon-messenger can talk to.
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, PartialOrd, Ord, Serialize, Deserialize)]
 #[serde(rename_all = "lowercase")]
 #[cfg_attr(feature = "schemars", derive(schemars::JsonSchema))]

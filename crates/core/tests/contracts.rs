@@ -1,4 +1,4 @@
-use hyper_messenger_core::{
+use horon_messenger_core::{
     Capabilities, ConfigPaths, CredentialStore, Error, ErrorCode, FileCredentialStore, Provider,
     ProviderKind,
 };
@@ -132,7 +132,7 @@ fn credential_files_are_owner_only() {
 
 #[test]
 fn envelope_renders_success_and_failure_shapes() {
-    use hyper_messenger_core::{Envelope, Meta};
+    use horon_messenger_core::{Envelope, Meta};
 
     let success = Envelope::success(json!({"value": 1}), Meta::now(Some(ProviderKind::Mock)));
     assert!(success.ok);

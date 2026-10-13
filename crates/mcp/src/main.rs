@@ -1,6 +1,6 @@
 use std::sync::Arc;
 
-use hyper_messenger_sdk::{
+use horon_messenger_sdk::{
     ChatQuery, Client, Envelope, MessageQuery, Meta, ProviderKind, SendRequest,
 };
 use rmcp::{
@@ -182,7 +182,7 @@ impl ServerHandler for MessengerServer {
     fn get_info(&self) -> ServerConfig {
         ServerConfig::new(ServerCapabilities::builder().enable_tools().build())
             .with_server_info(Implementation::new(
-                "hyper-messenger",
+                "horon-messenger",
                 env!("CARGO_PKG_VERSION"),
             ))
             .with_instructions(

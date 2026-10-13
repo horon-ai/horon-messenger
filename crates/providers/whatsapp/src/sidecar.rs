@@ -3,16 +3,16 @@
 use std::path::{Path, PathBuf};
 use std::time::Duration;
 
-use hyper_messenger_core::{Error, ProviderKind, Result};
-use hyper_messenger_provider_common::{JsonRpcProcess, SidecarSpec};
+use horon_messenger_core::{Error, ProviderKind, Result};
+use horon_messenger_provider_common::{JsonRpcProcess, SidecarSpec};
 use serde_json::Value;
 
 /// The environment variable holding the Node binary used to launch the sidecar.
-pub const NODE_BIN_ENV: &str = "HYPER_MESSENGER_NODE_BIN";
+pub const NODE_BIN_ENV: &str = "HORON_MESSENGER_NODE_BIN";
 /// The environment variable overriding the sidecar script path for installed layouts.
-pub const SIDECAR_ENV: &str = "HYPER_MESSENGER_WHATSAPP_SIDECAR";
+pub const SIDECAR_ENV: &str = "HORON_MESSENGER_WHATSAPP_SIDECAR";
 /// The environment variable overriding the per-request timeout in milliseconds.
-pub const TIMEOUT_ENV: &str = "HYPER_MESSENGER_WHATSAPP_TIMEOUT_MS";
+pub const TIMEOUT_ENV: &str = "HORON_MESSENGER_WHATSAPP_TIMEOUT_MS";
 /// The default per-request timeout for a sidecar call.
 pub const DEFAULT_TIMEOUT_MS: u64 = 30_000;
 

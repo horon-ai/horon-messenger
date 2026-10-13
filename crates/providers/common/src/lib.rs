@@ -1,4 +1,4 @@
-//! Shared HTTP plumbing for hyper-messenger providers.
+//! Shared HTTP plumbing for horon-messenger providers.
 
 mod client;
 mod sidecar;

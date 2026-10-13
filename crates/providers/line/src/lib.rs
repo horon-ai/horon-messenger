@@ -3,10 +3,10 @@
 //! Implementation path (b), chosen over (a) a hand-rolled Thrift client: LINE's
 //! user-account read/send surface is a Thrift service whose sessions are normally
 //! established with an E2EE handshake, and no maintained Rust crate speaks it. Driving
-//! the vendored linejs through `hyper-messenger-provider-common`'s sidecar keeps this
+//! the vendored linejs through `horon-messenger-provider-common`'s sidecar keeps this
 //! crate pure Rust, keeps the LINE protocol and its E2EE handshake out of the
 //! workspace, and lets the automated QA run against a stub program through
-//! `HYPER_MESSENGER_LINE_SIDECAR` the same way the operations run in production.
+//! `HORON_MESSENGER_LINE_SIDECAR` the same way the operations run in production.
 //!
 //! Scope: whoami, list_chats, get_chat, list_messages, send_message, list_members,
 //! snapshot. Out of scope: E2EE letter-sealing and the long-poll listener. Sending is
@@ -20,22 +20,22 @@ use std::time::Duration;
 use async_trait::async_trait;
 use serde_json::{Value, json};
 
-use hyper_messenger_core::{
+use horon_messenger_core::{
     AccountSummary, AuthMethod, AuthProvider, AuthStatus, Capabilities, Chat, ChatKind, ChatQuery,
     ConfigPaths, CredentialStore, Delivery, Error, FileCredentialStore, LoginOptions, LoginOutcome,
     Member, Message, MessagePage, MessageQuery, Profile, Provider, ProviderKind, Result,
     SendRequest, SendResult, Snapshot, now_rfc3339,
 };
-use hyper_messenger_provider_common::{DEFAULT_TIMEOUT, SidecarSpec};
+use horon_messenger_provider_common::{DEFAULT_TIMEOUT, SidecarSpec};
 
 use client::LineClient;
 use models::{LineChat, LineMessage};
 
 pub(crate) const PROVIDER: ProviderKind = ProviderKind::Line;
 
-const BIN_ENV: &str = "HYPER_MESSENGER_LINE_SIDECAR";
-const DEFAULT_BIN: &str = "hyper-messenger-line-sidecar";
-const ACCOUNT_ENV: &str = "HYPER_MESSENGER_LINE_ACCOUNT";
+const BIN_ENV: &str = "HORON_MESSENGER_LINE_SIDECAR";
+const DEFAULT_BIN: &str = "horon-messenger-line-sidecar";
+const ACCOUNT_ENV: &str = "HORON_MESSENGER_LINE_ACCOUNT";
 const DEFAULT_ACCOUNT: &str = "default";
 const DEFAULT_LIMIT: usize = 50;
 const CHAT_SCAN_LIMIT: usize = 1000;
@@ -160,7 +160,7 @@ impl LineProvider {
         static COUNTER: AtomicU64 = AtomicU64::new(0);
         let n = COUNTER.fetch_add(1, Ordering::Relaxed);
         let dir = std::env::temp_dir().join(format!(
-            "hyper-messenger-line-tests-{}-{n}",
+            "horon-messenger-line-tests-{}-{n}",
             std::process::id()
         ));
         let paths = ConfigPaths::at(dir);

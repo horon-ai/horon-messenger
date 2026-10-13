@@ -2,7 +2,7 @@
 //! `~/Desktop/dev/alpox/kakaotalk-bridge`; until then every advertised operation
 //! returns `NotImplemented`.
 
-use hyper_messenger_core::{
+use horon_messenger_core::{
     Capabilities, ConfigPaths, FileCredentialStore, Provider, ProviderKind,
 };
 

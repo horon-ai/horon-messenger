@@ -1,15 +1,15 @@
 //! An in-crate fake backend that replays fixture TDLib JSON through the real mapping.
 
 use async_trait::async_trait;
-use hyper_messenger_core::{Chat, Error, Member, Message, Profile, ProviderKind, Result};
+use horon_messenger_core::{Chat, Error, Member, Message, Profile, ProviderKind, Result};
 use serde_json::Value;
 
 use crate::mapping;
 use crate::transport::TelegramBackend;
 
 const PROVIDER: ProviderKind = ProviderKind::Telegram;
-const STATE_ENV: &str = "HYPER_MESSENGER_TELEGRAM_FAKE_STATE";
-const MALFORMED_ENV: &str = "HYPER_MESSENGER_TELEGRAM_FAKE_MALFORMED";
+const STATE_ENV: &str = "HORON_MESSENGER_TELEGRAM_FAKE_STATE";
+const MALFORMED_ENV: &str = "HORON_MESSENGER_TELEGRAM_FAKE_MALFORMED";
 
 /// A backend that reads fixture files and maps them exactly like the real TDLib path.
 pub struct QaFakeBackend {

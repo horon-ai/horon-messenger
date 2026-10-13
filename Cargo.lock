@@ -668,6 +668,278 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "7f24254aa9a54b5c858eaee2f5bccdb46aaf0e486a595ed5fd8f86ba55232a70"
 
 [[package]]
+name = "horon-messenger-cli"
+version = "0.1.0"
+dependencies = [
+ "clap",
+ "horon-messenger-sdk",
+ "serde_json",
+ "tokio",
+]
+
+[[package]]
+name = "horon-messenger-core"
+version = "0.1.0"
+dependencies = [
+ "async-trait",
+ "chrono",
+ "dirs",
+ "schemars 1.2.2",
+ "serde",
+ "serde_json",
+ "thiserror",
+]
+
+[[package]]
+name = "horon-messenger-mcp"
+version = "0.1.0"
+dependencies = [
+ "anyhow",
+ "horon-messenger-sdk",
+ "rmcp",
+ "schemars 1.2.2",
+ "serde",
+ "serde_json",
+ "tokio",
+ "tracing-subscriber",
+]
+
+[[package]]
+name = "horon-messenger-provider-channeltalk"
+version = "0.1.0"
+dependencies = [
+ "async-trait",
+ "chrono",
+ "horon-messenger-core",
+ "horon-messenger-provider-common",
+ "reqwest",
+ "serde",
+ "serde_json",
+ "thiserror",
+ "tokio",
+]
+
+[[package]]
+name = "horon-messenger-provider-common"
+version = "0.1.0"
+dependencies = [
+ "horon-messenger-core",
+ "reqwest",
+ "serde",
+ "serde_json",
+ "tokio",
+]
+
+[[package]]
+name = "horon-messenger-provider-discord"
+version = "0.1.0"
+dependencies = [
+ "async-trait",
+ "base64 0.22.1",
+ "horon-messenger-core",
+ "horon-messenger-provider-common",
+ "reqwest",
+ "serde",
+ "serde_json",
+ "thiserror",
+ "tokio",
+]
+
+[[package]]
+name = "horon-messenger-provider-imessage"
+version = "0.1.0"
+dependencies = [
+ "async-trait",
+ "horon-messenger-core",
+ "horon-messenger-provider-common",
+ "reqwest",
+ "serde",
+ "serde_json",
+ "thiserror",
+ "tokio",
+]
+
+[[package]]
+name = "horon-messenger-provider-instagram"
+version = "0.1.0"
+dependencies = [
+ "async-trait",
+ "chrono",
+ "horon-messenger-core",
+ "horon-messenger-provider-common",
+ "reqwest",
+ "serde",
+ "serde_json",
+ "thiserror",
+ "tokio",
+ "uuid",
+]
+
+[[package]]
+name = "horon-messenger-provider-kakaotalk"
+version = "0.1.0"
+dependencies = [
+ "horon-messenger-core",
+]
+
+[[package]]
+name = "horon-messenger-provider-line"
+version = "0.1.0"
+dependencies = [
+ "async-trait",
+ "horon-messenger-core",
+ "horon-messenger-provider-common",
+ "reqwest",
+ "serde",
+ "serde_json",
+ "thiserror",
+ "tokio",
+]
+
+[[package]]
+name = "horon-messenger-provider-mock"
+version = "0.1.0"
+dependencies = [
+ "async-trait",
+ "horon-messenger-core",
+ "serde_json",
+]
+
+[[package]]
+name = "horon-messenger-provider-slack"
+version = "0.1.0"
+dependencies = [
+ "async-trait",
+ "horon-messenger-core",
+ "horon-messenger-provider-common",
+ "reqwest",
+ "serde",
+ "serde_json",
+ "thiserror",
+ "tokio",
+]
+
+[[package]]
+name = "horon-messenger-provider-slackbot"
+version = "0.1.0"
+dependencies = [
+ "async-trait",
+ "chrono",
+ "horon-messenger-core",
+ "horon-messenger-provider-common",
+ "reqwest",
+ "serde",
+ "serde_json",
+ "thiserror",
+ "tokio",
+]
+
+[[package]]
+name = "horon-messenger-provider-telegram"
+version = "0.1.0"
+dependencies = [
+ "async-trait",
+ "chrono",
+ "horon-messenger-core",
+ "libloading",
+ "serde",
+ "serde_json",
+ "tdlib-rs",
+ "thiserror",
+ "tokio",
+]
+
+[[package]]
+name = "horon-messenger-provider-telegrambot"
+version = "0.1.0"
+dependencies = [
+ "async-trait",
+ "chrono",
+ "horon-messenger-core",
+ "horon-messenger-provider-common",
+ "reqwest",
+ "serde",
+ "serde_json",
+ "thiserror",
+ "tokio",
+]
+
+[[package]]
+name = "horon-messenger-provider-whatsapp"
+version = "0.1.0"
+dependencies = [
+ "async-trait",
+ "horon-messenger-core",
+ "horon-messenger-provider-common",
+ "serde",
+ "serde_json",
+]
+
+[[package]]
+name = "horon-messenger-provider-whatsappbot"
+version = "0.1.0"
+dependencies = [
+ "async-trait",
+ "horon-messenger-core",
+ "horon-messenger-provider-common",
+ "reqwest",
+ "serde",
+ "serde_json",
+ "thiserror",
+ "tokio",
+]
+
+[[package]]
+name = "horon-messenger-sdk"
+version = "0.1.0"
+dependencies = [
+ "horon-messenger-core",
+ "horon-messenger-provider-channeltalk",
+ "horon-messenger-provider-discord",
+ "horon-messenger-provider-imessage",
+ "horon-messenger-provider-instagram",
+ "horon-messenger-provider-kakaotalk",
+ "horon-messenger-provider-line",
+ "horon-messenger-provider-mock",
+ "horon-messenger-provider-slack",
+ "horon-messenger-provider-slackbot",
+ "horon-messenger-provider-telegram",
+ "horon-messenger-provider-telegrambot",
+ "horon-messenger-provider-whatsapp",
+ "horon-messenger-provider-whatsappbot",
+ "serde",
+ "serde_json",
+ "tokio",
+]
+
+[[package]]
+name = "horon-messenger-server"
+version = "0.1.0"
+dependencies = [
+ "anyhow",
+ "axum",
+ "clap",
+ "horon-messenger-sdk",
+ "serde",
+ "serde_json",
+ "tokio",
+ "tower-http",
+ "tracing",
+ "tracing-subscriber",
+]
+
+[[package]]
+name = "horon-messenger-ui"
+version = "0.1.0"
+dependencies = [
+ "anyhow",
+ "clap",
+ "horon-messenger-sdk",
+ "ratatui",
+ "tokio",
+]
+
+[[package]]
 name = "http"
 version = "1.5.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -730,278 +1002,6 @@ dependencies = [
  "smallvec",
  "tokio",
  "want",
-]
-
-[[package]]
-name = "hyper-messenger-cli"
-version = "0.1.0"
-dependencies = [
- "clap",
- "hyper-messenger-sdk",
- "serde_json",
- "tokio",
-]
-
-[[package]]
-name = "hyper-messenger-core"
-version = "0.1.0"
-dependencies = [
- "async-trait",
- "chrono",
- "dirs",
- "schemars 1.2.2",
- "serde",
- "serde_json",
- "thiserror",
-]
-
-[[package]]
-name = "hyper-messenger-mcp"
-version = "0.1.0"
-dependencies = [
- "anyhow",
- "hyper-messenger-sdk",
- "rmcp",
- "schemars 1.2.2",
- "serde",
- "serde_json",
- "tokio",
- "tracing-subscriber",
-]
-
-[[package]]
-name = "hyper-messenger-provider-channeltalk"
-version = "0.1.0"
-dependencies = [
- "async-trait",
- "chrono",
- "hyper-messenger-core",
- "hyper-messenger-provider-common",
- "reqwest",
- "serde",
- "serde_json",
- "thiserror",
- "tokio",
-]
-
-[[package]]
-name = "hyper-messenger-provider-common"
-version = "0.1.0"
-dependencies = [
- "hyper-messenger-core",
- "reqwest",
- "serde",
- "serde_json",
- "tokio",
-]
-
-[[package]]
-name = "hyper-messenger-provider-discord"
-version = "0.1.0"
-dependencies = [
- "async-trait",
- "base64 0.22.1",
- "hyper-messenger-core",
- "hyper-messenger-provider-common",
- "reqwest",
- "serde",
- "serde_json",
- "thiserror",
- "tokio",
-]
-
-[[package]]
-name = "hyper-messenger-provider-imessage"
-version = "0.1.0"
-dependencies = [
- "async-trait",
- "hyper-messenger-core",
- "hyper-messenger-provider-common",
- "reqwest",
- "serde",
- "serde_json",
- "thiserror",
- "tokio",
-]
-
-[[package]]
-name = "hyper-messenger-provider-instagram"
-version = "0.1.0"
-dependencies = [
- "async-trait",
- "chrono",
- "hyper-messenger-core",
- "hyper-messenger-provider-common",
- "reqwest",
- "serde",
- "serde_json",
- "thiserror",
- "tokio",
- "uuid",
-]
-
-[[package]]
-name = "hyper-messenger-provider-kakaotalk"
-version = "0.1.0"
-dependencies = [
- "hyper-messenger-core",
-]
-
-[[package]]
-name = "hyper-messenger-provider-line"
-version = "0.1.0"
-dependencies = [
- "async-trait",
- "hyper-messenger-core",
- "hyper-messenger-provider-common",
- "reqwest",
- "serde",
- "serde_json",
- "thiserror",
- "tokio",
-]
-
-[[package]]
-name = "hyper-messenger-provider-mock"
-version = "0.1.0"
-dependencies = [
- "async-trait",
- "hyper-messenger-core",
- "serde_json",
-]
-
-[[package]]
-name = "hyper-messenger-provider-slack"
-version = "0.1.0"
-dependencies = [
- "async-trait",
- "hyper-messenger-core",
- "hyper-messenger-provider-common",
- "reqwest",
- "serde",
- "serde_json",
- "thiserror",
- "tokio",
-]
-
-[[package]]
-name = "hyper-messenger-provider-slackbot"
-version = "0.1.0"
-dependencies = [
- "async-trait",
- "chrono",
- "hyper-messenger-core",
- "hyper-messenger-provider-common",
- "reqwest",
- "serde",
- "serde_json",
- "thiserror",
- "tokio",
-]
-
-[[package]]
-name = "hyper-messenger-provider-telegram"
-version = "0.1.0"
-dependencies = [
- "async-trait",
- "chrono",
- "hyper-messenger-core",
- "libloading",
- "serde",
- "serde_json",
- "tdlib-rs",
- "thiserror",
- "tokio",
-]
-
-[[package]]
-name = "hyper-messenger-provider-telegrambot"
-version = "0.1.0"
-dependencies = [
- "async-trait",
- "chrono",
- "hyper-messenger-core",
- "hyper-messenger-provider-common",
- "reqwest",
- "serde",
- "serde_json",
- "thiserror",
- "tokio",
-]
-
-[[package]]
-name = "hyper-messenger-provider-whatsapp"
-version = "0.1.0"
-dependencies = [
- "async-trait",
- "hyper-messenger-core",
- "hyper-messenger-provider-common",
- "serde",
- "serde_json",
-]
-
-[[package]]
-name = "hyper-messenger-provider-whatsappbot"
-version = "0.1.0"
-dependencies = [
- "async-trait",
- "hyper-messenger-core",
- "hyper-messenger-provider-common",
- "reqwest",
- "serde",
- "serde_json",
- "thiserror",
- "tokio",
-]
-
-[[package]]
-name = "hyper-messenger-sdk"
-version = "0.1.0"
-dependencies = [
- "hyper-messenger-core",
- "hyper-messenger-provider-channeltalk",
- "hyper-messenger-provider-discord",
- "hyper-messenger-provider-imessage",
- "hyper-messenger-provider-instagram",
- "hyper-messenger-provider-kakaotalk",
- "hyper-messenger-provider-line",
- "hyper-messenger-provider-mock",
- "hyper-messenger-provider-slack",
- "hyper-messenger-provider-slackbot",
- "hyper-messenger-provider-telegram",
- "hyper-messenger-provider-telegrambot",
- "hyper-messenger-provider-whatsapp",
- "hyper-messenger-provider-whatsappbot",
- "serde",
- "serde_json",
- "tokio",
-]
-
-[[package]]
-name = "hyper-messenger-server"
-version = "0.1.0"
-dependencies = [
- "anyhow",
- "axum",
- "clap",
- "hyper-messenger-sdk",
- "serde",
- "serde_json",
- "tokio",
- "tower-http",
- "tracing",
- "tracing-subscriber",
-]
-
-[[package]]
-name = "hyper-messenger-ui"
-version = "0.1.0"
-dependencies = [
- "anyhow",
- "clap",
- "hyper-messenger-sdk",
- "ratatui",
- "tokio",
 ]
 
 [[package]]

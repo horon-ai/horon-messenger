@@ -3,7 +3,7 @@ set -euo pipefail
 
 ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/../../../../.." && pwd)"
 QA_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-BIN="$ROOT/target/debug/hyper-messenger"
+BIN="$ROOT/target/debug/horon-messenger"
 STUB="$QA_DIR/stub_sidecar.mjs"
 SIDECAR_DIR="$ROOT/crates/providers/whatsapp/sidecar"
 CFG="$(mktemp -d)"
@@ -15,16 +15,16 @@ cleanup() {
 trap cleanup EXIT
 
 echo "# building the CLI with every sdk feature"
-(cd "$ROOT" && cargo build -p hyper-messenger-cli --features hyper-messenger-sdk/all -q)
+(cd "$ROOT" && cargo build -p horon-messenger-cli --features horon-messenger-sdk/all -q)
 
-export HYPER_MESSENGER_CONFIG_DIR="$CFG"
+export HORON_MESSENGER_CONFIG_DIR="$CFG"
 
 stub_run() {
   local mode="$1"
   shift
   WHATSAPP_STUB_MODE="$mode" \
-    HYPER_MESSENGER_WHATSAPP_SIDECAR="$STUB" \
-    HYPER_MESSENGER_WHATSAPP_TIMEOUT_MS=2000 \
+    HORON_MESSENGER_WHATSAPP_SIDECAR="$STUB" \
+    HORON_MESSENGER_WHATSAPP_TIMEOUT_MS=2000 \
     "$@"
 }
 
@@ -36,7 +36,7 @@ stub_run normal "$BIN" send whatsapp 12025551234@s.whatsapp.net "hi" | python3 -
 
 echo "# failure: a missing sidecar script is a typed CONFIG error"
 set +e
-missing_out="$(HYPER_MESSENGER_WHATSAPP_SIDECAR="$CFG/absent.mjs" "$BIN" chats whatsapp 2>/dev/null)"
+missing_out="$(HORON_MESSENGER_WHATSAPP_SIDECAR="$CFG/absent.mjs" "$BIN" chats whatsapp 2>/dev/null)"
 missing_code=$?
 set -e
 echo "$missing_out" | python3 -c 'import sys,json; d=json.load(sys.stdin); assert d["ok"] is False, d; assert d["error"]["code"]=="CONFIG", d; print("ok:true missing sidecar ->", d["error"]["code"])'

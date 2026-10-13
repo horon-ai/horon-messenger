@@ -1,4 +1,4 @@
-use hyper_messenger_core::{Error, ProviderKind};
+use horon_messenger_core::{Error, ProviderKind};
 use reqwest::StatusCode;
 use serde_json::Value;
 

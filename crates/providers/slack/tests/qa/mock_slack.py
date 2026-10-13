@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Mock Slack Web API for hyper-messenger QA.
+"""Mock Slack Web API for horon-messenger QA.
 
 Requires `Authorization: Bearer xoxc-mock-token` plus the `Cookie: d=mock-cookie`
 header. Any other credential returns HTTP 200 with {"ok": false, "error":

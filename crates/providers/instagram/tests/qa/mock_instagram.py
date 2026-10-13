@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Mock Instagram mobile API for hyper-messenger QA.
+"""Mock Instagram mobile API for horon-messenger QA.
 
 Every request must carry a `Cookie` header whose `sessionid` equals the seeded
 value; any other credential returns HTTP 401 with {"status": "fail", "message":

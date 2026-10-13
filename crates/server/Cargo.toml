@@ -1,6 +1,6 @@
 [package]
-name = "hyper-messenger-server"
-description = "The hyper-messenger HTTP API server."
+name = "horon-messenger-server"
+description = "The horon-messenger HTTP API server."
 version.workspace = true
 edition.workspace = true
 rust-version.workspace = true
@@ -9,11 +9,11 @@ repository.workspace = true
 authors.workspace = true
 
 [[bin]]
-name = "hyper-messenger-server"
+name = "horon-messenger-server"
 path = "src/main.rs"
 
 [dependencies]
-hyper-messenger-sdk.workspace = true
+horon-messenger-sdk.workspace = true
 anyhow.workspace = true
 axum.workspace = true
 clap.workspace = true

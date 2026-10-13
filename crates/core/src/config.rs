@@ -3,11 +3,11 @@ use std::path::{Path, PathBuf};
 use crate::error::{Error, Result};
 use crate::kind::ProviderKind;
 
-pub const CONFIG_DIR_ENV: &str = "HYPER_MESSENGER_CONFIG_DIR";
-pub const APP_DIR_NAME: &str = "hyper-messenger";
+pub const CONFIG_DIR_ENV: &str = "HORON_MESSENGER_CONFIG_DIR";
+pub const APP_DIR_NAME: &str = "horon-messenger";
 
 /// Where per-provider credentials and state live. One environment variable
-/// (`HYPER_MESSENGER_CONFIG_DIR`) relocates everything for sandboxes and CI.
+/// (`HORON_MESSENGER_CONFIG_DIR`) relocates everything for sandboxes and CI.
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct ConfigPaths {
     root: PathBuf,

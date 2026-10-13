@@ -1,8 +1,8 @@
 # WhatsApp sidecar
 
 A Node sidecar that bridges the Baileys WhatsApp Web library to the
-`hyper-messenger-provider-whatsapp` crate over the line-delimited JSON-RPC 2.0
-protocol defined by `hyper-messenger-provider-common`.
+`horon-messenger-provider-whatsapp` crate over the line-delimited JSON-RPC 2.0
+protocol defined by `horon-messenger-provider-common`.
 
 ## Install
 
@@ -17,9 +17,9 @@ Node.js 20 or newer is required at run time. The Rust build never invokes Node.
 ## Launch
 
 The Rust provider spawns the sidecar as `node index.mjs`. The Node binary is
-taken from `HYPER_MESSENGER_NODE_BIN` when set, otherwise `node` on `PATH`. The
+taken from `HORON_MESSENGER_NODE_BIN` when set, otherwise `node` on `PATH`. The
 script path is `crates/providers/whatsapp/sidecar/index.mjs` at build time, or the
-path in `HYPER_MESSENGER_WHATSAPP_SIDECAR` for an installed layout.
+path in `HORON_MESSENGER_WHATSAPP_SIDECAR` for an installed layout.
 
 ## Protocol
 

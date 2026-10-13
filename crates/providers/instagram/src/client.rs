@@ -7,8 +7,8 @@ use reqwest::header::{HeaderMap, HeaderValue};
 use serde::de::DeserializeOwned;
 use serde_json::Value;
 
-use hyper_messenger_core::{Error, ProviderKind, Result};
-use hyper_messenger_provider_common::{HttpClient, Request, urlencode};
+use horon_messenger_core::{Error, ProviderKind, Result};
+use horon_messenger_provider_common::{HttpClient, Request, urlencode};
 
 use crate::models::{
     BroadcastResponse, CurrentUserResponse, InboxResponse, Thread, ThreadResponse,
@@ -18,7 +18,7 @@ use crate::session::InstagramSession;
 /// The default Instagram mobile API base URL.
 pub const DEFAULT_BASE_URL: &str = "https://i.instagram.com/api/v1";
 /// The environment variable overriding the Instagram API base URL.
-pub const BASE_URL_ENV: &str = "HYPER_MESSENGER_INSTAGRAM_API_BASE";
+pub const BASE_URL_ENV: &str = "HORON_MESSENGER_INSTAGRAM_API_BASE";
 /// The Instagram Android app id sent as `X-IG-App-ID`.
 pub const APP_ID: &str = "567067343352427";
 /// The timeout applied to every Instagram request.
@@ -288,14 +288,14 @@ mod tests {
     fn check_status_accepts_ok_and_rejects_missing_or_fail() {
         assert!(check_status(&serde_json::json!({ "status": "ok" })).is_ok());
         let missing = check_status(&serde_json::json!({ "inbox": {} })).unwrap_err();
-        assert_eq!(missing.code(), hyper_messenger_core::ErrorCode::Protocol);
+        assert_eq!(missing.code(), horon_messenger_core::ErrorCode::Protocol);
         let fail =
             check_status(&serde_json::json!({ "status": "fail", "message": "login_required" }))
                 .unwrap_err();
-        assert_eq!(fail.code(), hyper_messenger_core::ErrorCode::AuthFailed);
+        assert_eq!(fail.code(), horon_messenger_core::ErrorCode::AuthFailed);
         let other =
             check_status(&serde_json::json!({ "status": "fail", "message": "boom" })).unwrap_err();
-        assert_eq!(other.code(), hyper_messenger_core::ErrorCode::Protocol);
+        assert_eq!(other.code(), horon_messenger_core::ErrorCode::Protocol);
     }
 
     #[tokio::test]
@@ -339,7 +339,7 @@ mod tests {
         let error = client.current_user().await.unwrap_err();
         assert_eq!(
             error.code(),
-            hyper_messenger_core::ErrorCode::Protocol,
+            horon_messenger_core::ErrorCode::Protocol,
             "got {error:?}"
         );
     }

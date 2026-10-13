@@ -1,4 +1,4 @@
-//! Telegram provider for `hyper-messenger`.
+//! Telegram provider for `horon-messenger`.
 //!
 //! Backed by TDLib through the `tdjson` JSON API: chats and messages map from
 //! TDLib JSON to the core `Chat`/`Message` model, and auth follows the TDLib
@@ -23,7 +23,7 @@
 use std::sync::Mutex;
 
 use async_trait::async_trait;
-use hyper_messenger_core::{
+use horon_messenger_core::{
     AccountSummary, AuthMethod, AuthProvider, AuthStatus, Capabilities, Chat, ChatQuery,
     ConfigPaths, CredentialStore, Delivery, FileCredentialStore, LoginOptions, LoginOutcome,
     Member, Message, MessagePage, MessageQuery, Profile, Provider, ProviderKind, Result,
@@ -111,7 +111,7 @@ impl TelegramProvider {
         #[cfg(all(not(feature = "qa-fake"), not(feature = "tdlib")))]
         {
             let _ = &self.paths;
-            Err(hyper_messenger_core::Error::Config {
+            Err(horon_messenger_core::Error::Config {
                 message: "the Telegram provider has no TDLib backend in this build; enable the \
                           `tdlib` feature (runtime libtdjson) or the `qa-fake` feature (fixtures)"
                     .to_owned(),
@@ -345,7 +345,7 @@ impl AuthProvider for TelegramProvider {
 #[cfg(test)]
 mod tests {
     use super::*;
-    use hyper_messenger_core::{ChatKind, Error};
+    use horon_messenger_core::{ChatKind, Error};
     use serde_json::json;
     use std::path::PathBuf;
     #[cfg(feature = "qa-fake")]
@@ -489,7 +489,7 @@ mod tests {
     fn malformed_json_is_a_protocol_error() {
         let error = mapping::parse_response(&fixture("malformed.json")).unwrap_err();
         assert!(matches!(error, Error::Protocol { .. }), "got {error:?}");
-        assert_eq!(error.code(), hyper_messenger_core::ErrorCode::Protocol);
+        assert_eq!(error.code(), horon_messenger_core::ErrorCode::Protocol);
     }
 
     #[test]
@@ -583,11 +583,11 @@ mod tests {
     #[tokio::test]
     async fn stale_closed_state_returns_auth_required() {
         let _guard = env_guard().await;
-        unsafe { std::env::set_var("HYPER_MESSENGER_TELEGRAM_FAKE_STATE", "closed") };
+        unsafe { std::env::set_var("HORON_MESSENGER_TELEGRAM_FAKE_STATE", "closed") };
         let dir = std::env::temp_dir().join(format!("hm-telegram-closed-{}", std::process::id()));
         let provider = TelegramProvider::new(ConfigPaths::at(dir));
         let error = provider.whoami().await.unwrap_err();
-        unsafe { std::env::remove_var("HYPER_MESSENGER_TELEGRAM_FAKE_STATE") };
+        unsafe { std::env::remove_var("HORON_MESSENGER_TELEGRAM_FAKE_STATE") };
         assert!(matches!(error, Error::AuthRequired { .. }), "got {error:?}");
     }
 
@@ -595,11 +595,11 @@ mod tests {
     #[tokio::test]
     async fn fake_malformed_fixture_is_a_protocol_error() {
         let _guard = env_guard().await;
-        unsafe { std::env::set_var("HYPER_MESSENGER_TELEGRAM_FAKE_MALFORMED", "1") };
+        unsafe { std::env::set_var("HORON_MESSENGER_TELEGRAM_FAKE_MALFORMED", "1") };
         let dir = std::env::temp_dir().join(format!("hm-telegram-bad-{}", std::process::id()));
         let provider = TelegramProvider::new(ConfigPaths::at(dir));
         let error = provider.whoami().await.unwrap_err();
-        unsafe { std::env::remove_var("HYPER_MESSENGER_TELEGRAM_FAKE_MALFORMED") };
+        unsafe { std::env::remove_var("HORON_MESSENGER_TELEGRAM_FAKE_MALFORMED") };
         assert!(matches!(error, Error::Protocol { .. }), "got {error:?}");
     }
 }

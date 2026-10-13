@@ -4,7 +4,7 @@ use std::sync::{Arc, Mutex};
 use std::time::{Duration, Instant};
 
 use async_trait::async_trait;
-use hyper_messenger_core::{
+use horon_messenger_core::{
     Chat, ConfigPaths, CredentialStore, Error, FileCredentialStore, Member, Message, Profile,
     ProviderKind, Result,
 };
@@ -176,7 +176,7 @@ impl TdlibBackend {
                 "api_id": self.config.api_id,
                 "api_hash": self.config.api_hash,
                 "system_language_code": "en",
-                "device_model": "hyper-messenger",
+                "device_model": "horon-messenger",
                 "application_version": env!("CARGO_PKG_VERSION"),
                 "database_directory": database,
                 "files_directory": files,

@@ -1,6 +1,6 @@
 [package]
-name = "hyper-messenger-provider-telegram"
-description = "Telegram provider for hyper-messenger."
+name = "horon-messenger-provider-telegram"
+description = "Telegram provider for horon-messenger."
 version.workspace = true
 edition.workspace = true
 rust-version.workspace = true
@@ -14,7 +14,7 @@ qa-fake = []
 tdlib = ["dep:tdlib-rs"]
 
 [dependencies]
-hyper-messenger-core.workspace = true
+horon-messenger-core.workspace = true
 async-trait.workspace = true
 chrono.workspace = true
 libloading = "0.8"

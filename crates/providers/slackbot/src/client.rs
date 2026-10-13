@@ -3,15 +3,15 @@ use reqwest::header::{HeaderMap, HeaderValue};
 use serde::de::DeserializeOwned;
 use serde_json::Value;
 
-use hyper_messenger_core::{Error, ProviderKind, Result};
-use hyper_messenger_provider_common::{HttpClient, Request};
+use horon_messenger_core::{Error, ProviderKind, Result};
+use horon_messenger_provider_common::{HttpClient, Request};
 
 use crate::models::{
     AuthTest, Channel, ChannelInfo, ChannelList, History, MemberList, PostedMessage, UserInfo,
 };
 
 pub const DEFAULT_BASE_URL: &str = "https://slack.com/api";
-pub const BASE_URL_ENV: &str = "HYPER_MESSENGER_SLACKBOT_API_BASE";
+pub const BASE_URL_ENV: &str = "HORON_MESSENGER_SLACKBOT_API_BASE";
 
 const BUCKET_KEY: &str = "slackbot:global";
 
@@ -142,7 +142,7 @@ impl SlackBotClient {
 #[cfg(test)]
 mod tests {
     use super::*;
-    use hyper_messenger_core::ErrorCode;
+    use horon_messenger_core::ErrorCode;
 
     #[test]
     fn ok_false_maps_auth_codes_to_auth_failed() {

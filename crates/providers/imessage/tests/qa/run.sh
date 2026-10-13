@@ -3,7 +3,7 @@ set -euo pipefail
 
 HERE="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 ROOT="$(cd "$HERE/../../../../.." && pwd)"
-BIN="$ROOT/target/debug/hyper-messenger"
+BIN="$ROOT/target/debug/horon-messenger"
 STUB="$HERE/stub_imsg.py"
 CFG="$(mktemp -d)"
 
@@ -16,14 +16,14 @@ cleanup() {
 trap cleanup EXIT
 
 echo "# building the CLI with the imessage provider"
-(cd "$ROOT" && cargo build -p hyper-messenger-cli --features hyper-messenger-sdk/all -q)
+(cd "$ROOT" && cargo build -p horon-messenger-cli --features horon-messenger-sdk/all -q)
 
-export HYPER_MESSENGER_CONFIG_DIR="$CFG"
-export HYPER_MESSENGER_IMSG_BIN="$STUB"
+export HORON_MESSENGER_CONFIG_DIR="$CFG"
+export HORON_MESSENGER_IMSG_BIN="$STUB"
 
 fail=0
 
-echo "# happy: chats imessage (stub over HYPER_MESSENGER_IMSG_BIN)"
+echo "# happy: chats imessage (stub over HORON_MESSENGER_IMSG_BIN)"
 "$BIN" chats imessage | python3 -c 'import sys,json; d=json.load(sys.stdin); assert d["ok"] is True, d; c=[x for x in d["data"] if x["id"]=="42"][0]; assert c["name"]=="Jane", c; assert c["kind"]=="direct", c; assert c["member_count"]==1, c; print("ok:true chats=2 first=Jane kind=direct")' || fail=1
 
 echo "# happy: messages imessage 42 (oldest first)"
@@ -56,7 +56,7 @@ echo "$out" | grep -q 'Full Disk Access' || { echo "ASSERT FAILED: message must 
 
 echo "# failure: invalid binary (env points nowhere, PATH has no imsg) -> CONFIG, non-zero exit"
 set +e
-out="$(PATH=/nonexistent HYPER_MESSENGER_IMSG_BIN=/nonexistent/imsg "$BIN" chats imessage)"
+out="$(PATH=/nonexistent HORON_MESSENGER_IMSG_BIN=/nonexistent/imsg "$BIN" chats imessage)"
 code=$?
 set -e
 echo "$out"
@@ -65,7 +65,7 @@ echo "$out" | grep -q '"code":"CONFIG"' || { echo "ASSERT FAILED: CONFIG"; fail=
 
 echo "# failure: unset binary and no imsg on PATH -> CONFIG, non-zero exit"
 set +e
-out="$(env -u HYPER_MESSENGER_IMSG_BIN PATH=/nonexistent "$BIN" chats imessage)"
+out="$(env -u HORON_MESSENGER_IMSG_BIN PATH=/nonexistent "$BIN" chats imessage)"
 code=$?
 set -e
 echo "$out"

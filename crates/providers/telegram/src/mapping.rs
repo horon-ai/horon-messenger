@@ -1,6 +1,6 @@
 //! Pure TDLib JSON to domain mapping, shared by the real and `qa-fake` backends.
 
-use hyper_messenger_core::{
+use horon_messenger_core::{
     Attachment, Chat, ChatKind, Error, Member, Message, Profile, ProviderKind, Result,
 };
 use serde_json::Value;
@@ -87,7 +87,7 @@ pub fn message(value: &Value, fallback_chat_id: i64) -> Result<Message> {
             .get("date")
             .and_then(Value::as_i64)
             .map(unix_to_rfc3339)
-            .unwrap_or_else(hyper_messenger_core::now_rfc3339),
+            .unwrap_or_else(horon_messenger_core::now_rfc3339),
         edited_at: value
             .get("edit_date")
             .and_then(Value::as_i64)
@@ -161,7 +161,7 @@ pub fn chat_ids(value: &Value) -> Result<Vec<i64>> {
 pub fn unix_to_rfc3339(seconds: i64) -> String {
     chrono::DateTime::from_timestamp(seconds, 0)
         .map(|time| time.to_rfc3339_opts(chrono::SecondsFormat::Millis, true))
-        .unwrap_or_else(hyper_messenger_core::now_rfc3339)
+        .unwrap_or_else(horon_messenger_core::now_rfc3339)
 }
 
 fn display_name(user: &Value) -> Option<String> {

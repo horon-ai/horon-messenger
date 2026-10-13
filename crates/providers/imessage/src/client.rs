@@ -2,8 +2,8 @@ use std::time::Duration;
 
 use serde_json::{Value, json};
 
-use hyper_messenger_core::{Error, Result};
-use hyper_messenger_provider_common::{JsonRpcProcess, SidecarSpec};
+use horon_messenger_core::{Error, Result};
+use horon_messenger_provider_common::{JsonRpcProcess, SidecarSpec};
 
 use crate::PROVIDER;
 use crate::models::{ChatsList, ImsgChat, ImsgMessage, MessagesHistory, SendResponse};
@@ -77,7 +77,7 @@ fn classify(error: Error) -> Error {
     {
         return Error::AuthFailed {
             provider: PROVIDER,
-            message: "imsg cannot read the Messages database; grant Full Disk Access to the app that launched hyper-messenger (System Settings -> Privacy & Security -> Full Disk Access)".to_owned(),
+            message: "imsg cannot read the Messages database; grant Full Disk Access to the app that launched horon-messenger (System Settings -> Privacy & Security -> Full Disk Access)".to_owned(),
         };
     }
     if AUTOMATION_HINTS.iter().any(|hint| text.contains(hint)) {

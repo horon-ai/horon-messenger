@@ -12,7 +12,7 @@ const DEFAULT_DEVICE = 'ANDROIDSECONDARY'
 let client = null
 
 function configDir() {
-  return process.env.HYPER_MESSENGER_CONFIG_DIR || join(process.env.HOME || '.', '.hyper-messenger')
+  return process.env.HORON_MESSENGER_CONFIG_DIR || join(process.env.HOME || '.', '.horon-messenger')
 }
 
 function storagePath(accountId) {

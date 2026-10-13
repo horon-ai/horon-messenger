@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Mock WhatsApp Cloud (Graph) API for hyper-messenger QA on a fixed port."""
+"""Mock WhatsApp Cloud (Graph) API for horon-messenger QA on a fixed port."""
 import json
 import sys
 from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer

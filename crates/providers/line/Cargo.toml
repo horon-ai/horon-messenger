@@ -1,6 +1,6 @@
 [package]
-name = "hyper-messenger-provider-line"
-description = "LINE provider for hyper-messenger."
+name = "horon-messenger-provider-line"
+description = "LINE provider for horon-messenger."
 version.workspace = true
 edition.workspace = true
 rust-version.workspace = true
@@ -9,8 +9,8 @@ repository.workspace = true
 authors.workspace = true
 
 [dependencies]
-hyper-messenger-core.workspace = true
-hyper-messenger-provider-common.workspace = true
+horon-messenger-core.workspace = true
+horon-messenger-provider-common.workspace = true
 async-trait.workspace = true
 reqwest.workspace = true
 serde.workspace = true

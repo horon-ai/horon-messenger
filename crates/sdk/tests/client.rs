@@ -1,11 +1,11 @@
-use hyper_messenger_sdk::{
+use horon_messenger_sdk::{
     ChatKind, ChatQuery, Client, Delivery, MessageQuery, ProviderKind, SendRequest,
 };
 
 #[tokio::test]
 async fn default_client_registers_the_mock_provider() {
     let client = Client::builder()
-        .config_dir("/tmp/hyper-messenger-test-config")
+        .config_dir("/tmp/horon-messenger-test-config")
         .build()
         .expect("build client");
     assert!(client.registry().kinds().contains(&ProviderKind::Mock));
@@ -21,7 +21,7 @@ async fn default_client_registers_the_mock_provider() {
 #[tokio::test]
 async fn whoami_and_list_chats_answer_from_memory() {
     let client = Client::builder()
-        .config_dir("/tmp/hyper-messenger-test-config")
+        .config_dir("/tmp/horon-messenger-test-config")
         .build()
         .expect("build client");
 
@@ -39,7 +39,7 @@ async fn whoami_and_list_chats_answer_from_memory() {
 #[tokio::test]
 async fn chat_search_filters_by_name() {
     let client = Client::builder()
-        .config_dir("/tmp/hyper-messenger-test-config")
+        .config_dir("/tmp/horon-messenger-test-config")
         .build()
         .expect("build client");
 
@@ -58,7 +58,7 @@ async fn chat_search_filters_by_name() {
 #[tokio::test]
 async fn send_message_is_visible_on_the_next_read() {
     let client = Client::builder()
-        .config_dir("/tmp/hyper-messenger-test-config")
+        .config_dir("/tmp/horon-messenger-test-config")
         .build()
         .expect("build client");
 
@@ -90,7 +90,7 @@ async fn send_message_is_visible_on_the_next_read() {
 
 #[test]
 fn an_empty_registry_reports_not_registered() {
-    use hyper_messenger_sdk::{ErrorCode, ProviderRegistry};
+    use horon_messenger_sdk::{ErrorCode, ProviderRegistry};
 
     let registry = ProviderRegistry::new();
     match registry.require(ProviderKind::Discord) {

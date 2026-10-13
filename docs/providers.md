@@ -1,7 +1,7 @@
 # Providers
 
 A provider is one crate under `crates/providers/<name>/` that implements the
-`Provider` trait from `hyper-messenger-core`.
+`Provider` trait from `horon-messenger-core`.
 
 ## Skeleton vs implementation
 
@@ -34,9 +34,9 @@ of scope for the platform, leave it unadvertised so it reports `Unsupported`.
 
 1. Add the crate under `crates/providers/<name>/` and to `members` in the root
    `Cargo.toml`.
-2. Add a `hyper-messenger-provider-<name>` entry to `[workspace.dependencies]`.
+2. Add a `horon-messenger-provider-<name>` entry to `[workspace.dependencies]`.
 3. Add an optional dependency and a feature in `crates/sdk/Cargo.toml`
-   (`<name> = ["dep:hyper-messenger-provider-<name>"]`), and include it in `all`.
+   (`<name> = ["dep:horon-messenger-provider-<name>"]`), and include it in `all`.
 4. Register it in `crates/sdk/src/lib.rs::register_builtin` behind
    `#[cfg(feature = "<name>")]`.
 5. Add a `ProviderKind` variant if the platform is new.
@@ -53,19 +53,19 @@ it; `cargo build --workspace --all-features` wires all of them into `sdk`.
 |----------|------|-----------|---------------|
 | Mock (`mock`) | none | in-memory | none |
 | KakaoTalk (`kakaotalk`, skeleton) | desktop session and a derived DB key; tablet LOCO session for send (planned) | local SQLCipher DB read, LOCO over TLS for send, macOS Accessibility for UI-only actions (planned) | macOS; operations are not implemented yet |
-| Discord (`discord`) | user token from `HYPER_MESSENGER_DISCORD_TOKEN` or `auth login --param token=...` | HTTP REST, base override `HYPER_MESSENGER_DISCORD_API_BASE` | none |
-| Channel Talk (`channeltalk`) | operator cookies (`account_cookie`, optional `session_cookie`) via `auth login --param` or `HYPER_MESSENGER_CHANNELTALK_ACCOUNT_COOKIE` / `_SESSION_COOKIE` | HTTP REST, base override `HYPER_MESSENGER_CHANNELTALK_API_BASE` | none |
-| Telegram Bot (`telegrambot`) | bot token from `HYPER_MESSENGER_TELEGRAMBOT_TOKEN` or `auth login --param token=...` | HTTP, base override `HYPER_MESSENGER_TELEGRAMBOT_API_BASE` | none |
-| WhatsApp Bot (`whatsappbot`) | phone number id and access token from `HYPER_MESSENGER_WHATSAPPBOT_PHONE_NUMBER_ID` / `_ACCESS_TOKEN` or `auth login --param` | HTTP, base override `HYPER_MESSENGER_WHATSAPPBOT_API_BASE` | none |
-| Slack Bot (`slackbot`) | bot token from `HYPER_MESSENGER_SLACKBOT_TOKEN` or `auth login --param token=...` | HTTP, base override `HYPER_MESSENGER_SLACKBOT_API_BASE` | none |
-| Slack (`slack`) | user token and cookie from `HYPER_MESSENGER_SLACK_TOKEN` / `_COOKIE` or `auth login --param token=... --param cookie=...` | HTTP, base override `HYPER_MESSENGER_SLACK_API_BASE` | none |
-| iMessage (`imessage`) | none; reads the local Messages app | sidecar over JSON-RPC (spawns `imsg`) | macOS, the `imsg` binary (`HYPER_MESSENGER_IMSG_BIN`) and Full Disk Access |
+| Discord (`discord`) | user token from `HORON_MESSENGER_DISCORD_TOKEN` or `auth login --param token=...` | HTTP REST, base override `HORON_MESSENGER_DISCORD_API_BASE` | none |
+| Channel Talk (`channeltalk`) | operator cookies (`account_cookie`, optional `session_cookie`) via `auth login --param` or `HORON_MESSENGER_CHANNELTALK_ACCOUNT_COOKIE` / `_SESSION_COOKIE` | HTTP REST, base override `HORON_MESSENGER_CHANNELTALK_API_BASE` | none |
+| Telegram Bot (`telegrambot`) | bot token from `HORON_MESSENGER_TELEGRAMBOT_TOKEN` or `auth login --param token=...` | HTTP, base override `HORON_MESSENGER_TELEGRAMBOT_API_BASE` | none |
+| WhatsApp Bot (`whatsappbot`) | phone number id and access token from `HORON_MESSENGER_WHATSAPPBOT_PHONE_NUMBER_ID` / `_ACCESS_TOKEN` or `auth login --param` | HTTP, base override `HORON_MESSENGER_WHATSAPPBOT_API_BASE` | none |
+| Slack Bot (`slackbot`) | bot token from `HORON_MESSENGER_SLACKBOT_TOKEN` or `auth login --param token=...` | HTTP, base override `HORON_MESSENGER_SLACKBOT_API_BASE` | none |
+| Slack (`slack`) | user token and cookie from `HORON_MESSENGER_SLACK_TOKEN` / `_COOKIE` or `auth login --param token=... --param cookie=...` | HTTP, base override `HORON_MESSENGER_SLACK_API_BASE` | none |
+| iMessage (`imessage`) | none; reads the local Messages app | sidecar over JSON-RPC (spawns `imsg`) | macOS, the `imsg` binary (`HORON_MESSENGER_IMSG_BIN`) and Full Disk Access |
 | Telegram (`telegram`) | phone-code sign-in via TDLib (`api_id`, `api_hash`, phone) | TDLib native `libtdjson`, loaded at run time | `libtdjson` on the library path or `TDLIB_PATH` |
-| WhatsApp (`whatsapp`) | device pairing (QR or pairing code) through the sidecar | Node sidecar over JSON-RPC (`@whiskeysockets/baileys`) | Node 20+, `npm ci` in `crates/providers/whatsapp/sidecar/`, env `HYPER_MESSENGER_WHATSAPP_SIDECAR` and `HYPER_MESSENGER_NODE_BIN` |
-| LINE (`line`) | token or email and password sign-in through the sidecar | Node sidecar over JSON-RPC (linejs) | Node 20+, `npm install` in `crates/providers/line/sidecar/`, env `HYPER_MESSENGER_LINE_SIDECAR` |
-| Instagram (`instagram`) | session cookie (`sessionid`, `ds_user_id`) via `auth login --param` or `HYPER_MESSENGER_INSTAGRAM_SESSIONID` / `_DS_USER_ID` | HTTP with a session `Cookie` header, base override `HYPER_MESSENGER_INSTAGRAM_API_BASE` | none |
+| WhatsApp (`whatsapp`) | device pairing (QR or pairing code) through the sidecar | Node sidecar over JSON-RPC (`@whiskeysockets/baileys`) | Node 20+, `npm ci` in `crates/providers/whatsapp/sidecar/`, env `HORON_MESSENGER_WHATSAPP_SIDECAR` and `HORON_MESSENGER_NODE_BIN` |
+| LINE (`line`) | token or email and password sign-in through the sidecar | Node sidecar over JSON-RPC (linejs) | Node 20+, `npm install` in `crates/providers/line/sidecar/`, env `HORON_MESSENGER_LINE_SIDECAR` |
+| Instagram (`instagram`) | session cookie (`sessionid`, `ds_user_id`) via `auth login --param` or `HORON_MESSENGER_INSTAGRAM_SESSIONID` / `_DS_USER_ID` | HTTP with a session `Cookie` header, base override `HORON_MESSENGER_INSTAGRAM_API_BASE` | none |
 
-Every HTTP provider takes `HYPER_MESSENGER_<NAME>_API_BASE` to point at a
+Every HTTP provider takes `HORON_MESSENGER_<NAME>_API_BASE` to point at a
 different API base (tests, proxies). WhatsApp Bot advertises only `whoami` and
 `send_message`.
 

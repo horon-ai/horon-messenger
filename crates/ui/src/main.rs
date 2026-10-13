@@ -2,7 +2,7 @@ use std::io::{self, Stdout};
 use std::time::Duration;
 
 use clap::Parser;
-use hyper_messenger_sdk::{Chat, ChatKind, ChatQuery, Client, Message, MessageQuery, ProviderKind};
+use horon_messenger_sdk::{Chat, ChatKind, ChatQuery, Client, Message, MessageQuery, ProviderKind};
 use ratatui::{
     Terminal,
     backend::CrosstermBackend,
@@ -19,9 +19,9 @@ use ratatui::{
 
 #[derive(Debug, Parser)]
 #[command(
-    name = "hyper-messenger-tui",
+    name = "horon-messenger-tui",
     version,
-    about = "Terminal UI for hyper-messenger"
+    about = "Terminal UI for horon-messenger"
 )]
 struct Args {
     #[arg(long, value_parser = parse_provider, default_value = "mock")]

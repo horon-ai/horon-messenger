@@ -1,9 +1,9 @@
 # Discord provider QA
 
-Re-runnable smoke test for `hyper-messenger-provider-discord`. It boots a mock
+Re-runnable smoke test for `horon-messenger-provider-discord`. It boots a mock
 Discord REST API (`mock_discord.py`, `127.0.0.1:8771`), drives the real
-`hyper-messenger` CLI over it with `HYPER_MESSENGER_DISCORD_API_BASE` and
-`HYPER_MESSENGER_DISCORD_TOKEN`, asserts each `{ok,data,meta}` envelope with
+`horon-messenger` CLI over it with `HORON_MESSENGER_DISCORD_API_BASE` and
+`HORON_MESSENGER_DISCORD_TOKEN`, asserts each `{ok,data,meta}` envelope with
 `python3 -c`, then kills the mock and prints a `cleanup:` line.
 
 ```bash

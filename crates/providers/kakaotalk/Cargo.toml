@@ -1,6 +1,6 @@
 [package]
-name = "hyper-messenger-provider-kakaotalk"
-description = "KakaoTalk provider for hyper-messenger."
+name = "horon-messenger-provider-kakaotalk"
+description = "KakaoTalk provider for horon-messenger."
 version.workspace = true
 edition.workspace = true
 rust-version.workspace = true
@@ -9,4 +9,4 @@ repository.workspace = true
 authors.workspace = true
 
 [dependencies]
-hyper-messenger-core.workspace = true
+horon-messenger-core.workspace = true

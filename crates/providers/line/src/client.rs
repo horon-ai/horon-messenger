@@ -2,8 +2,8 @@ use std::time::Duration;
 
 use serde_json::{Value, json};
 
-use hyper_messenger_core::{Error, Result};
-use hyper_messenger_provider_common::{JsonRpcProcess, SidecarSpec};
+use horon_messenger_core::{Error, Result};
+use horon_messenger_provider_common::{JsonRpcProcess, SidecarSpec};
 
 use crate::PROVIDER;
 use crate::models::{

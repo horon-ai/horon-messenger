@@ -1,4 +1,4 @@
-# hyper-messenger
+# horon-messenger
 
 One bridge for every messenger, written in Rust. KakaoTalk, Discord, Slack,
 Telegram, WhatsApp, LINE, Instagram, iMessage, Channel Talk and anything else,
@@ -42,12 +42,12 @@ transport and prerequisites are in [docs/providers.md](docs/providers.md).
 
 ```
 crates/
-├── core/                     hyper-messenger-core     Provider contract, domain model, config, credentials, wire envelope
-├── sdk/                      hyper-messenger-sdk      The public client over every provider a build enabled
-├── cli/                      hyper-messenger          Command line interface
-├── mcp/                      hyper-messenger-mcp      MCP server (stdio)
-├── server/                   hyper-messenger-server   HTTP API server
-├── ui/                       hyper-messenger-tui      Terminal UI
+├── core/                     horon-messenger-core     Provider contract, domain model, config, credentials, wire envelope
+├── sdk/                      horon-messenger-sdk      The public client over every provider a build enabled
+├── cli/                      horon-messenger          Command line interface
+├── mcp/                      horon-messenger-mcp      MCP server (stdio)
+├── server/                   horon-messenger-server   HTTP API server
+├── ui/                       horon-messenger-tui      Terminal UI
 └── providers/
     ├── common/               sidecar JSON-RPC client and shared helpers
     ├── mock/                 in-memory provider for development and tests
@@ -85,11 +85,11 @@ The toolchain is pinned in `rust-toolchain.toml` (1.97.1, edition 2024).
 ### CLI
 
 ```bash
-cargo run -p hyper-messenger-cli -- providers
-cargo run -p hyper-messenger-cli -- chats mock --pretty
-cargo run -p hyper-messenger-cli -- messages mock general --pretty
-cargo run -p hyper-messenger-cli -- send mock general "hello"
-cargo run -p hyper-messenger-cli -- auth status mock
+cargo run -p horon-messenger-cli -- providers
+cargo run -p horon-messenger-cli -- chats mock --pretty
+cargo run -p horon-messenger-cli -- messages mock general --pretty
+cargo run -p horon-messenger-cli -- send mock general "hello"
+cargo run -p horon-messenger-cli -- auth status mock
 ```
 
 Output is a JSON envelope on stdout: `{"ok": true, "data": ..., "meta": ...}` on
@@ -99,7 +99,7 @@ on failure. `--pretty` indents it; the exit code is non-zero when `ok` is false.
 ### MCP server
 
 ```bash
-cargo run -p hyper-messenger-mcp
+cargo run -p horon-messenger-mcp
 ```
 
 Speaks MCP over stdio and exposes `list_providers`, `whoami`, `list_chats`,
@@ -108,7 +108,7 @@ Speaks MCP over stdio and exposes `list_providers`, `whoami`, `list_chats`,
 ### HTTP API server
 
 ```bash
-cargo run -p hyper-messenger-server -- --host 127.0.0.1 --port 8787
+cargo run -p horon-messenger-server -- --host 127.0.0.1 --port 8787
 curl localhost:8787/v1/providers
 curl 'localhost:8787/v1/providers/mock/chats'
 curl -X POST localhost:8787/v1/providers/mock/chats/general/messages \
@@ -120,8 +120,8 @@ The server binds to loopback by default. It returns the same envelope as the CLI
 ### Terminal UI
 
 ```bash
-cargo run -p hyper-messenger-ui -- --provider mock
-cargo run -p hyper-messenger-ui -- --provider mock --snapshot   # non-interactive
+cargo run -p horon-messenger-ui -- --provider mock
+cargo run -p horon-messenger-ui -- --provider mock --snapshot   # non-interactive
 ```
 
 `j`/`k` or the arrow keys move between chats, `q` quits.
@@ -129,7 +129,7 @@ cargo run -p hyper-messenger-ui -- --provider mock --snapshot   # non-interactiv
 ## Configuration
 
 Credentials and per-provider state live under
-`~/.config/hyper-messenger/<provider>/`. Set `HYPER_MESSENGER_CONFIG_DIR` to
+`~/.config/horon-messenger/<provider>/`. Set `HORON_MESSENGER_CONFIG_DIR` to
 relocate everything (sandboxes, CI, non-default homes). Files are owner-only
 (`0700` directories, `0600` files) and written atomically.
 
@@ -140,7 +140,7 @@ same drill:
 
 1. Add the crate under `crates/providers/<name>/` and list it in the root
    `Cargo.toml` `members`.
-2. Add a `hyper-messenger-provider-<name>` entry to `[workspace.dependencies]`.
+2. Add a `horon-messenger-provider-<name>` entry to `[workspace.dependencies]`.
 3. Add an optional dependency and a feature in `crates/sdk/Cargo.toml`, and
    include it in `all`.
 4. Register it in `crates/sdk/src/lib.rs::register_builtin` behind
@@ -149,7 +149,7 @@ same drill:
 
 A provider that needs a helper process (iMessage, WhatsApp, LINE) also ships a
 sidecar under `crates/providers/<name>/sidecar/` and speaks line-delimited
-JSON-RPC 2.0 through `hyper-messenger-provider-common`.
+JSON-RPC 2.0 through `horon-messenger-provider-common`.
 
 Full detail is in [docs/providers.md](docs/providers.md) and
 [docs/architecture.md](docs/architecture.md).

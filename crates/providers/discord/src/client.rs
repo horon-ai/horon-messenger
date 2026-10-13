@@ -4,15 +4,15 @@ use reqwest::header::{HeaderMap, HeaderName, HeaderValue};
 use serde::de::DeserializeOwned;
 use serde_json::Value;
 
-use hyper_messenger_core::{ProviderKind, Result};
-use hyper_messenger_provider_common::{HttpClient, Request, urlencode};
+use horon_messenger_core::{ProviderKind, Result};
+use horon_messenger_provider_common::{HttpClient, Request, urlencode};
 
 use crate::models::{
     DiscordGuild, DiscordGuildMember, DiscordMessage, DiscordSearchResponse, DiscordUser,
 };
 
 pub const DEFAULT_BASE_URL: &str = "https://discord.com/api/v10";
-pub const BASE_URL_ENV: &str = "HYPER_MESSENGER_DISCORD_API_BASE";
+pub const BASE_URL_ENV: &str = "HORON_MESSENGER_DISCORD_API_BASE";
 
 const USER_AGENT: &str = "Discord/1.0.9210 Chrome/134.0.0.0 Electron/35.3.0";
 const SUPER_PROPERTIES: &str = r#"{"os":"Mac OS X","browser":"Discord Client","release_channel":"stable","client_version":"1.0.9210","os_version":"24.3.0","os_arch":"arm64","app_arch":"arm64","system_locale":"en-US","browser_user_agent":"Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) discord/1.0.9210 Chrome/134.0.0.0 Electron/35.3.0 Safari/537.36","browser_version":"134.0.0.0","client_build_number":366629,"native_build_number":64292,"client_event_source":null,"design_id":0}"#;

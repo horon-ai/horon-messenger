@@ -1,4 +1,4 @@
-use hyper_messenger_core::{Chat, ChatKind, Member, Message, MessagePage, ProviderKind};
+use horon_messenger_core::{Chat, ChatKind, Member, Message, MessagePage, ProviderKind};
 use serde_json::Value;
 
 use crate::models::{SlackChannel, SlackMessage, SlackSearchMessages, SlackUser};

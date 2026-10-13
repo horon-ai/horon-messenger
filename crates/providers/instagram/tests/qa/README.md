@@ -1,10 +1,10 @@
 # Instagram provider QA
 
-Re-runnable smoke test for `hyper-messenger-provider-instagram`. It boots a mock
+Re-runnable smoke test for `horon-messenger-provider-instagram`. It boots a mock
 Instagram mobile API (`mock_instagram.py`, `127.0.0.1:8831`), drives the real
-`hyper-messenger` CLI over it with `HYPER_MESSENGER_INSTAGRAM_API_BASE`,
-`HYPER_MESSENGER_INSTAGRAM_SESSIONID`, `HYPER_MESSENGER_INSTAGRAM_DS_USER_ID`
-and `HYPER_MESSENGER_INSTAGRAM_DEVICE_ID`, asserts each `{ok,data,meta}` envelope
+`horon-messenger` CLI over it with `HORON_MESSENGER_INSTAGRAM_API_BASE`,
+`HORON_MESSENGER_INSTAGRAM_SESSIONID`, `HORON_MESSENGER_INSTAGRAM_DS_USER_ID`
+and `HORON_MESSENGER_INSTAGRAM_DEVICE_ID`, asserts each `{ok,data,meta}` envelope
 with `python3 -c`, then kills the mock and prints a `cleanup:` line.
 
 ```bash

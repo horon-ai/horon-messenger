@@ -2,7 +2,7 @@ use std::path::PathBuf;
 use std::process::ExitCode;
 
 use clap::{Args, Parser, Subcommand};
-use hyper_messenger_sdk::{
+use horon_messenger_sdk::{
     ChatQuery, Client, DynProvider, Envelope, Error, LoginOptions, MessageQuery, Meta,
     ProviderKind, SendRequest,
 };
@@ -10,7 +10,7 @@ use serde_json::{Map, Value};
 
 #[derive(Debug, Parser)]
 #[command(
-    name = "hyper-messenger",
+    name = "horon-messenger",
     version,
     about = "Multi-messenger bridge for AI agents",
     propagate_version = true
@@ -24,7 +24,7 @@ struct Cli {
     #[arg(
         long,
         global = true,
-        env = "HYPER_MESSENGER_CONFIG_DIR",
+        env = "HORON_MESSENGER_CONFIG_DIR",
         value_name = "DIR"
     )]
     config_dir: Option<PathBuf>,

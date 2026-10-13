@@ -1,8 +1,8 @@
 # LINE sidecar
 
-A Node program that wraps the linejs client and speaks the hyper-messenger
+A Node program that wraps the linejs client and speaks the horon-messenger
 line-delimited JSON-RPC protocol on stdin/stdout. The Rust provider
-(`hyper-messenger-provider-line`) spawns it and calls the operations below.
+(`horon-messenger-provider-line`) spawns it and calls the operations below.
 
 ## Install
 
@@ -11,14 +11,14 @@ cd crates/providers/line/sidecar
 npm install          # resolves @jsr/evex__linejs from the JSR npm mirror
 ```
 
-Then either put `index.js` on `PATH` as `hyper-messenger-line-sidecar`, or point
+Then either put `index.js` on `PATH` as `horon-messenger-line-sidecar`, or point
 the provider at it directly:
 
 ```bash
-export HYPER_MESSENGER_LINE_SIDECAR="$PWD/crates/providers/line/sidecar/index.js"
+export HORON_MESSENGER_LINE_SIDECAR="$PWD/crates/providers/line/sidecar/index.js"
 ```
 
-`HYPER_MESSENGER_CONFIG_DIR` (the same variable the CLI reads) selects where the
+`HORON_MESSENGER_CONFIG_DIR` (the same variable the CLI reads) selects where the
 per-account linejs storage file lives under `line-storage/`.
 
 ## Protocol

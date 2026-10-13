@@ -14,13 +14,13 @@ platform is an independent adapter crate. It is the Rust counterpart of
 
 | Path | Crate | Role |
 |------|-------|------|
-| `crates/core` | `hyper-messenger-core` | `Provider` trait, domain model, `Capabilities`, `ConfigPaths`, `CredentialStore`, `Envelope` |
-| `crates/sdk` | `hyper-messenger-sdk` | `Client` / `ClientBuilder`; assembles the registry of enabled providers |
-| `crates/cli` | `hyper-messenger-cli` | `hyper-messenger` binary (clap) |
-| `crates/mcp` | `hyper-messenger-mcp` | `hyper-messenger-mcp` binary (rmcp, stdio) |
-| `crates/server` | `hyper-messenger-server` | `hyper-messenger-server` binary (axum) |
-| `crates/ui` | `hyper-messenger-ui` | `hyper-messenger-tui` binary (ratatui) |
-| `crates/providers/*` | `hyper-messenger-provider-*` | One crate per platform |
+| `crates/core` | `horon-messenger-core` | `Provider` trait, domain model, `Capabilities`, `ConfigPaths`, `CredentialStore`, `Envelope` |
+| `crates/sdk` | `horon-messenger-sdk` | `Client` / `ClientBuilder`; assembles the registry of enabled providers |
+| `crates/cli` | `horon-messenger-cli` | `horon-messenger` binary (clap) |
+| `crates/mcp` | `horon-messenger-mcp` | `horon-messenger-mcp` binary (rmcp, stdio) |
+| `crates/server` | `horon-messenger-server` | `horon-messenger-server` binary (axum) |
+| `crates/ui` | `horon-messenger-ui` | `horon-messenger-tui` binary (ratatui) |
+| `crates/providers/*` | `horon-messenger-provider-*` | One crate per platform |
 
 Dependency direction: `providers -> core`, `sdk -> core + providers`, `surfaces ->
 sdk`. Nothing depends on a surface.

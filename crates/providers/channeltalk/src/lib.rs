@@ -6,7 +6,7 @@ mod models;
 use async_trait::async_trait;
 use serde_json::Value;
 
-use hyper_messenger_core::{
+use horon_messenger_core::{
     AccountSummary, AuthMethod, AuthProvider, AuthStatus, Capabilities, Chat, ChatKind, ChatQuery,
     ConfigPaths, CredentialStore, Delivery, Error, FileCredentialStore, LoginOptions, LoginOutcome,
     Member, Message, MessagePage, MessageQuery, Profile, Provider, ProviderKind, Result,
@@ -18,8 +18,8 @@ use models::ChannelMessage;
 
 const PROVIDER: ProviderKind = ProviderKind::ChannelTalk;
 const DEFAULT_ACCOUNT: &str = "default";
-const ACCOUNT_ENV: &str = "HYPER_MESSENGER_CHANNELTALK_ACCOUNT_COOKIE";
-const SESSION_ENV: &str = "HYPER_MESSENGER_CHANNELTALK_SESSION_COOKIE";
+const ACCOUNT_ENV: &str = "HORON_MESSENGER_CHANNELTALK_ACCOUNT_COOKIE";
+const SESSION_ENV: &str = "HORON_MESSENGER_CHANNELTALK_SESSION_COOKIE";
 
 #[derive(Debug, Clone)]
 struct Credentials {

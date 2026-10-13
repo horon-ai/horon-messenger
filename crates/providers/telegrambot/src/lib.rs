@@ -13,7 +13,7 @@ use std::collections::HashSet;
 use async_trait::async_trait;
 use serde_json::Value;
 
-use hyper_messenger_core::{
+use horon_messenger_core::{
     AccountSummary, AuthMethod, AuthProvider, AuthStatus, Capabilities, Chat, ChatKind, ChatQuery,
     ConfigPaths, CredentialStore, Delivery, Error, FileCredentialStore, LoginOptions, LoginOutcome,
     Member, Message, MessagePage, MessageQuery, Profile, Provider, ProviderKind, Result,
@@ -25,7 +25,7 @@ use models::{BotUser, Message as TelegramMessage, TelegramChat};
 
 const PROVIDER: ProviderKind = ProviderKind::TelegramBot;
 const DEFAULT_ACCOUNT: &str = "default";
-const TOKEN_ENV: &str = "HYPER_MESSENGER_TELEGRAMBOT_TOKEN";
+const TOKEN_ENV: &str = "HORON_MESSENGER_TELEGRAMBOT_TOKEN";
 
 /// The Telegram Bot provider, authenticated with a bot token.
 #[derive(Debug, Clone)]

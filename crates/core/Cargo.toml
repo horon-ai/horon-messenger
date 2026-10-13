@@ -1,6 +1,6 @@
 [package]
-name = "hyper-messenger-core"
-description = "Core contracts for hyper-messenger: the provider abstraction, domain model, config, credentials and the shared wire envelope."
+name = "horon-messenger-core"
+description = "Core contracts for horon-messenger: the provider abstraction, domain model, config, credentials and the shared wire envelope."
 version.workspace = true
 edition.workspace = true
 rust-version.workspace = true

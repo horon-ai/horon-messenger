@@ -8,12 +8,12 @@ use std::time::Duration;
 use async_trait::async_trait;
 use serde_json::{Value, json};
 
-use hyper_messenger_core::{
+use horon_messenger_core::{
     AccountSummary, AuthMethod, AuthProvider, AuthStatus, Capabilities, Chat, ChatKind, ChatQuery,
     ConfigPaths, Error, FileCredentialStore, Member, Message, MessagePage, MessageQuery, Profile,
     Provider, ProviderKind, Result, SendRequest, SendResult, Snapshot, now_rfc3339,
 };
-use hyper_messenger_provider_common::{DEFAULT_TIMEOUT, SidecarSpec};
+use horon_messenger_provider_common::{DEFAULT_TIMEOUT, SidecarSpec};
 
 use client::IMessageClient;
 use models::{ImsgChat, ImsgMessage};
@@ -21,7 +21,7 @@ use models::{ImsgChat, ImsgMessage};
 pub(crate) const PROVIDER: ProviderKind = ProviderKind::IMessage;
 
 const DEFAULT_BIN: &str = "imsg";
-const BIN_ENV: &str = "HYPER_MESSENGER_IMSG_BIN";
+const BIN_ENV: &str = "HORON_MESSENGER_IMSG_BIN";
 const LOCAL_ACCOUNT: &str = "local";
 const CHAT_SCAN_LIMIT: usize = 1000;
 const DEFAULT_LIMIT: usize = 25;
@@ -176,7 +176,7 @@ impl IMessageProvider {
 
     #[cfg(test)]
     fn for_test(spec: SidecarSpec, timeout: Duration) -> Self {
-        let paths = ConfigPaths::at(std::env::temp_dir().join("hyper-messenger-imessage-tests"));
+        let paths = ConfigPaths::at(std::env::temp_dir().join("horon-messenger-imessage-tests"));
         Self {
             credentials: FileCredentialStore::new(paths.clone()),
             paths,
@@ -310,7 +310,7 @@ impl Provider for IMessageProvider {
             message_id,
             sent_at: now_rfc3339(),
             accepted: response.ok.unwrap_or(true),
-            delivery: hyper_messenger_core::Delivery::ServerAccepted,
+            delivery: horon_messenger_core::Delivery::ServerAccepted,
             extra: json!({ "service": response.service }),
         })
     }
@@ -385,7 +385,7 @@ impl AuthProvider for IMessageProvider {
 #[cfg(test)]
 mod tests {
     use super::*;
-    use hyper_messenger_core::Delivery;
+    use horon_messenger_core::Delivery;
 
     const FIXTURE_STUB: &str = r#"
 import sys, json
@@ -584,7 +584,7 @@ sys.exit(0)
         let provider = IMessageProvider::for_test(
             SidecarSpec::new(
                 PROVIDER,
-                "/nonexistent/hyper-messenger-imsg",
+                "/nonexistent/horon-messenger-imsg",
                 vec!["rpc".to_owned()],
             ),
             Duration::from_secs(5),

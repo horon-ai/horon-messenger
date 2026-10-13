@@ -3,7 +3,7 @@
 use serde::Deserialize;
 use serde_json::{Map, Value};
 
-use hyper_messenger_core::{Chat, ChatKind, Member, Message, ProviderKind, now_rfc3339};
+use horon_messenger_core::{Chat, ChatKind, Member, Message, ProviderKind, now_rfc3339};
 
 const PROVIDER: ProviderKind = ProviderKind::WhatsApp;
 

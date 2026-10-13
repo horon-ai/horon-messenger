@@ -3,16 +3,16 @@ set -euo pipefail
 
 HERE="$(cd "$(dirname "$0")" && pwd)"
 ROOT="$(cd "$HERE/../../../../.." && pwd)"
-BIN="$ROOT/target/debug/hyper-messenger"
+BIN="$ROOT/target/debug/horon-messenger"
 PORT=8813
 BASE="http://127.0.0.1:$PORT"
 
-export HYPER_MESSENGER_SLACKBOT_API_BASE="$BASE"
-export HYPER_MESSENGER_SLACKBOT_TOKEN="xoxb-test-token"
-export HYPER_MESSENGER_CONFIG_DIR="$(mktemp -d)"
+export HORON_MESSENGER_SLACKBOT_API_BASE="$BASE"
+export HORON_MESSENGER_SLACKBOT_TOKEN="xoxb-test-token"
+export HORON_MESSENGER_CONFIG_DIR="$(mktemp -d)"
 
 echo "== build cli =="
-cargo build -p hyper-messenger-cli --features hyper-messenger-sdk/all >/dev/null
+cargo build -p horon-messenger-cli --features horon-messenger-sdk/all >/dev/null
 
 echo "== start mock slack on $PORT =="
 python3 "$HERE/mock_slack.py" "$PORT" &
@@ -20,7 +20,7 @@ MOCK_PID=$!
 cleanup() {
   kill "$MOCK_PID" 2>/dev/null || true
   wait "$MOCK_PID" 2>/dev/null || true
-  rm -rf "$HYPER_MESSENGER_CONFIG_DIR"
+  rm -rf "$HORON_MESSENGER_CONFIG_DIR"
   echo "cleanup: mock pid $MOCK_PID stopped, config dir removed"
 }
 trap cleanup EXIT

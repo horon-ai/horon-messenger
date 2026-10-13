@@ -4,7 +4,7 @@ use std::ffi::{CStr, CString};
 use std::os::raw::{c_char, c_double, c_int};
 use std::path::PathBuf;
 
-use hyper_messenger_core::{Error, ProviderKind, Result};
+use horon_messenger_core::{Error, ProviderKind, Result};
 
 type CreateClientId = unsafe extern "C" fn() -> c_int;
 type SendRequest = unsafe extern "C" fn(c_int, *const c_char);
@@ -142,7 +142,7 @@ fn library_file_name() -> &'static str {
 fn default_candidates() -> Vec<PathBuf> {
     let name = library_file_name();
     let mut candidates = Vec::new();
-    for var in ["TDLIB_PATH", "TDJSON_PATH", "HYPER_MESSENGER_TDLIB_PATH"] {
+    for var in ["TDLIB_PATH", "TDJSON_PATH", "HORON_MESSENGER_TDLIB_PATH"] {
         if let Some(value) = std::env::var_os(var)
             && !value.is_empty()
         {

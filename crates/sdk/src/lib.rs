@@ -1,5 +1,5 @@
-pub use hyper_messenger_core as core;
-pub use hyper_messenger_core::*;
+pub use horon_messenger_core as core;
+pub use horon_messenger_core::*;
 
 use std::path::PathBuf;
 use std::sync::Arc;
@@ -133,78 +133,78 @@ impl ClientBuilder {
 fn register_builtin(registry: &mut ProviderRegistry, paths: &ConfigPaths) {
     #[cfg(feature = "mock")]
     {
-        registry.register(Arc::new(hyper_messenger_provider_mock::MockProvider::new()));
+        registry.register(Arc::new(horon_messenger_provider_mock::MockProvider::new()));
     }
     #[cfg(feature = "kakaotalk")]
     {
         registry.register(Arc::new(
-            hyper_messenger_provider_kakaotalk::KakaoTalkProvider::new(paths.clone()),
+            horon_messenger_provider_kakaotalk::KakaoTalkProvider::new(paths.clone()),
         ));
     }
     #[cfg(feature = "discord")]
     {
         registry.register(Arc::new(
-            hyper_messenger_provider_discord::DiscordProvider::new(paths.clone()),
+            horon_messenger_provider_discord::DiscordProvider::new(paths.clone()),
         ));
     }
     #[cfg(feature = "telegram")]
     {
         registry.register(Arc::new(
-            hyper_messenger_provider_telegram::TelegramProvider::new(paths.clone()),
+            horon_messenger_provider_telegram::TelegramProvider::new(paths.clone()),
         ));
     }
     #[cfg(feature = "channeltalk")]
     {
         registry.register(Arc::new(
-            hyper_messenger_provider_channeltalk::ChannelTalkProvider::new(paths.clone()),
+            horon_messenger_provider_channeltalk::ChannelTalkProvider::new(paths.clone()),
         ));
     }
     #[cfg(feature = "telegrambot")]
     {
         registry.register(Arc::new(
-            hyper_messenger_provider_telegrambot::TelegramBotProvider::new(paths.clone()),
+            horon_messenger_provider_telegrambot::TelegramBotProvider::new(paths.clone()),
         ));
     }
     #[cfg(feature = "whatsappbot")]
     {
         registry.register(Arc::new(
-            hyper_messenger_provider_whatsappbot::WhatsAppBotProvider::new(paths.clone()),
+            horon_messenger_provider_whatsappbot::WhatsAppBotProvider::new(paths.clone()),
         ));
     }
     #[cfg(feature = "slackbot")]
     {
         registry.register(Arc::new(
-            hyper_messenger_provider_slackbot::SlackBotProvider::new(paths.clone()),
+            horon_messenger_provider_slackbot::SlackBotProvider::new(paths.clone()),
         ));
     }
     #[cfg(feature = "slack")]
     {
         registry.register(Arc::new(
-            hyper_messenger_provider_slack::SlackProvider::new(paths.clone()),
+            horon_messenger_provider_slack::SlackProvider::new(paths.clone()),
         ));
     }
     #[cfg(feature = "imessage")]
     {
         registry.register(Arc::new(
-            hyper_messenger_provider_imessage::IMessageProvider::new(paths.clone()),
+            horon_messenger_provider_imessage::IMessageProvider::new(paths.clone()),
         ));
     }
     #[cfg(feature = "whatsapp")]
     {
         registry.register(Arc::new(
-            hyper_messenger_provider_whatsapp::WhatsAppProvider::new(paths.clone()),
+            horon_messenger_provider_whatsapp::WhatsAppProvider::new(paths.clone()),
         ));
     }
     #[cfg(feature = "line")]
     {
-        registry.register(Arc::new(hyper_messenger_provider_line::LineProvider::new(
+        registry.register(Arc::new(horon_messenger_provider_line::LineProvider::new(
             paths.clone(),
         )));
     }
     #[cfg(feature = "instagram")]
     {
         registry.register(Arc::new(
-            hyper_messenger_provider_instagram::InstagramProvider::new(paths.clone()),
+            horon_messenger_provider_instagram::InstagramProvider::new(paths.clone()),
         ));
     }
     let _ = paths;

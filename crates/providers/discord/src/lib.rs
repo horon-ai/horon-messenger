@@ -6,7 +6,7 @@ mod models;
 use async_trait::async_trait;
 use serde_json::Value;
 
-use hyper_messenger_core::{
+use horon_messenger_core::{
     AccountSummary, AuthMethod, AuthProvider, AuthStatus, Capabilities, Chat, ChatKind, ChatQuery,
     ConfigPaths, CredentialStore, Delivery, Error, FileCredentialStore, LoginOptions, LoginOutcome,
     Member, Message, MessagePage, MessageQuery, Profile, Provider, ProviderKind, Result,
@@ -18,7 +18,7 @@ use models::DiscordMessage;
 
 const PROVIDER: ProviderKind = ProviderKind::Discord;
 const DEFAULT_ACCOUNT: &str = "default";
-const TOKEN_ENV: &str = "HYPER_MESSENGER_DISCORD_TOKEN";
+const TOKEN_ENV: &str = "HORON_MESSENGER_DISCORD_TOKEN";
 const E2E_TOKEN_ENV: &str = "E2E_DISCORD_TOKEN";
 
 /// The Discord provider: token authentication over the REST v10 API.

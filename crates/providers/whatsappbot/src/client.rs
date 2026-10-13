@@ -1,15 +1,15 @@
 use reqwest::header::{HeaderMap, HeaderValue};
 use serde::de::DeserializeOwned;
 
-use hyper_messenger_core::{Error, ProviderKind, Result};
-use hyper_messenger_provider_common::{HttpClient, Request};
+use horon_messenger_core::{Error, ProviderKind, Result};
+use horon_messenger_provider_common::{HttpClient, Request};
 
 use crate::models::{MessageResponse, PhoneNumber};
 
 /// The production Graph API base URL.
 pub const DEFAULT_BASE_URL: &str = "https://graph.facebook.com/v23.0";
 /// The environment variable that overrides the Graph API base URL.
-pub const BASE_URL_ENV: &str = "HYPER_MESSENGER_WHATSAPPBOT_API_BASE";
+pub const BASE_URL_ENV: &str = "HORON_MESSENGER_WHATSAPPBOT_API_BASE";
 
 const BUCKET_KEY: &str = "whatsappbot:global";
 
@@ -91,7 +91,7 @@ impl WhatsAppBotClient {
 #[cfg(test)]
 mod tests {
     use super::*;
-    use hyper_messenger_core::ErrorCode;
+    use horon_messenger_core::ErrorCode;
     use tokio::io::{AsyncReadExt, AsyncWriteExt};
     use tokio::net::TcpListener;
 

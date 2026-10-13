@@ -1,7 +1,7 @@
 //! The transport a [`crate::TelegramProvider`] drives: the real TDLib client or the `qa-fake` replay.
 
 use async_trait::async_trait;
-use hyper_messenger_core::{Chat, Member, Message, Profile, Result};
+use horon_messenger_core::{Chat, Member, Message, Profile, Result};
 use serde_json::Value;
 
 /// The operations a Telegram transport answers, independent of how it is backed.

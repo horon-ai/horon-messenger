@@ -8,7 +8,7 @@ mod session;
 use async_trait::async_trait;
 use serde_json::Value;
 
-use hyper_messenger_core::{
+use horon_messenger_core::{
     AccountSummary, AuthMethod, AuthProvider, AuthStatus, Capabilities, Chat, ChatQuery,
     ConfigPaths, CredentialStore, Delivery, Error, FileCredentialStore, LoginOptions, LoginOutcome,
     Member, Message, MessagePage, MessageQuery, Profile, Provider, ProviderKind, Result,
@@ -21,10 +21,10 @@ use session::InstagramSession;
 
 const PROVIDER: ProviderKind = ProviderKind::Instagram;
 const DEFAULT_ACCOUNT: &str = "default";
-const SESSIONID_ENV: &str = "HYPER_MESSENGER_INSTAGRAM_SESSIONID";
-const DS_USER_ID_ENV: &str = "HYPER_MESSENGER_INSTAGRAM_DS_USER_ID";
-const DEVICE_ID_ENV: &str = "HYPER_MESSENGER_INSTAGRAM_DEVICE_ID";
-const CSRFTOKEN_ENV: &str = "HYPER_MESSENGER_INSTAGRAM_CSRFTOKEN";
+const SESSIONID_ENV: &str = "HORON_MESSENGER_INSTAGRAM_SESSIONID";
+const DS_USER_ID_ENV: &str = "HORON_MESSENGER_INSTAGRAM_DS_USER_ID";
+const DEVICE_ID_ENV: &str = "HORON_MESSENGER_INSTAGRAM_DEVICE_ID";
+const CSRFTOKEN_ENV: &str = "HORON_MESSENGER_INSTAGRAM_CSRFTOKEN";
 
 /// The Instagram provider: account authentication over the Instagram mobile API.
 #[derive(Debug, Clone)]

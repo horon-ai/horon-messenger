@@ -5,13 +5,13 @@ use reqwest::header::{HeaderMap, HeaderValue};
 use serde::de::DeserializeOwned;
 use serde_json::Value;
 
-use hyper_messenger_core::{Error, ProviderKind, Result};
-use hyper_messenger_provider_common::{HttpClient, Request, urlencode};
+use horon_messenger_core::{Error, ProviderKind, Result};
+use horon_messenger_provider_common::{HttpClient, Request, urlencode};
 
 use crate::models::{Channel, ChannelAccount, ChannelManager, ChannelMessage, SearchHit};
 
 pub const DEFAULT_BASE_URL: &str = "https://desk-api.channel.io";
-pub const BASE_URL_ENV: &str = "HYPER_MESSENGER_CHANNELTALK_API_BASE";
+pub const BASE_URL_ENV: &str = "HORON_MESSENGER_CHANNELTALK_API_BASE";
 
 const BUCKET_KEY: &str = "channeltalk:global";
 

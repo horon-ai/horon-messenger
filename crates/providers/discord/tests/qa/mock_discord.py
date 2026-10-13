@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Mock Discord REST API for hyper-messenger QA.
+"""Mock Discord REST API for horon-messenger QA.
 
 401s on a wrong Authorization header. Serves the routes the Discord provider
 calls, plus two QA-only endpoints: GET /__stats returns per-route request counts

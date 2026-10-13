@@ -7,7 +7,7 @@ use axum::{
     routing::get,
 };
 use clap::Parser;
-use hyper_messenger_sdk::{
+use horon_messenger_sdk::{
     ChatQuery, Client, Envelope, MessageQuery, Meta, ProviderKind, SendRequest,
 };
 use serde::Deserialize;
@@ -15,9 +15,9 @@ use tower_http::trace::TraceLayer;
 
 #[derive(Debug, Parser)]
 #[command(
-    name = "hyper-messenger-server",
+    name = "horon-messenger-server",
     version,
-    about = "HTTP API for hyper-messenger"
+    about = "HTTP API for horon-messenger"
 )]
 struct Args {
     #[arg(long, default_value = "127.0.0.1")]
@@ -26,7 +26,7 @@ struct Args {
     #[arg(long, default_value_t = 8787)]
     port: u16,
 
-    #[arg(long, env = "HYPER_MESSENGER_CONFIG_DIR")]
+    #[arg(long, env = "HORON_MESSENGER_CONFIG_DIR")]
     config_dir: Option<PathBuf>,
 }
 
@@ -74,7 +74,7 @@ async fn main() -> anyhow::Result<()> {
 
     let listener = tokio::net::TcpListener::bind((args.host.as_str(), args.port)).await?;
     tracing::info!(
-        "hyper-messenger-server listening on http://{}:{}",
+        "horon-messenger-server listening on http://{}:{}",
         args.host,
         args.port
     );

@@ -5,7 +5,7 @@ ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/../../../../.." && pwd)"
 QA_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 PORT=8811
 CHAT="42"
-BIN="$ROOT/target/debug/hyper-messenger"
+BIN="$ROOT/target/debug/horon-messenger"
 CFG="$(mktemp -d)"
 MOCK_PID=""
 
@@ -20,7 +20,7 @@ cleanup() {
 trap cleanup EXIT
 
 echo "# building the CLI with all features"
-if ! (cd "$ROOT" && cargo build -p hyper-messenger-cli --features hyper-messenger-sdk/all -q); then
+if ! (cd "$ROOT" && cargo build -p horon-messenger-cli --features horon-messenger-sdk/all -q); then
   echo "build failed"
   exit 1
 fi
@@ -34,9 +34,9 @@ for _ in $(seq 1 60); do
   sleep 0.1
 done
 
-export HYPER_MESSENGER_CONFIG_DIR="$CFG"
-export HYPER_MESSENGER_TELEGRAMBOT_API_BASE="http://127.0.0.1:$PORT"
-export HYPER_MESSENGER_TELEGRAMBOT_TOKEN="mock"
+export HORON_MESSENGER_CONFIG_DIR="$CFG"
+export HORON_MESSENGER_TELEGRAMBOT_API_BASE="http://127.0.0.1:$PORT"
+export HORON_MESSENGER_TELEGRAMBOT_TOKEN="mock"
 
 echo "# whoami telegrambot"
 "$BIN" whoami telegrambot | python3 -c 'import sys,json; d=json.load(sys.stdin); assert d["ok"] is True, d; assert d["data"]["account_id"]=="123456789", d; assert d["data"]["username"]=="mock_bot", d; print("ok:true whoami mock_bot 123456789")'
@@ -58,7 +58,7 @@ bad_out="$("$BIN" send telegrambot "$CHAT" "__BADJSON__" || true)"
 echo "$bad_out" | python3 -c 'import sys,json; d=json.load(sys.stdin); assert d["ok"] is False, d; assert d["error"]["code"]=="PROTOCOL", d; print("ok:true malformed body -> PROTOCOL")'
 
 echo "# adversarial: wrong token maps ok:false 401 to AUTH_FAILED"
-wrong_out="$(HYPER_MESSENGER_TELEGRAMBOT_TOKEN="wrong" "$BIN" whoami telegrambot || true)"
+wrong_out="$(HORON_MESSENGER_TELEGRAMBOT_TOKEN="wrong" "$BIN" whoami telegrambot || true)"
 echo "$wrong_out" | python3 -c 'import sys,json; d=json.load(sys.stdin); assert d["ok"] is False, d; assert d["error"]["code"]=="AUTH_FAILED", d; print("ok:true wrong token -> AUTH_FAILED")'
 
 echo "telegrambot qa done"

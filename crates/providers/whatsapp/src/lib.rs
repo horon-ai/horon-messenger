@@ -9,7 +9,7 @@ use async_trait::async_trait;
 use serde::de::DeserializeOwned;
 use serde_json::{Value, json};
 
-use hyper_messenger_core::{
+use horon_messenger_core::{
     AccountSummary, AuthMethod, AuthProvider, AuthStatus, Capabilities, Chat, ChatQuery,
     ConfigPaths, Delivery, Error, FileCredentialStore, LoginOptions, LoginOutcome, Member,
     MessagePage, MessageQuery, Profile, Provider, ProviderKind, Result, SendRequest, SendResult,

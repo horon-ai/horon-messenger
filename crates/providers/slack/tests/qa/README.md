@@ -1,9 +1,9 @@
 # Slack provider QA
 
-Re-runnable smoke test for `hyper-messenger-provider-slack`. It boots a mock
+Re-runnable smoke test for `horon-messenger-provider-slack`. It boots a mock
 Slack Web API (`mock_slack.py`, `127.0.0.1:8814`), drives the real
-`hyper-messenger` CLI over it with `HYPER_MESSENGER_SLACK_API_BASE`,
-`HYPER_MESSENGER_SLACK_TOKEN` and `HYPER_MESSENGER_SLACK_COOKIE`, asserts each
+`horon-messenger` CLI over it with `HORON_MESSENGER_SLACK_API_BASE`,
+`HORON_MESSENGER_SLACK_TOKEN` and `HORON_MESSENGER_SLACK_COOKIE`, asserts each
 `{ok,data,meta}` envelope with `python3 -c`, then kills the mock and prints a
 `cleanup:` line.
 

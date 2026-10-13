@@ -1,6 +1,6 @@
 [package]
-name = "hyper-messenger-sdk"
-description = "The public library surface for hyper-messenger: one client over every messenger provider a build enabled."
+name = "horon-messenger-sdk"
+description = "The public library surface for horon-messenger: one client over every messenger provider a build enabled."
 version.workspace = true
 edition.workspace = true
 rust-version.workspace = true
@@ -10,37 +10,37 @@ authors.workspace = true
 
 [features]
 default = ["mock"]
-mock = ["dep:hyper-messenger-provider-mock"]
-kakaotalk = ["dep:hyper-messenger-provider-kakaotalk"]
-discord = ["dep:hyper-messenger-provider-discord"]
-telegram = ["dep:hyper-messenger-provider-telegram"]
-channeltalk = ["dep:hyper-messenger-provider-channeltalk"]
-telegrambot = ["dep:hyper-messenger-provider-telegrambot"]
-whatsappbot = ["dep:hyper-messenger-provider-whatsappbot"]
-slackbot = ["dep:hyper-messenger-provider-slackbot"]
-slack = ["dep:hyper-messenger-provider-slack"]
-imessage = ["dep:hyper-messenger-provider-imessage"]
-whatsapp = ["dep:hyper-messenger-provider-whatsapp"]
-line = ["dep:hyper-messenger-provider-line"]
-instagram = ["dep:hyper-messenger-provider-instagram"]
+mock = ["dep:horon-messenger-provider-mock"]
+kakaotalk = ["dep:horon-messenger-provider-kakaotalk"]
+discord = ["dep:horon-messenger-provider-discord"]
+telegram = ["dep:horon-messenger-provider-telegram"]
+channeltalk = ["dep:horon-messenger-provider-channeltalk"]
+telegrambot = ["dep:horon-messenger-provider-telegrambot"]
+whatsappbot = ["dep:horon-messenger-provider-whatsappbot"]
+slackbot = ["dep:horon-messenger-provider-slackbot"]
+slack = ["dep:horon-messenger-provider-slack"]
+imessage = ["dep:horon-messenger-provider-imessage"]
+whatsapp = ["dep:horon-messenger-provider-whatsapp"]
+line = ["dep:horon-messenger-provider-line"]
+instagram = ["dep:horon-messenger-provider-instagram"]
 all = ["mock", "kakaotalk", "discord", "telegram", "channeltalk", "telegrambot", "whatsappbot", "slackbot", "slack", "imessage", "whatsapp", "line", "instagram"]
-schemars = ["hyper-messenger-core/schemars"]
+schemars = ["horon-messenger-core/schemars"]
 
 [dependencies]
-hyper-messenger-core.workspace = true
-hyper-messenger-provider-mock = { workspace = true, optional = true }
-hyper-messenger-provider-kakaotalk = { workspace = true, optional = true }
-hyper-messenger-provider-discord = { workspace = true, optional = true }
-hyper-messenger-provider-telegram = { workspace = true, optional = true }
-hyper-messenger-provider-channeltalk = { workspace = true, optional = true }
-hyper-messenger-provider-telegrambot = { workspace = true, optional = true }
-hyper-messenger-provider-whatsappbot = { workspace = true, optional = true }
-hyper-messenger-provider-slackbot = { workspace = true, optional = true }
-hyper-messenger-provider-slack = { workspace = true, optional = true }
-hyper-messenger-provider-imessage = { workspace = true, optional = true }
-hyper-messenger-provider-whatsapp = { workspace = true, optional = true }
-hyper-messenger-provider-line = { workspace = true, optional = true }
-hyper-messenger-provider-instagram = { workspace = true, optional = true }
+horon-messenger-core.workspace = true
+horon-messenger-provider-mock = { workspace = true, optional = true }
+horon-messenger-provider-kakaotalk = { workspace = true, optional = true }
+horon-messenger-provider-discord = { workspace = true, optional = true }
+horon-messenger-provider-telegram = { workspace = true, optional = true }
+horon-messenger-provider-channeltalk = { workspace = true, optional = true }
+horon-messenger-provider-telegrambot = { workspace = true, optional = true }
+horon-messenger-provider-whatsappbot = { workspace = true, optional = true }
+horon-messenger-provider-slackbot = { workspace = true, optional = true }
+horon-messenger-provider-slack = { workspace = true, optional = true }
+horon-messenger-provider-imessage = { workspace = true, optional = true }
+horon-messenger-provider-whatsapp = { workspace = true, optional = true }
+horon-messenger-provider-line = { workspace = true, optional = true }
+horon-messenger-provider-instagram = { workspace = true, optional = true }
 serde.workspace = true
 serde_json.workspace = true
 

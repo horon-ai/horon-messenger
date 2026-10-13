@@ -3,7 +3,7 @@ set -euo pipefail
 
 HERE="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 ROOT="$(cd "$HERE/../../../../.." && pwd)"
-BIN="$ROOT/target/debug/hyper-messenger"
+BIN="$ROOT/target/debug/horon-messenger"
 STUB="$HERE/stub_line.py"
 CFG="$(mktemp -d)"
 
@@ -16,14 +16,14 @@ cleanup() {
 trap cleanup EXIT
 
 echo "# building the CLI with the line provider"
-(cd "$ROOT" && cargo build -p hyper-messenger-cli --features hyper-messenger-sdk/all -q)
+(cd "$ROOT" && cargo build -p horon-messenger-cli --features horon-messenger-sdk/all -q)
 
-export HYPER_MESSENGER_CONFIG_DIR="$CFG"
-export HYPER_MESSENGER_LINE_SIDECAR="$STUB"
+export HORON_MESSENGER_CONFIG_DIR="$CFG"
+export HORON_MESSENGER_LINE_SIDECAR="$STUB"
 
 fail=0
 
-echo "# happy: auth login line (stub over HYPER_MESSENGER_LINE_SIDECAR)"
+echo "# happy: auth login line (stub over HORON_MESSENGER_LINE_SIDECAR)"
 "$BIN" auth login line --param token=QA_TOKEN | python3 -c 'import sys,json; d=json.load(sys.stdin); assert d["ok"] is True, d; assert d["data"]["authenticated"] is True, d; assert d["data"]["account_id"]=="u_self", d; print("ok:true account_id=u_self")' || fail=1
 
 echo "# happy: chats line"
@@ -55,7 +55,7 @@ echo "$out" | grep -q '"code":"PROTOCOL"' || { echo "ASSERT FAILED: PROTOCOL"; f
 
 echo "# failure: no credentials -> AUTH_REQUIRED, non-zero exit"
 set +e
-out="$(HYPER_MESSENGER_CONFIG_DIR="$(mktemp -d)" "$BIN" chats line)"
+out="$(HORON_MESSENGER_CONFIG_DIR="$(mktemp -d)" "$BIN" chats line)"
 code=$?
 set -e
 echo "$out"

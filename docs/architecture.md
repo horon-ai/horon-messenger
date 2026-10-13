@@ -50,7 +50,7 @@ send while delegating sign-in to a CLI-only flow.
 `Capabilities` is a bit set. `whoami`, `list_chats`, `get_chat`, `list_messages`,
 `search_messages`, `send_message`, `send_media`, `mark_read`, `list_members`,
 `snapshot`, `listen`. Surfaces read it to describe what a provider can do before
-anything is attempted (`hyper-messenger providers`).
+anything is attempted (`horon-messenger providers`).
 
 ## Wire envelope
 
@@ -71,8 +71,8 @@ is true only for the transient classes.
 <config>/<provider>/<name>.json               # provider state (sync cursors, caches)
 ```
 
-`<config>` is `HYPER_MESSENGER_CONFIG_DIR`, else the platform config dir plus
-`hyper-messenger`. Directories are created `0700`; files are written atomically
+`<config>` is `HORON_MESSENGER_CONFIG_DIR`, else the platform config dir plus
+`horon-messenger`. Directories are created `0700`; files are written atomically
 through `write_private_atomic`, so a reader never sees a partial file. Providers
 choose their own on-disk schema; core owns only the location and the safe write.
 

@@ -1,4 +1,4 @@
-//! Core contracts shared by every hyper-messenger provider and surface: the
+//! Core contracts shared by every horon-messenger provider and surface: the
 //! [`Provider`] operation contract, the domain [`model`], config and credential
 //! paths, and the [`Envelope`] wire shape the CLI, MCP server and API server speak.
 

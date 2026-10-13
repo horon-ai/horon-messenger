@@ -3,8 +3,8 @@ use reqwest::header::{HeaderMap, HeaderValue};
 use serde::de::DeserializeOwned;
 use serde_json::Value;
 
-use hyper_messenger_core::{Error, ProviderKind, Result};
-use hyper_messenger_provider_common::{HttpClient, Request, urlencode};
+use horon_messenger_core::{Error, ProviderKind, Result};
+use horon_messenger_provider_common::{HttpClient, Request, urlencode};
 
 use crate::models::{
     SlackAuthTest, SlackChannel, SlackConversationsList, SlackHistory, SlackMembers,
@@ -12,7 +12,7 @@ use crate::models::{
 };
 
 pub const DEFAULT_BASE_URL: &str = "https://slack.com/api";
-pub const BASE_URL_ENV: &str = "HYPER_MESSENGER_SLACK_API_BASE";
+pub const BASE_URL_ENV: &str = "HORON_MESSENGER_SLACK_API_BASE";
 
 const PROVIDER: ProviderKind = ProviderKind::Slack;
 const PAGE_LIMIT: usize = 200;
@@ -280,7 +280,7 @@ impl SlackClient {
 #[cfg(test)]
 mod tests {
     use super::*;
-    use hyper_messenger_core::ErrorCode;
+    use horon_messenger_core::ErrorCode;
 
     #[test]
     fn headers_carry_bearer_token_and_cookie() {

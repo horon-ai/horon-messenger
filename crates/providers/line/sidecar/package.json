@@ -1,11 +1,11 @@
 {
-  "name": "hyper-messenger-line-sidecar",
+  "name": "horon-messenger-line-sidecar",
   "version": "0.1.0",
   "private": true,
   "type": "module",
-  "description": "linejs-backed JSON-RPC sidecar for the hyper-messenger LINE provider.",
+  "description": "linejs-backed JSON-RPC sidecar for the horon-messenger LINE provider.",
   "bin": {
-    "hyper-messenger-line-sidecar": "./index.js"
+    "horon-messenger-line-sidecar": "./index.js"
   },
   "engines": {
     "node": ">=20"

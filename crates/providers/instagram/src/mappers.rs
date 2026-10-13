@@ -1,6 +1,6 @@
 //! Maps Instagram API shapes onto the shared domain model.
 
-use hyper_messenger_core::{Attachment, Chat, ChatKind, Member, Message, Profile, ProviderKind};
+use horon_messenger_core::{Attachment, Chat, ChatKind, Member, Message, Profile, ProviderKind};
 use serde_json::Value;
 
 use crate::models::{IgUser, Item, Thread};
@@ -18,7 +18,7 @@ fn value_to_string(value: &Value) -> String {
 fn micros_to_rfc3339(micros: i64) -> String {
     chrono::DateTime::from_timestamp_millis(micros / 1000)
         .map(|time| time.to_rfc3339_opts(chrono::SecondsFormat::Millis, true))
-        .unwrap_or_else(hyper_messenger_core::now_rfc3339)
+        .unwrap_or_else(horon_messenger_core::now_rfc3339)
 }
 
 fn message_text(item: &Item) -> String {
@@ -193,7 +193,7 @@ pub fn message(item: &Item, chat_id: &str) -> Message {
         sent_at: item
             .timestamp
             .map(micros_to_rfc3339)
-            .unwrap_or_else(hyper_messenger_core::now_rfc3339),
+            .unwrap_or_else(horon_messenger_core::now_rfc3339),
         edited_at: None,
         attachments,
         reply_to: None,

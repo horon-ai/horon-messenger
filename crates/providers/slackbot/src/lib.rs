@@ -8,7 +8,7 @@ mod models;
 use async_trait::async_trait;
 use serde_json::Value;
 
-use hyper_messenger_core::{
+use horon_messenger_core::{
     AccountSummary, AuthMethod, AuthProvider, AuthStatus, Capabilities, Chat, ChatKind, ChatQuery,
     ConfigPaths, CredentialStore, Delivery, Error, FileCredentialStore, LoginOptions, LoginOutcome,
     Member, Message, MessagePage, MessageQuery, Profile, Provider, ProviderKind, Result,
@@ -19,7 +19,7 @@ use client::SlackBotClient;
 
 const PROVIDER: ProviderKind = ProviderKind::SlackBot;
 const DEFAULT_ACCOUNT: &str = "default";
-const TOKEN_ENV: &str = "HYPER_MESSENGER_SLACKBOT_TOKEN";
+const TOKEN_ENV: &str = "HORON_MESSENGER_SLACKBOT_TOKEN";
 
 /// The Slack Bot provider: bot-token authentication over the Slack Web API.
 #[derive(Debug, Clone)]
@@ -304,7 +304,7 @@ impl AuthProvider for SlackBotProvider {
 #[cfg(test)]
 mod tests {
     use super::*;
-    use hyper_messenger_core::ErrorCode;
+    use horon_messenger_core::ErrorCode;
 
     #[test]
     fn bot_token_prefix_is_accepted() {

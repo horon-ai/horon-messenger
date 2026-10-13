@@ -1,6 +1,6 @@
 [package]
-name = "hyper-messenger-mcp"
-description = "The hyper-messenger MCP server."
+name = "horon-messenger-mcp"
+description = "The horon-messenger MCP server."
 version.workspace = true
 edition.workspace = true
 rust-version.workspace = true
@@ -9,11 +9,11 @@ repository.workspace = true
 authors.workspace = true
 
 [[bin]]
-name = "hyper-messenger-mcp"
+name = "horon-messenger-mcp"
 path = "src/main.rs"
 
 [dependencies]
-hyper-messenger-sdk = { workspace = true, features = ["schemars"] }
+horon-messenger-sdk = { workspace = true, features = ["schemars"] }
 anyhow.workspace = true
 rmcp.workspace = true
 schemars.workspace = true
