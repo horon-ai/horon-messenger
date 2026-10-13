@@ -15,6 +15,8 @@ use horon_messenger_core::{
     SendRequest, SendResult, Snapshot, now_rfc3339,
 };
 
+use horon_messenger_provider_common::HttpClient;
+
 use client::InstagramClient;
 use models::Item;
 use session::InstagramSession;
@@ -27,10 +29,20 @@ const DEVICE_ID_ENV: &str = "HORON_MESSENGER_INSTAGRAM_DEVICE_ID";
 const CSRFTOKEN_ENV: &str = "HORON_MESSENGER_INSTAGRAM_CSRFTOKEN";
 
 /// The Instagram provider: account authentication over the Instagram mobile API.
-#[derive(Debug, Clone)]
+#[derive(Clone)]
 pub struct InstagramProvider {
     paths: ConfigPaths,
     credentials: FileCredentialStore,
+    http: HttpClient,
+}
+
+impl std::fmt::Debug for InstagramProvider {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        f.debug_struct("InstagramProvider")
+            .field("paths", &self.paths)
+            .field("credentials", &self.credentials)
+            .finish()
+    }
 }
 
 impl InstagramProvider {
@@ -39,6 +51,7 @@ impl InstagramProvider {
         Self {
             credentials: FileCredentialStore::new(paths.clone()),
             paths,
+            http: HttpClient::shared(),
         }
     }
 
@@ -86,7 +99,7 @@ impl InstagramProvider {
     }
 
     fn client(&self) -> Result<InstagramClient> {
-        InstagramClient::new(self.session()?)
+        InstagramClient::new(self.http.clone(), self.session()?)
     }
 }
 

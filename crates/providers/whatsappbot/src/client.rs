@@ -24,12 +24,13 @@ pub struct WhatsAppBotClient {
 impl WhatsAppBotClient {
     /// Builds a client for one phone number id, honouring the base-URL override.
     pub fn new(
+        http: HttpClient,
         phone_number_id: impl Into<String>,
         access_token: impl Into<String>,
     ) -> Result<Self> {
         let base_url = std::env::var(BASE_URL_ENV).unwrap_or_else(|_| DEFAULT_BASE_URL.to_owned());
         Ok(Self {
-            http: HttpClient::new()?,
+            http,
             base_url: base_url.trim_end_matches('/').to_owned(),
             phone_number_id: phone_number_id.into(),
             access_token: access_token.into(),
@@ -98,7 +99,7 @@ mod tests {
     #[test]
     fn base_url_honours_the_env_override() {
         unsafe { std::env::set_var(BASE_URL_ENV, "http://127.0.0.1:9997") };
-        let client = WhatsAppBotClient::new("phone", "token").unwrap();
+        let client = WhatsAppBotClient::new(HttpClient::shared(), "phone", "token").unwrap();
         assert_eq!(client.base_url, "http://127.0.0.1:9997");
         unsafe { std::env::remove_var(BASE_URL_ENV) };
     }
@@ -120,7 +121,8 @@ mod tests {
                 let _ = socket.write_all(response.as_bytes()).await;
             }
         });
-        let mut client = WhatsAppBotClient::new("phone-123", "bad-token").unwrap();
+        let mut client =
+            WhatsAppBotClient::new(HttpClient::shared(), "phone-123", "bad-token").unwrap();
         client.base_url = format!("http://{addr}");
         let error = client.verify_phone_number().await.unwrap_err();
         assert_eq!(error.code(), ErrorCode::AuthFailed);
