@@ -1,0 +1,27 @@
+{
+  "name": "@horon-ai/messenger-server-mcp",
+  "version": "0.1.0",
+  "description": "Installs the horon-messenger HTTP API server and the MCP server together.",
+  "keywords": [
+    "messenger",
+    "server",
+    "mcp",
+    "horon"
+  ],
+  "license": "MIT",
+  "homepage": "https://github.com/horon-ai/horon-messenger",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/horon-ai/horon-messenger.git"
+  },
+  "bugs": {
+    "url": "https://github.com/horon-ai/horon-messenger/issues"
+  },
+  "publishConfig": {
+    "access": "public"
+  },
+  "dependencies": {
+    "@horon-ai/messenger-server": "0.1.0",
+    "@horon-ai/messenger-mcp": "0.1.0"
+  }
+}
