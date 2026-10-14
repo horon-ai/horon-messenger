@@ -94,6 +94,7 @@ impl TdlibLibrary {
         )
     }
 
+    #[cfg(unix)]
     fn from_process() -> Option<Self> {
         let this = libloading::os::unix::Library::this();
         unsafe {
@@ -107,6 +108,11 @@ impl TdlibLibrary {
                 receive,
             })
         }
+    }
+
+    #[cfg(not(unix))]
+    fn from_process() -> Option<Self> {
+        None
     }
 }
 
