@@ -191,7 +191,7 @@ impl IMessageProvider {
         }
     }
 
-    #[cfg(test)]
+    #[cfg(all(test, target_os = "macos"))]
     fn for_test(spec: SidecarSpec, timeout: Duration) -> Self {
         let paths = ConfigPaths::at(std::env::temp_dir().join("horon-messenger-imessage-tests"));
         Self {
@@ -400,7 +400,7 @@ impl AuthProvider for IMessageProvider {
     }
 }
 
-#[cfg(test)]
+#[cfg(all(test, target_os = "macos"))]
 mod tests {
     use super::*;
     use horon_messenger_core::Delivery;
