@@ -117,12 +117,23 @@ jobs:
         run: |
           set -euo pipefail
           tag="${GITHUB_REF_NAME}"
+          mkdir -p release
+          for dir in artifacts/binaries-*; do
+            platform="${dir#artifacts/binaries-}"
+            for f in "$dir"/*; do
+              base="$(basename "$f")"
+              ext=""
+              case "$base" in *.exe) ext=".exe" ;; esac
+              name="${base%.exe}"
+              cp "$f" "release/${name}-${platform}${ext}"
+            done
+          done
+          ls -1 release
           if gh release view "$tag" >/dev/null 2>&1; then
             echo "release $tag already exists; nothing to do"
             exit 0
           fi
-          mapfile -t assets < <(find artifacts -type f)
-          gh release create "$tag" --title "$tag" --generate-notes "${assets[@]}"
+          gh release create "$tag" --title "$tag" --generate-notes release/*
 
   wrappers:
     name: publish wrappers

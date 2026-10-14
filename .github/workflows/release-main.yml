@@ -27,7 +27,7 @@ jobs:
     steps:
       - uses: actions/checkout@v4
         with:
-          ref: main
+          ref: ${{ github.event.workflow_run.head_sha || 'main' }}
           fetch-depth: 0
       - name: Install the pinned toolchain
         run: rustup toolchain install 1.97.1 --profile minimal
@@ -51,8 +51,8 @@ jobs:
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
           git commit -am "chore(release): v${{ steps.version.outputs.next }} [skip release]"
-          git tag "v${{ steps.version.outputs.next }}"
-          git push origin HEAD:main --follow-tags
+          git tag -a "v${{ steps.version.outputs.next }}" -m "Release v${{ steps.version.outputs.next }}"
+          git push origin HEAD:main "refs/tags/v${{ steps.version.outputs.next }}"
       - name: Dispatch the publisher
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
