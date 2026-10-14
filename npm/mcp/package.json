@@ -1,0 +1,42 @@
+{
+  "name": "@horon-ai/messenger-mcp",
+  "version": "0.1.0",
+  "description": "horon-messenger MCP server over stdio. Installs the prebuilt Rust binary for your platform.",
+  "keywords": [
+    "mcp",
+    "model-context-protocol",
+    "messenger",
+    "kakaotalk",
+    "discord",
+    "telegram",
+    "horon"
+  ],
+  "license": "MIT",
+  "homepage": "https://github.com/horon-ai/horon-messenger",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/horon-ai/horon-messenger.git"
+  },
+  "bugs": {
+    "url": "https://github.com/horon-ai/horon-messenger/issues"
+  },
+  "bin": {
+    "horon-messenger-mcp": "bin/horon-messenger-mcp.js"
+  },
+  "files": [
+    "bin/"
+  ],
+  "engines": {
+    "node": ">=18"
+  },
+  "publishConfig": {
+    "access": "public"
+  },
+  "optionalDependencies": {
+    "@horon-ai/messenger-mcp-darwin-arm64": "0.1.0",
+    "@horon-ai/messenger-mcp-darwin-x64": "0.1.0",
+    "@horon-ai/messenger-mcp-linux-x64-gnu": "0.1.0",
+    "@horon-ai/messenger-mcp-linux-arm64-gnu": "0.1.0",
+    "@horon-ai/messenger-mcp-win32-x64-msvc": "0.1.0"
+  }
+}

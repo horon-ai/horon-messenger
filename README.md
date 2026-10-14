@@ -69,6 +69,53 @@ Every surface depends only on `sdk`; `sdk` depends only on `core` and the
 provider crates its features enabled. A provider depends only on `core`. That is
 the whole dependency direction, and it never bends back.
 
+## Install
+
+Every surface ships as a prebuilt binary through npm, so no Rust toolchain is
+needed:
+
+```bash
+npx @horon-ai/messenger providers             # CLI
+npx @horon-ai/messenger-mcp                   # MCP server (stdio)
+npx @horon-ai/messenger-server --port 8787    # HTTP API server
+```
+
+`bunx` and `bun add -g` work the same way. Each surface installs on its own, or
+in the server-anchored combinations:
+
+| Deploy | Install |
+|--------|---------|
+| CLI only | `npm install -g @horon-ai/messenger` |
+| MCP only | `npm install -g @horon-ai/messenger-mcp` |
+| Server only | `npm install -g @horon-ai/messenger-server` |
+| Server + MCP | `npm install -g @horon-ai/messenger-server-mcp` |
+| Server + TUI | `npm install -g @horon-ai/messenger-server-tui` |
+| Server + MCP + TUI | `npm install -g @horon-ai/messenger-server-mcp-tui` |
+
+`cli` and `mcp` also run straight from the registry with `npx` or `bunx`:
+
+```bash
+npx @horon-ai/messenger providers
+bunx @horon-ai/messenger-mcp
+```
+
+The npm packages are thin wrappers:
+on install they pull the prebuilt binary for your platform
+(`@horon-ai/messenger-darwin-arm64` and so on) and run it, forwarding stdio and
+the exit code. The wrapper source lives in [`npm/`](npm/).
+
+The Rust-native paths stay available for a smaller provider set:
+
+```bash
+cargo install --path crates/cli --features discord,telegram
+cargo install horon-messenger-cli                # once published to crates.io
+```
+
+The published npm binaries are built with every provider enabled. To install
+only some providers, use the cargo path with the matching `--features`.
+`core` and `sdk` are libraries, not binaries: add them from Rust with
+`cargo add horon-messenger-sdk --features discord,telegram`.
+
 ## Build
 
 ```bash
