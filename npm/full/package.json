@@ -1,8 +1,20 @@
 {
   "name": "@horon-ai/messenger",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "description": "Installs and runs every horon-messenger surface: the CLI, the MCP server, the HTTP API server and the terminal UI.",
-  "keywords": ["messenger", "kakaotalk", "discord", "telegram", "slack", "whatsapp", "cli", "mcp", "server", "tui", "horon"],
+  "keywords": [
+    "messenger",
+    "kakaotalk",
+    "discord",
+    "telegram",
+    "slack",
+    "whatsapp",
+    "cli",
+    "mcp",
+    "server",
+    "tui",
+    "horon"
+  ],
   "license": "MIT",
   "homepage": "https://github.com/horon-ai/horon-messenger",
   "repository": {
@@ -15,7 +27,9 @@
   "bin": {
     "horon-messenger": "bin/horon-messenger.js"
   },
-  "files": ["bin/"],
+  "files": [
+    "bin/"
+  ],
   "engines": {
     "node": ">=18"
   },
@@ -23,13 +37,13 @@
     "access": "public"
   },
   "dependencies": {
-    "@horon-ai/messenger-server-mcp-tui": "0.1.0"
+    "@horon-ai/messenger-server-mcp-tui": "0.2.0"
   },
   "optionalDependencies": {
-    "@horon-ai/messenger-cli-darwin-arm64": "0.1.0",
-    "@horon-ai/messenger-cli-darwin-x64": "0.1.0",
-    "@horon-ai/messenger-cli-linux-x64-gnu": "0.1.0",
-    "@horon-ai/messenger-cli-linux-arm64-gnu": "0.1.0",
-    "@horon-ai/messenger-cli-win32-x64-msvc": "0.1.0"
+    "@horon-ai/messenger-cli-darwin-arm64": "0.2.0",
+    "@horon-ai/messenger-cli-darwin-x64": "0.2.0",
+    "@horon-ai/messenger-cli-linux-x64-gnu": "0.2.0",
+    "@horon-ai/messenger-cli-linux-arm64-gnu": "0.2.0",
+    "@horon-ai/messenger-cli-win32-x64-msvc": "0.2.0"
   }
 }

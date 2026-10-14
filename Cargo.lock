@@ -669,7 +669,7 @@ checksum = "7f24254aa9a54b5c858eaee2f5bccdb46aaf0e486a595ed5fd8f86ba55232a70"
 
 [[package]]
 name = "horon-messenger-cli"
-version = "0.1.0"
+version = "0.2.0"
 dependencies = [
  "clap",
  "futures-util",
@@ -683,7 +683,7 @@ dependencies = [
 
 [[package]]
 name = "horon-messenger-core"
-version = "0.1.0"
+version = "0.2.0"
 dependencies = [
  "async-trait",
  "chrono",
@@ -697,7 +697,7 @@ dependencies = [
 
 [[package]]
 name = "horon-messenger-mcp"
-version = "0.1.0"
+version = "0.2.0"
 dependencies = [
  "anyhow",
  "futures-util",
@@ -712,7 +712,7 @@ dependencies = [
 
 [[package]]
 name = "horon-messenger-provider-channeltalk"
-version = "0.1.0"
+version = "0.2.0"
 dependencies = [
  "async-trait",
  "chrono",
@@ -727,7 +727,7 @@ dependencies = [
 
 [[package]]
 name = "horon-messenger-provider-common"
-version = "0.1.0"
+version = "0.2.0"
 dependencies = [
  "horon-messenger-core",
  "reqwest",
@@ -738,7 +738,7 @@ dependencies = [
 
 [[package]]
 name = "horon-messenger-provider-discord"
-version = "0.1.0"
+version = "0.2.0"
 dependencies = [
  "async-trait",
  "base64 0.22.1",
@@ -753,7 +753,7 @@ dependencies = [
 
 [[package]]
 name = "horon-messenger-provider-imessage"
-version = "0.1.0"
+version = "0.2.0"
 dependencies = [
  "async-trait",
  "horon-messenger-core",
@@ -767,7 +767,7 @@ dependencies = [
 
 [[package]]
 name = "horon-messenger-provider-instagram"
-version = "0.1.0"
+version = "0.2.0"
 dependencies = [
  "async-trait",
  "chrono",
@@ -783,14 +783,14 @@ dependencies = [
 
 [[package]]
 name = "horon-messenger-provider-kakaotalk"
-version = "0.1.0"
+version = "0.2.0"
 dependencies = [
  "horon-messenger-core",
 ]
 
 [[package]]
 name = "horon-messenger-provider-line"
-version = "0.1.0"
+version = "0.2.0"
 dependencies = [
  "async-trait",
  "horon-messenger-core",
@@ -804,7 +804,7 @@ dependencies = [
 
 [[package]]
 name = "horon-messenger-provider-mock"
-version = "0.1.0"
+version = "0.2.0"
 dependencies = [
  "async-trait",
  "futures-util",
@@ -815,7 +815,7 @@ dependencies = [
 
 [[package]]
 name = "horon-messenger-provider-slack"
-version = "0.1.0"
+version = "0.2.0"
 dependencies = [
  "async-trait",
  "horon-messenger-core",
@@ -829,7 +829,7 @@ dependencies = [
 
 [[package]]
 name = "horon-messenger-provider-slackbot"
-version = "0.1.0"
+version = "0.2.0"
 dependencies = [
  "async-trait",
  "chrono",
@@ -844,7 +844,7 @@ dependencies = [
 
 [[package]]
 name = "horon-messenger-provider-telegram"
-version = "0.1.0"
+version = "0.2.0"
 dependencies = [
  "async-trait",
  "chrono",
@@ -859,7 +859,7 @@ dependencies = [
 
 [[package]]
 name = "horon-messenger-provider-telegrambot"
-version = "0.1.0"
+version = "0.2.0"
 dependencies = [
  "async-trait",
  "chrono",
@@ -874,7 +874,7 @@ dependencies = [
 
 [[package]]
 name = "horon-messenger-provider-whatsapp"
-version = "0.1.0"
+version = "0.2.0"
 dependencies = [
  "async-trait",
  "horon-messenger-core",
@@ -886,7 +886,7 @@ dependencies = [
 
 [[package]]
 name = "horon-messenger-provider-whatsappbot"
-version = "0.1.0"
+version = "0.2.0"
 dependencies = [
  "async-trait",
  "horon-messenger-core",
@@ -900,7 +900,7 @@ dependencies = [
 
 [[package]]
 name = "horon-messenger-sdk"
-version = "0.1.0"
+version = "0.2.0"
 dependencies = [
  "horon-messenger-core",
  "horon-messenger-provider-channeltalk",
@@ -923,7 +923,7 @@ dependencies = [
 
 [[package]]
 name = "horon-messenger-server"
-version = "0.1.0"
+version = "0.2.0"
 dependencies = [
  "anyhow",
  "axum",
@@ -941,7 +941,7 @@ dependencies = [
 
 [[package]]
 name = "horon-messenger-ui"
-version = "0.1.0"
+version = "0.2.0"
 dependencies = [
  "anyhow",
  "clap",

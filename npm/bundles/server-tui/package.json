@@ -1,6 +1,6 @@
 {
   "name": "@horon-ai/messenger-server-tui",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "description": "Installs the horon-messenger HTTP API server and the terminal UI together.",
   "keywords": [
     "messenger",
@@ -27,13 +27,13 @@
     "access": "public"
   },
   "dependencies": {
-    "@horon-ai/messenger-server": "0.1.0"
+    "@horon-ai/messenger-server": "0.2.0"
   },
   "optionalDependencies": {
-    "@horon-ai/messenger-tui-darwin-arm64": "0.1.0",
-    "@horon-ai/messenger-tui-darwin-x64": "0.1.0",
-    "@horon-ai/messenger-tui-linux-x64-gnu": "0.1.0",
-    "@horon-ai/messenger-tui-linux-arm64-gnu": "0.1.0",
-    "@horon-ai/messenger-tui-win32-x64-msvc": "0.1.0"
+    "@horon-ai/messenger-tui-darwin-arm64": "0.2.0",
+    "@horon-ai/messenger-tui-darwin-x64": "0.2.0",
+    "@horon-ai/messenger-tui-linux-x64-gnu": "0.2.0",
+    "@horon-ai/messenger-tui-linux-arm64-gnu": "0.2.0",
+    "@horon-ai/messenger-tui-win32-x64-msvc": "0.2.0"
   }
 }
