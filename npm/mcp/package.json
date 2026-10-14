@@ -1,6 +1,6 @@
 {
   "name": "@horon-ai/messenger-mcp",
-  "version": "0.3.0",
+  "version": "0.4.0",
   "description": "horon-messenger MCP server over stdio. Installs the prebuilt Rust binary for your platform.",
   "keywords": [
     "mcp",
@@ -33,10 +33,10 @@
     "access": "public"
   },
   "optionalDependencies": {
-    "@horon-ai/messenger-mcp-darwin-arm64": "0.3.0",
-    "@horon-ai/messenger-mcp-darwin-x64": "0.3.0",
-    "@horon-ai/messenger-mcp-linux-x64-gnu": "0.3.0",
-    "@horon-ai/messenger-mcp-linux-arm64-gnu": "0.3.0",
-    "@horon-ai/messenger-mcp-win32-x64-msvc": "0.3.0"
+    "@horon-ai/messenger-mcp-darwin-arm64": "0.4.0",
+    "@horon-ai/messenger-mcp-darwin-x64": "0.4.0",
+    "@horon-ai/messenger-mcp-linux-x64-gnu": "0.4.0",
+    "@horon-ai/messenger-mcp-linux-arm64-gnu": "0.4.0",
+    "@horon-ai/messenger-mcp-win32-x64-msvc": "0.4.0"
   }
 }

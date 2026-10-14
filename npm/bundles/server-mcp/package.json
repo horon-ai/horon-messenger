@@ -1,6 +1,6 @@
 {
   "name": "@horon-ai/messenger-server-mcp",
-  "version": "0.3.0",
+  "version": "0.4.0",
   "description": "Installs the horon-messenger HTTP API server and the MCP server together.",
   "keywords": [
     "messenger",
@@ -21,7 +21,7 @@
     "access": "public"
   },
   "dependencies": {
-    "@horon-ai/messenger-server": "0.3.0",
-    "@horon-ai/messenger-mcp": "0.3.0"
+    "@horon-ai/messenger-server": "0.4.0",
+    "@horon-ai/messenger-mcp": "0.4.0"
   }
 }
