@@ -24,7 +24,7 @@ members = [
 ]
 
 [workspace.package]
-version = "0.6.0"
+version = "0.7.0"
 edition = "2024"
 rust-version = "1.97"
 license = "MIT"
@@ -33,22 +33,22 @@ authors = ["minyeol"]
 description = "Multi-messenger bridge for AI agents: one CLI, SDK, MCP server and API server across KakaoTalk, Discord, Telegram, Channel Talk and more."
 
 [workspace.dependencies]
-horon-messenger-core = { path = "crates/core", version = "0.6.0" }
-horon-messenger-sdk = { path = "crates/sdk", version = "0.6.0", default-features = false }
-horon-messenger-provider-common = { path = "crates/providers/common", version = "0.6.0" }
-horon-messenger-provider-mock = { path = "crates/providers/mock", version = "0.6.0" }
-horon-messenger-provider-kakaotalk = { path = "crates/providers/kakaotalk", version = "0.6.0" }
-horon-messenger-provider-discord = { path = "crates/providers/discord", version = "0.6.0" }
-horon-messenger-provider-telegram = { path = "crates/providers/telegram", version = "0.6.0" }
-horon-messenger-provider-channeltalk = { path = "crates/providers/channeltalk", version = "0.6.0" }
-horon-messenger-provider-telegrambot = { path = "crates/providers/telegrambot", version = "0.6.0" }
-horon-messenger-provider-whatsappbot = { path = "crates/providers/whatsappbot", version = "0.6.0" }
-horon-messenger-provider-slackbot = { path = "crates/providers/slackbot", version = "0.6.0" }
-horon-messenger-provider-slack = { path = "crates/providers/slack", version = "0.6.0" }
-horon-messenger-provider-imessage = { path = "crates/providers/imessage", version = "0.6.0" }
-horon-messenger-provider-whatsapp = { path = "crates/providers/whatsapp", version = "0.6.0" }
-horon-messenger-provider-line = { path = "crates/providers/line", version = "0.6.0" }
-horon-messenger-provider-instagram = { path = "crates/providers/instagram", version = "0.6.0" }
+horon-messenger-core = { path = "crates/core", version = "0.7.0" }
+horon-messenger-sdk = { path = "crates/sdk", version = "0.7.0", default-features = false }
+horon-messenger-provider-common = { path = "crates/providers/common", version = "0.7.0" }
+horon-messenger-provider-mock = { path = "crates/providers/mock", version = "0.7.0" }
+horon-messenger-provider-kakaotalk = { path = "crates/providers/kakaotalk", version = "0.7.0" }
+horon-messenger-provider-discord = { path = "crates/providers/discord", version = "0.7.0" }
+horon-messenger-provider-telegram = { path = "crates/providers/telegram", version = "0.7.0" }
+horon-messenger-provider-channeltalk = { path = "crates/providers/channeltalk", version = "0.7.0" }
+horon-messenger-provider-telegrambot = { path = "crates/providers/telegrambot", version = "0.7.0" }
+horon-messenger-provider-whatsappbot = { path = "crates/providers/whatsappbot", version = "0.7.0" }
+horon-messenger-provider-slackbot = { path = "crates/providers/slackbot", version = "0.7.0" }
+horon-messenger-provider-slack = { path = "crates/providers/slack", version = "0.7.0" }
+horon-messenger-provider-imessage = { path = "crates/providers/imessage", version = "0.7.0" }
+horon-messenger-provider-whatsapp = { path = "crates/providers/whatsapp", version = "0.7.0" }
+horon-messenger-provider-line = { path = "crates/providers/line", version = "0.7.0" }
+horon-messenger-provider-instagram = { path = "crates/providers/instagram", version = "0.7.0" }
 
 anyhow = "1"
 async-trait = "0.1"
