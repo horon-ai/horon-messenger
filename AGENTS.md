@@ -71,10 +71,12 @@ actionlint
   `channeltalk`, `all`. Provider crates are always workspace members, so
   `cargo build --workspace` compiles them even when `sdk` does not re-export them.
 - The HTTP server binds to loopback by default; do not widen that without a reason.
-- Releases are cut from `main` (integration on `dev`). A push to `main` that
+- Releases are cut from `main` (integration on `dev`). CI (`.github/workflows/ci.yml`)
+  runs on a push to every branch and on every pull request. A push to `main` that
   passes CI triggers `release-main.yml`, which bumps the minor version in
-  `Cargo.toml`, tags `vX.Y.Z`, and dispatches `release.yml`; `release.yml`
-  publishes to npm when `NPM_TOKEN` is set and always creates the GitHub Release.
-  The workspace version in the root `Cargo.toml` is the single source of truth;
+  `Cargo.toml`, tags `vX.Y.Z`, fast-forwards `dev` to the release commit so the two
+  branches stay identical, and dispatches `release.yml`; `release.yml` publishes to
+  npm when `NPM_TOKEN` is set and always creates the GitHub Release. The workspace
+  version in the root `Cargo.toml` is the single source of truth;
   `scripts/release/bump.mjs` rewrites it and `npm/scripts/sync-version.mjs`
   propagates it to the npm manifests.

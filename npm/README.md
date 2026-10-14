@@ -69,10 +69,12 @@ esbuild, biome, oxlint and turbo use.
 ## Release
 
 Releases are cut from `main`, not by hand. Feature work lands on `dev`; a
-`dev` → `main` pull request promotes it. Once CI is green on `main`,
+`dev` → `main` pull request promotes it. CI (`.github/workflows/ci.yml`) runs on
+a push to every branch and on every pull request. Once CI is green on `main`,
 `.github/workflows/release-main.yml` bumps the workspace minor version in
 `Cargo.toml`, refreshes `Cargo.lock`, syncs every npm manifest with
-`scripts/sync-version.mjs`, commits `chore(release): vX.Y.Z`, tags `vX.Y.Z`, and
+`scripts/sync-version.mjs`, commits `chore(release): vX.Y.Z`, tags `vX.Y.Z`,
+fast-forwards `dev` to the release commit so the two branches stay identical, and
 dispatches `.github/workflows/release.yml` at that tag (a tag pushed with the
 default `GITHUB_TOKEN` cannot start a workflow by itself, so the dispatch is
 explicit).
