@@ -13,9 +13,29 @@ env:
   CARGO_TERM_COLOR: always
 
 jobs:
+  verify:
+    name: verify the tag matches the manifest version
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Check the tag against Cargo.toml
+        if: startsWith(github.ref, 'refs/tags/v')
+        run: |
+          set -euo pipefail
+          tag="${GITHUB_REF_NAME#v}"
+          manifest=$(node -e "const m=require('fs').readFileSync('Cargo.toml','utf8').match(/^version = \"([^\"]+)\"/m); if(!m) process.exit(1); console.log(m[1])")
+          echo "tag=$tag manifest=$manifest"
+          if [ "$tag" != "$manifest" ]; then
+            echo "the tag $tag does not match the manifest version $manifest" >&2
+            exit 1
+          fi
+
   binaries:
     name: build ${{ matrix.platform }}
+    needs: verify
     runs-on: ${{ matrix.os }}
+    env:
+      NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
     strategy:
       fail-fast: false
       matrix:
@@ -24,7 +44,7 @@ jobs:
             os: macos-14
             target: aarch64-apple-darwin
           - platform: darwin-x64
-            os: macos-13
+            os: macos-15-intel
             target: x86_64-apple-darwin
           - platform: linux-x64-gnu
             os: ubuntu-latest
@@ -45,7 +65,23 @@ jobs:
           registry-url: https://registry.npmjs.org
       - name: Build the four surfaces
         run: cargo build --release --all-features --target ${{ matrix.target }} -p horon-messenger-cli -p horon-messenger-mcp -p horon-messenger-server -p horon-messenger-ui
+      - name: Collect the platform binaries
+        shell: bash
+        run: |
+          set -euo pipefail
+          ext=""
+          if [ "${{ runner.os }}" = "Windows" ]; then ext=".exe"; fi
+          mkdir -p dist
+          for bin in horon-messenger horon-messenger-mcp horon-messenger-server horon-messenger-tui; do
+            cp "target/${{ matrix.target }}/release/${bin}${ext}" "dist/${bin}${ext}"
+          done
+      - name: Upload the platform binaries
+        uses: actions/upload-artifact@v4
+        with:
+          name: binaries-${{ matrix.platform }}
+          path: dist/*
       - name: Stage and publish the platform packages
+        if: env.NPM_TOKEN != ''
         shell: bash
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
@@ -64,10 +100,36 @@ jobs:
             npm publish "$dir" --access public
           done
 
+  release:
+    name: publish the GitHub Release
+    needs: [binaries]
+    if: startsWith(github.ref, 'refs/tags/v')
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/download-artifact@v4
+        with:
+          path: artifacts
+      - name: Create the GitHub Release with the binaries
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          set -euo pipefail
+          tag="${GITHUB_REF_NAME}"
+          if gh release view "$tag" >/dev/null 2>&1; then
+            echo "release $tag already exists; nothing to do"
+            exit 0
+          fi
+          mapfile -t assets < <(find artifacts -type f)
+          gh release create "$tag" --title "$tag" --generate-notes "${assets[@]}"
+
   wrappers:
     name: publish wrappers
     needs: binaries
     runs-on: ubuntu-latest
+    env:
+      NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
@@ -75,6 +137,7 @@ jobs:
           node-version: 20
           registry-url: https://registry.npmjs.org
       - name: Publish the wrapper packages
+        if: env.NPM_TOKEN != ''
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
         run: |
@@ -88,6 +151,8 @@ jobs:
     name: publish bundles
     needs: wrappers
     runs-on: ubuntu-latest
+    env:
+      NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
@@ -95,6 +160,7 @@ jobs:
           node-version: 20
           registry-url: https://registry.npmjs.org
       - name: Publish the bundle packages
+        if: env.NPM_TOKEN != ''
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
         run: |
@@ -108,6 +174,8 @@ jobs:
     name: publish full package
     needs: bundles
     runs-on: ubuntu-latest
+    env:
+      NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
@@ -115,6 +183,7 @@ jobs:
           node-version: 20
           registry-url: https://registry.npmjs.org
       - name: Publish the all-in-one package
+        if: env.NPM_TOKEN != ''
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
         run: |
