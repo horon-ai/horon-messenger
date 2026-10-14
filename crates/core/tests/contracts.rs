@@ -152,3 +152,37 @@ fn envelope_renders_success_and_failure_shapes() {
     assert_eq!(rendered["error"]["code"], "NOT_REGISTERED");
     assert_eq!(rendered["error"]["retryable"], false);
 }
+
+#[test]
+fn into_value_matches_serialized_envelope_shape() {
+    use horon_messenger_core::{Envelope, Meta};
+
+    let success = Envelope::success(
+        json!({"value": 1, "nested": {"a": [1, 2, 3]}}),
+        Meta::now(Some(ProviderKind::Mock)).with_warning("partial result"),
+    );
+    assert_eq!(
+        success.clone().into_value(),
+        serde_json::to_value(&success).unwrap(),
+        "success shape"
+    );
+
+    let failure = Envelope::failure(
+        &Error::NotRegistered {
+            provider: ProviderKind::Discord,
+        },
+        Meta::now(Some(ProviderKind::Discord)),
+    );
+    assert_eq!(
+        failure.clone().into_value(),
+        serde_json::to_value(&failure).unwrap(),
+        "failure shape"
+    );
+
+    let bare = Envelope::success(json!([1, 2, 3]), Meta::now(None));
+    assert_eq!(
+        bare.clone().into_value(),
+        serde_json::to_value(&bare).unwrap(),
+        "success shape without provider"
+    );
+}
