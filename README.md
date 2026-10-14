@@ -249,6 +249,23 @@ JSON-RPC 2.0 through `horon-messenger-provider-common`.
 Full detail is in [docs/providers.md](docs/providers.md), [docs/architecture.md](docs/architecture.md)
 and the per-surface docs under [docs/](docs/README.md).
 
+## Releases
+
+Releases are cut from `main`. Feature work lands on `dev`; when it is ready,
+promote it to `main` with a `dev` → `main` pull request. CI
+(`.github/workflows/ci.yml`) must pass on `main` first, then `Release on main`
+(`.github/workflows/release-main.yml`) bumps the workspace minor version, commits
+it, tags `vX.Y.Z`, and dispatches the `Release` workflow
+(`.github/workflows/release.yml`). That builds the four surfaces for five
+platforms, attaches them to a GitHub Release, and publishes the npm packages.
+
+`Cargo.toml` is the single source of truth for the version. The release workflow
+rewrites it, refreshes `Cargo.lock`, and syncs the npm manifests through
+`npm/scripts/sync-version.mjs`, so the Rust version and the npm versions never
+drift. Publishing to npm needs an `NPM_TOKEN` repository secret with rights to
+the `@horon-ai` scope; without it the GitHub Release is still created and the npm
+steps are skipped with a warning.
+
 ## License
 
 MIT. See [LICENSE](LICENSE).
