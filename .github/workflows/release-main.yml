@@ -1,0 +1,59 @@
+name: Release on main
+
+on:
+  workflow_run:
+    workflows: ["CI"]
+    types: [completed]
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: write
+  actions: write
+
+concurrency:
+  group: release-main
+  cancel-in-progress: false
+
+jobs:
+  bump:
+    name: bump
+    if: >-
+      github.event_name == 'workflow_dispatch' ||
+      (github.event.workflow_run.conclusion == 'success' &&
+      !contains(github.event.workflow_run.head_commit.message, '[skip release]') &&
+      !startsWith(github.event.workflow_run.head_commit.message, 'chore(release):'))
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: main
+          fetch-depth: 0
+      - name: Install the pinned toolchain
+        run: rustup toolchain install 1.97.1 --profile minimal
+      - name: Compute the next version
+        id: version
+        run: |
+          set -euo pipefail
+          cur=$(node -e "const m=require('fs').readFileSync('Cargo.toml','utf8').match(/^version = \"([^\"]+)\"/m); if(!m) process.exit(1); console.log(m[1])")
+          next=$(node scripts/release/next-version.mjs "$cur")
+          echo "current=$cur" >> "$GITHUB_OUTPUT"
+          echo "next=$next" >> "$GITHUB_OUTPUT"
+      - name: Bump the workspace version
+        run: |
+          set -euo pipefail
+          node scripts/release/bump.mjs "${{ steps.version.outputs.next }}"
+          cargo update --workspace
+          node npm/scripts/sync-version.mjs
+      - name: Commit and tag the release
+        run: |
+          set -euo pipefail
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git commit -am "chore(release): v${{ steps.version.outputs.next }} [skip release]"
+          git tag "v${{ steps.version.outputs.next }}"
+          git push origin HEAD:main --follow-tags
+      - name: Dispatch the publisher
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: gh workflow run release.yml --ref "v${{ steps.version.outputs.next }}"
