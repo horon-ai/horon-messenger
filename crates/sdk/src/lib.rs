@@ -70,6 +70,27 @@ impl Client {
     pub async fn snapshot(&self, kind: ProviderKind) -> Result<Snapshot> {
         self.provider(kind)?.snapshot().await
     }
+
+    pub async fn get_chat(&self, kind: ProviderKind, chat_id: &str) -> Result<Chat> {
+        self.provider(kind)?.get_chat(chat_id).await
+    }
+
+    pub async fn search_messages(
+        &self,
+        kind: ProviderKind,
+        chat_id: Option<&str>,
+        query: &MessageQuery,
+    ) -> Result<MessagePage> {
+        self.provider(kind)?.search_messages(chat_id, query).await
+    }
+
+    pub async fn mark_read(&self, kind: ProviderKind, chat_id: &str) -> Result<()> {
+        self.provider(kind)?.mark_read(chat_id).await
+    }
+
+    pub async fn listen(&self, kind: ProviderKind, chat_id: Option<&str>) -> Result<EventStream> {
+        self.provider(kind)?.listen(chat_id).await
+    }
 }
 
 #[derive(Debug, Clone, Serialize)]
