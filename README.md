@@ -75,17 +75,20 @@ Every surface ships as a prebuilt binary through npm, so no Rust toolchain is
 needed:
 
 ```bash
-npx @horon-ai/messenger providers             # CLI
+npx @horon-ai/messenger-cli providers         # CLI
 npx @horon-ai/messenger-mcp                   # MCP server (stdio)
 npx @horon-ai/messenger-server --port 8787    # HTTP API server
 ```
 
-`bunx` and `bun add -g` work the same way. Each surface installs on its own, or
-in the server-anchored combinations:
+`bunx` and `bun add -g` work the same way, and `@horon-ai/messenger` runs the
+CLI too, so `npx @horon-ai/messenger daemon start` works after a one-line run.
+Each surface installs on its own, in the server-anchored combinations, or all at
+once:
 
 | Deploy | Install |
 |--------|---------|
-| CLI only | `npm install -g @horon-ai/messenger` |
+| Everything (cli + mcp + server + tui) | `npm install -g @horon-ai/messenger` |
+| CLI only | `npm install -g @horon-ai/messenger-cli` |
 | MCP only | `npm install -g @horon-ai/messenger-mcp` |
 | Server only | `npm install -g @horon-ai/messenger-server` |
 | Server + MCP | `npm install -g @horon-ai/messenger-server-mcp` |
@@ -95,14 +98,15 @@ in the server-anchored combinations:
 `cli` and `mcp` also run straight from the registry with `npx` or `bunx`:
 
 ```bash
-npx @horon-ai/messenger providers
+npx @horon-ai/messenger-cli providers
+npx @horon-ai/messenger daemon start
 bunx @horon-ai/messenger-mcp
 ```
 
 The npm packages are thin wrappers:
 on install they pull the prebuilt binary for your platform
-(`@horon-ai/messenger-darwin-arm64` and so on) and run it, forwarding stdio and
-the exit code. The wrapper source lives in [`npm/`](npm/).
+(`@horon-ai/messenger-cli-darwin-arm64` and so on) and run it, forwarding stdio
+and the exit code. The wrapper source lives in [`npm/`](npm/).
 
 The Rust-native paths stay available for a smaller provider set:
 
@@ -115,6 +119,20 @@ The published npm binaries are built with every provider enabled. To install
 only some providers, use the cargo path with the matching `--features`.
 `core` and `sdk` are libraries, not binaries: add them from Rust with
 `cargo add horon-messenger-sdk --features discord,telegram`.
+
+## Docs
+
+Design and per-surface reference live in [`docs/`](docs/README.md):
+
+| Doc | Covers |
+|-----|--------|
+| [docs/CLI.md](docs/CLI.md) | The `horon-messenger` CLI: commands, daemon, setup, update |
+| [docs/MCP.md](docs/MCP.md) | The MCP server and its tools |
+| [docs/SERVER.md](docs/SERVER.md) | The HTTP API server and its routes |
+| [docs/UI.md](docs/UI.md) | The terminal UI |
+| [docs/SDK.md](docs/SDK.md) | The `Client` library surface |
+| [docs/CORE.md](docs/CORE.md) | The provider contract, model and envelope |
+| [docs/architecture.md](docs/architecture.md), [docs/providers.md](docs/providers.md) | Layers and every provider |
 
 ## Build
 
@@ -138,6 +156,25 @@ cargo run -p horon-messenger-cli -- messages mock general --pretty
 cargo run -p horon-messenger-cli -- send mock general "hello"
 cargo run -p horon-messenger-cli -- auth status mock
 ```
+
+Beyond the message commands, the CLI manages the local install:
+
+```bash
+horon-messenger setup                 # prepare the config dir and report provider readiness
+horon-messenger daemon start          # run the HTTP API server in the background
+horon-messenger daemon status         # is it running, and on which url
+horon-messenger daemon restart        # stop then start
+horon-messenger daemon stop           # stop the background server
+horon-messenger update --check        # is a newer release published
+horon-messenger update                # install the latest release (npm install path)
+```
+
+`daemon` finds `horon-messenger-server` next to the CLI, on `PATH`, or at
+`HORON_MESSENGER_SERVER`. It writes `server.pid` and `server.log` under the
+config dir and probes the port for liveness. `update` reads the npm registry for
+the installed package and installs the latest with the package manager that ran
+the CLI (npm, bun, pnpm or yarn); a build that did not come from npm reports the
+available version instead of overwriting itself.
 
 Output is a JSON envelope on stdout: `{"ok": true, "data": ..., "meta": ...}` on
 success, `{"ok": false, "error": {"code", "message", "retryable"}, "meta": ...}`
@@ -198,8 +235,8 @@ A provider that needs a helper process (iMessage, WhatsApp, LINE) also ships a
 sidecar under `crates/providers/<name>/sidecar/` and speaks line-delimited
 JSON-RPC 2.0 through `horon-messenger-provider-common`.
 
-Full detail is in [docs/providers.md](docs/providers.md) and
-[docs/architecture.md](docs/architecture.md).
+Full detail is in [docs/providers.md](docs/providers.md), [docs/architecture.md](docs/architecture.md)
+and the per-surface docs under [docs/](docs/README.md).
 
 ## License
 
