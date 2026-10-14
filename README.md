@@ -253,11 +253,16 @@ and the per-surface docs under [docs/](docs/README.md).
 
 Releases are cut from `main`. Feature work lands on `dev`; when it is ready,
 promote it to `main` with a `dev` → `main` pull request. CI
-(`.github/workflows/ci.yml`) must pass on `main` first, then `Release on main`
-(`.github/workflows/release-main.yml`) bumps the workspace minor version, commits
-it, tags `vX.Y.Z`, and dispatches the `Release` workflow
-(`.github/workflows/release.yml`). That builds the four surfaces for five
-platforms, attaches them to a GitHub Release, and publishes the npm packages.
+(`.github/workflows/ci.yml`) runs on a push to **every** branch and on every pull
+request; `Release on main` waits for CI to pass on `main`, then bumps the
+workspace minor version, commits it, tags `vX.Y.Z`, and dispatches the `Release`
+workflow (`.github/workflows/release.yml`). That builds the four surfaces for
+five platforms, attaches them to a GitHub Release, and publishes the npm
+packages.
+
+`dev` is kept in step with `main`: after a release, `release-main.yml`
+fast-forwards `dev` to the release commit, so the two branches carry the same
+source whenever no feature work is in flight on `dev`.
 
 `Cargo.toml` is the single source of truth for the version. The release workflow
 rewrites it, refreshes `Cargo.lock`, and syncs the npm manifests through
