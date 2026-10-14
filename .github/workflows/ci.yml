@@ -5,16 +5,20 @@ on:
     branches: [main, dev]
   pull_request:
 
+permissions:
+  contents: read
+
 env:
   CARGO_TERM_COLOR: always
 
 jobs:
   check:
+    name: check
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
       - name: Install the pinned toolchain
-        run: rustup toolchain install --profile minimal --component rustfmt,clippy
+        run: rustup toolchain install 1.97.1 --profile minimal --component rustfmt,clippy
       - name: Format
         run: cargo fmt --all --check
       - name: Clippy
@@ -25,3 +29,18 @@ jobs:
         run: cargo test --workspace --all-features
       - name: Cross-surface QA
         run: bash scripts/qa/cross-surface.sh
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+      - name: Release script tests
+        run: node --test scripts/release
+
+  workflows:
+    name: workflows
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install actionlint
+        run: bash <(curl -fsSL https://raw.githubusercontent.com/rhysd/actionlint/main/scripts/download-actionlint.bash)
+      - name: Lint the workflow YAML
+        run: ./actionlint -color
