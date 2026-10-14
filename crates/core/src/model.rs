@@ -166,3 +166,29 @@ pub struct Snapshot {
     pub chats: Vec<Chat>,
     pub generated_at: String,
 }
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Serialize, Deserialize)]
+#[serde(rename_all = "snake_case")]
+pub enum EventKind {
+    Message,
+    Read,
+    Typing,
+    Unknown,
+}
+
+/// One thing that happened on a provider, emitted by a `listen` stream.
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct Event {
+    pub provider: ProviderKind,
+    pub chat_id: String,
+    pub kind: EventKind,
+    pub at: String,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub message: Option<Message>,
+    #[serde(default, skip_serializing_if = "is_null")]
+    pub extra: Value,
+}
+
+/// The stream a provider returns from `listen`.
+pub type EventStream =
+    std::pin::Pin<Box<dyn futures_core::Stream<Item = crate::error::Result<Event>> + Send>>;

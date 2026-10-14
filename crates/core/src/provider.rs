@@ -7,7 +7,8 @@ use crate::capability::Capabilities;
 use crate::error::{Error, Result};
 use crate::kind::ProviderKind;
 use crate::model::{
-    Chat, ChatQuery, Member, MessagePage, MessageQuery, Profile, SendRequest, SendResult, Snapshot,
+    Chat, ChatQuery, EventStream, Member, MessagePage, MessageQuery, Profile, SendRequest,
+    SendResult, Snapshot,
 };
 
 /// One messenger platform. Every surface reaches a platform only through this
@@ -78,6 +79,11 @@ pub trait Provider: Send + Sync + 'static {
 
     async fn snapshot(&self) -> Result<Snapshot> {
         Err(self.gate(Capabilities::SNAPSHOT))
+    }
+
+    /// A stream of events from a provider, or one chat when `chat_id` is set.
+    async fn listen(&self, _chat_id: Option<&str>) -> Result<EventStream> {
+        Err(self.gate(Capabilities::LISTEN))
     }
 }
 

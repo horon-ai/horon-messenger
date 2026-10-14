@@ -21,8 +21,8 @@ pub use envelope::{Envelope, ErrorBody, Meta};
 pub use error::{Error, ErrorCode, Result};
 pub use kind::ProviderKind;
 pub use model::{
-    Attachment, Chat, ChatKind, ChatQuery, Delivery, Member, Message, MessagePage, MessageQuery,
-    Profile, SendRequest, SendResult, Snapshot,
+    Attachment, Chat, ChatKind, ChatQuery, Delivery, Event, EventKind, EventStream, Member,
+    Message, MessagePage, MessageQuery, Profile, SendRequest, SendResult, Snapshot,
 };
 pub use provider::{DynProvider, Provider};
 pub use registry::ProviderRegistry;

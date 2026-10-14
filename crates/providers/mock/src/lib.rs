@@ -5,8 +5,9 @@ use serde_json::Value;
 
 use horon_messenger_core::{
     AccountSummary, AuthMethod, AuthProvider, AuthStatus, Capabilities, Chat, ChatKind, ChatQuery,
-    Delivery, Error, LoginOptions, LoginOutcome, Member, Message, MessagePage, MessageQuery,
-    Profile, Provider, ProviderKind, Result, SendRequest, SendResult, Snapshot, now_rfc3339,
+    Delivery, Error, Event, EventKind, EventStream, LoginOptions, LoginOutcome, Member, Message,
+    MessagePage, MessageQuery, Profile, Provider, ProviderKind, Result, SendRequest, SendResult,
+    Snapshot, now_rfc3339,
 };
 
 const ACCOUNT_ID: &str = "mock-user";
@@ -122,7 +123,9 @@ impl Provider for MockProvider {
             | Capabilities::SEARCH_MESSAGES
             | Capabilities::SEND_MESSAGE
             | Capabilities::LIST_MEMBERS
+            | Capabilities::MARK_READ
             | Capabilities::SNAPSHOT
+            | Capabilities::LISTEN
     }
 
     fn auth(&self) -> Option<&dyn AuthProvider> {
@@ -198,8 +201,30 @@ impl Provider for MockProvider {
         chat_id: Option<&str>,
         query: &MessageQuery,
     ) -> Result<MessagePage> {
-        self.list_messages(chat_id.unwrap_or("general"), query)
-            .await
+        match chat_id {
+            Some(id) => self.list_messages(id, query).await,
+            None => {
+                let mut messages = Vec::new();
+                for chat in Self::chats() {
+                    messages.extend(self.list_messages(&chat.id, query).await?.messages);
+                }
+                let has_more = query.limit.is_some_and(|limit| messages.len() > limit);
+                if let Some(limit) = query.limit {
+                    messages.truncate(limit);
+                }
+                Ok(MessagePage {
+                    provider: ProviderKind::Mock,
+                    chat_id: String::new(),
+                    messages,
+                    has_more,
+                    newest_first: true,
+                })
+            }
+        }
+    }
+
+    async fn mark_read(&self, _chat_id: &str) -> Result<()> {
+        Ok(())
     }
 
     async fn send_message(&self, request: &SendRequest) -> Result<SendResult> {
@@ -261,6 +286,34 @@ impl Provider for MockProvider {
             generated_at: now_rfc3339(),
         })
     }
+
+    async fn listen(&self, chat_id: Option<&str>) -> Result<EventStream> {
+        let mut messages = match chat_id {
+            Some(id) => Self::seed(id),
+            None => Self::chats()
+                .iter()
+                .flat_map(|chat| Self::seed(&chat.id))
+                .collect(),
+        };
+        {
+            let state = self.state.lock().expect("mock state lock");
+            messages.extend(state.sent.iter().cloned());
+        }
+        let events: Vec<Result<Event>> = messages
+            .into_iter()
+            .map(|message| {
+                Ok(Event {
+                    provider: ProviderKind::Mock,
+                    chat_id: message.chat_id.clone(),
+                    kind: EventKind::Message,
+                    at: message.sent_at.clone(),
+                    message: Some(message),
+                    extra: Value::Null,
+                })
+            })
+            .collect();
+        Ok(Box::pin(futures_util::stream::iter(events)))
+    }
 }
 
 #[async_trait]
@@ -300,5 +353,81 @@ impl AuthProvider for MockProvider {
 
     async fn logout(&self, _account_id: Option<&str>) -> Result<()> {
         Ok(())
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use futures_util::StreamExt;
+
+    #[tokio::test]
+    async fn get_chat_returns_a_seeded_chat_and_not_found_otherwise() {
+        let provider = MockProvider::new();
+        let chat = provider.get_chat("general").await.expect("get_chat");
+        assert_eq!(chat.id, "general");
+        assert_eq!(
+            provider.get_chat("nope").await.unwrap_err().code(),
+            horon_messenger_core::ErrorCode::NotFound
+        );
+    }
+
+    #[tokio::test]
+    async fn search_without_a_chat_scans_every_chat() {
+        let provider = MockProvider::new();
+        let query = MessageQuery {
+            search: Some("standup".to_owned()),
+            ..MessageQuery::default()
+        };
+        let page = provider
+            .search_messages(None, &query)
+            .await
+            .expect("search");
+        assert!(
+            page.messages
+                .iter()
+                .any(|message| message.chat_id == "team")
+        );
+    }
+
+    #[tokio::test]
+    async fn mark_read_succeeds() {
+        MockProvider::new()
+            .mark_read("general")
+            .await
+            .expect("mark_read");
+    }
+
+    #[tokio::test]
+    async fn listen_streams_seeded_messages_then_sent_ones() {
+        let provider = MockProvider::new();
+        let stream = provider.listen(Some("general")).await.expect("listen");
+        let events: Vec<_> = stream.collect().await;
+        assert_eq!(events.len(), 2);
+        assert!(
+            events
+                .iter()
+                .all(|event| event.as_ref().unwrap().kind == EventKind::Message)
+        );
+
+        provider
+            .send_message(&SendRequest {
+                chat_id: "general".to_owned(),
+                text: "new".to_owned(),
+                ..SendRequest::default()
+            })
+            .await
+            .expect("send");
+        let stream = provider.listen(Some("general")).await.expect("listen");
+        let events: Vec<_> = stream.collect().await;
+        assert_eq!(events.len(), 3);
+    }
+
+    #[tokio::test]
+    async fn listen_without_a_chat_covers_every_chat() {
+        let provider = MockProvider::new();
+        let stream = provider.listen(None).await.expect("listen");
+        let events: Vec<_> = stream.collect().await;
+        assert!(events.len() >= 4);
     }
 }
