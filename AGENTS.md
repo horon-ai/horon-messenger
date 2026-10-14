@@ -36,6 +36,7 @@ sdk`. Nothing depends on a surface.
 | Add an MCP tool | `crates/mcp/src/main.rs` |
 | Add an HTTP route | `crates/server/src/main.rs` |
 | Config or credential layout | `crates/core/src/config.rs`, `crates/core/src/credential.rs` |
+| CI, release automation | `.github/workflows/{ci,release,release-main}.yml`, `scripts/release/` |
 
 ## Conventions
 
@@ -59,6 +60,8 @@ cargo build --workspace --all-features
 cargo test --workspace
 cargo clippy --workspace --all-targets -- -D warnings
 cargo fmt --all
+node --test scripts/release
+actionlint
 ```
 
 ## Notes
@@ -68,3 +71,10 @@ cargo fmt --all
   `channeltalk`, `all`. Provider crates are always workspace members, so
   `cargo build --workspace` compiles them even when `sdk` does not re-export them.
 - The HTTP server binds to loopback by default; do not widen that without a reason.
+- Releases are cut from `main` (integration on `dev`). A push to `main` that
+  passes CI triggers `release-main.yml`, which bumps the minor version in
+  `Cargo.toml`, tags `vX.Y.Z`, and dispatches `release.yml`; `release.yml`
+  publishes to npm when `NPM_TOKEN` is set and always creates the GitHub Release.
+  The workspace version in the root `Cargo.toml` is the single source of truth;
+  `scripts/release/bump.mjs` rewrites it and `npm/scripts/sync-version.mjs`
+  propagates it to the npm manifests.

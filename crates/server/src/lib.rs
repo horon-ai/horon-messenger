@@ -69,10 +69,7 @@ pub fn build_router(client: Arc<Client>) -> Router {
         .route("/v1/providers", get(list_providers))
         .route("/v1/providers/{kind}/whoami", get(whoami))
         .route("/v1/providers/{kind}/chats", get(list_chats))
-        .route(
-            "/v1/providers/{kind}/chats/{chat_id}",
-            get(get_chat),
-        )
+        .route("/v1/providers/{kind}/chats/{chat_id}", get(get_chat))
         .route(
             "/v1/providers/{kind}/chats/{chat_id}/messages",
             get(list_messages).post(send_message),
@@ -81,10 +78,7 @@ pub fn build_router(client: Arc<Client>) -> Router {
             "/v1/providers/{kind}/chats/{chat_id}/members",
             get(list_members),
         )
-        .route(
-            "/v1/providers/{kind}/chats/{chat_id}/read",
-            post(mark_read),
-        )
+        .route("/v1/providers/{kind}/chats/{chat_id}/read", post(mark_read))
         .route("/v1/providers/{kind}/messages", get(search_messages))
         .route("/v1/providers/{kind}/events", get(listen))
         .route("/v1/providers/{kind}/snapshot", get(snapshot))

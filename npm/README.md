@@ -68,12 +68,26 @@ esbuild, biome, oxlint and turbo use.
 
 ## Release
 
-`.github/workflows/release.yml` runs on a `v*` tag (or manually). For each
-platform it builds the four surfaces with `--all-features`, stages them into
-platform packages with `scripts/stage.mjs`, and publishes those first, then the
-wrapper packages, the bundles, and finally the all-in-one `@horon-ai/messenger`.
-It needs an `NPM_TOKEN` repository secret with publish rights to the `@horon-ai`
-scope; the scope must exist on npm.
+Releases are cut from `main`, not by hand. Feature work lands on `dev`; a
+`dev` → `main` pull request promotes it. Once CI is green on `main`,
+`.github/workflows/release-main.yml` bumps the workspace minor version in
+`Cargo.toml`, refreshes `Cargo.lock`, syncs every npm manifest with
+`scripts/sync-version.mjs`, commits `chore(release): vX.Y.Z`, tags `vX.Y.Z`, and
+dispatches `.github/workflows/release.yml` at that tag (a tag pushed with the
+default `GITHUB_TOKEN` cannot start a workflow by itself, so the dispatch is
+explicit).
+
+`release.yml` builds the four surfaces with `--all-features` on five platforms,
+stages them into platform packages with `scripts/stage.mjs`, publishes those
+first, then the wrapper packages, the bundles, and finally the all-in-one
+`@horon-ai/messenger`, and creates the GitHub Release with the binaries attached.
+Publishing to npm needs an `NPM_TOKEN` repository secret with publish rights to
+the `@horon-ai` scope (the scope must exist on npm); without the secret the npm
+steps are skipped with a warning and the GitHub Release is still created.
+
+The version lives only in the root `Cargo.toml`; `scripts/release/bump.mjs`
+rewrites it (workspace version plus the internal `horon-messenger-*` pins) and
+`node --test scripts/release` covers it.
 
 The published binaries are built with every provider enabled. To install a
 smaller provider set, use the cargo path instead:
