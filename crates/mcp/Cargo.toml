@@ -30,6 +30,7 @@ all = ["horon-messenger-sdk/all"]
 [dependencies]
 horon-messenger-sdk = { workspace = true, features = ["schemars"] }
 anyhow.workspace = true
+futures-util.workspace = true
 rmcp.workspace = true
 schemars.workspace = true
 serde.workspace = true

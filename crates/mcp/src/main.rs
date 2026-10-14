@@ -1,5 +1,6 @@
 use std::sync::Arc;
 
+use futures_util::StreamExt;
 use horon_messenger_sdk::{
     ChatQuery, Client, Envelope, MessageQuery, Meta, ProviderKind, SendRequest,
 };
@@ -70,6 +71,41 @@ struct MembersInput {
     provider: ProviderKind,
     /// Chat identifier, as returned by list_chats.
     chat_id: String,
+}
+
+#[derive(Debug, Deserialize, JsonSchema)]
+struct ChatInput {
+    /// Provider to query: kakaotalk, discord, telegram, channeltalk or mock.
+    provider: ProviderKind,
+    /// Chat identifier, as returned by list_chats.
+    chat_id: String,
+}
+
+#[derive(Debug, Deserialize, JsonSchema)]
+struct SearchMessagesInput {
+    /// Provider to query: kakaotalk, discord, telegram, channeltalk or mock.
+    provider: ProviderKind,
+    /// Restrict the search to one chat; omit to search every chat the provider allows.
+    #[serde(default)]
+    chat_id: Option<String>,
+    /// Case-insensitive substring filter on message text.
+    #[serde(default)]
+    search: Option<String>,
+    /// Maximum number of messages to return.
+    #[serde(default)]
+    limit: Option<usize>,
+}
+
+#[derive(Debug, Deserialize, JsonSchema)]
+struct ListenInput {
+    /// Provider to listen on: kakaotalk, discord, telegram, channeltalk or mock.
+    provider: ProviderKind,
+    /// Restrict the stream to one chat; omit to listen on every chat.
+    #[serde(default)]
+    chat_id: Option<String>,
+    /// Stop after this many events (default 20).
+    #[serde(default)]
+    limit: Option<usize>,
 }
 
 fn tool_result(envelope: Envelope) -> CallToolResult {
@@ -174,6 +210,92 @@ impl MessengerServer {
             Meta::now(Some(input.provider)),
         );
         tool_result(envelope)
+    }
+
+    #[tool(name = "get_chat", description = "Show one chat by id.")]
+    async fn get_chat(&self, Parameters(input): Parameters<ChatInput>) -> CallToolResult {
+        let envelope = Envelope::from_result(
+            self.client.get_chat(input.provider, &input.chat_id).await,
+            Meta::now(Some(input.provider)),
+        );
+        tool_result(envelope)
+    }
+
+    #[tool(
+        name = "search_messages",
+        description = "Search messages by a text substring, in one chat or across every chat."
+    )]
+    async fn search_messages(
+        &self,
+        Parameters(input): Parameters<SearchMessagesInput>,
+    ) -> CallToolResult {
+        let query = MessageQuery {
+            search: input.search,
+            limit: input.limit,
+            before: None,
+            after: None,
+        };
+        let envelope = Envelope::from_result(
+            self.client
+                .search_messages(input.provider, input.chat_id.as_deref(), &query)
+                .await,
+            Meta::now(Some(input.provider)),
+        );
+        tool_result(envelope)
+    }
+
+    #[tool(name = "mark_read", description = "Mark a chat as read.")]
+    async fn mark_read(&self, Parameters(input): Parameters<ChatInput>) -> CallToolResult {
+        let envelope = Envelope::from_result(
+            self.client.mark_read(input.provider, &input.chat_id).await,
+            Meta::now(Some(input.provider)),
+        );
+        tool_result(envelope)
+    }
+
+    #[tool(
+        name = "snapshot",
+        description = "Print a provider snapshot: the profile and every chat."
+    )]
+    async fn snapshot(&self, Parameters(input): Parameters<ProviderInput>) -> CallToolResult {
+        let envelope = Envelope::from_result(
+            self.client.snapshot(input.provider).await,
+            Meta::now(Some(input.provider)),
+        );
+        tool_result(envelope)
+    }
+
+    #[tool(
+        name = "listen",
+        description = "Collect recent events (message, read, typing) from a provider, up to a limit."
+    )]
+    async fn listen(&self, Parameters(input): Parameters<ListenInput>) -> CallToolResult {
+        let limit = input.limit.unwrap_or(20);
+        let mut stream = match self
+            .client
+            .listen(input.provider, input.chat_id.as_deref())
+            .await
+        {
+            Ok(stream) => stream,
+            Err(error) => {
+                return tool_result(Envelope::failure(&error, Meta::now(Some(input.provider))));
+            }
+        };
+        let mut events = Vec::new();
+        while let Some(item) = stream.next().await {
+            match item {
+                Ok(event) => {
+                    events.push(event);
+                    if events.len() >= limit {
+                        break;
+                    }
+                }
+                Err(error) => {
+                    return tool_result(Envelope::failure(&error, Meta::now(Some(input.provider))));
+                }
+            }
+        }
+        tool_result(Envelope::success(events, Meta::now(Some(input.provider))))
     }
 }
 
