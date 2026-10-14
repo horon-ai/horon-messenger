@@ -80,6 +80,9 @@ jobs:
         with:
           name: binaries-${{ matrix.platform }}
           path: dist/*
+      - name: npm publishing skipped (no NPM_TOKEN)
+        if: env.NPM_TOKEN == ''
+        run: echo "::warning::NPM_TOKEN is not set; skipping the npm publish for the platform packages"
       - name: Stage and publish the platform packages
         if: env.NPM_TOKEN != ''
         shell: bash
@@ -150,6 +153,9 @@ jobs:
         with:
           node-version: 20
           registry-url: https://registry.npmjs.org
+      - name: npm publishing skipped (no NPM_TOKEN)
+        if: env.NPM_TOKEN == ''
+        run: echo "::warning::NPM_TOKEN is not set; skipping the npm publish for the wrappers"
       - name: Publish the wrapper packages
         if: env.NPM_TOKEN != ''
         env:
@@ -173,6 +179,9 @@ jobs:
         with:
           node-version: 20
           registry-url: https://registry.npmjs.org
+      - name: npm publishing skipped (no NPM_TOKEN)
+        if: env.NPM_TOKEN == ''
+        run: echo "::warning::NPM_TOKEN is not set; skipping the npm publish for the bundles"
       - name: Publish the bundle packages
         if: env.NPM_TOKEN != ''
         env:
@@ -196,6 +205,9 @@ jobs:
         with:
           node-version: 20
           registry-url: https://registry.npmjs.org
+      - name: npm publishing skipped (no NPM_TOKEN)
+        if: env.NPM_TOKEN == ''
+        run: echo "::warning::NPM_TOKEN is not set; skipping the npm publish for the all-in-one package"
       - name: Publish the all-in-one package
         if: env.NPM_TOKEN != ''
         env:
