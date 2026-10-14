@@ -53,6 +53,13 @@ jobs:
           git commit -am "chore(release): v${{ steps.version.outputs.next }} [skip release]"
           git tag -a "v${{ steps.version.outputs.next }}" -m "Release v${{ steps.version.outputs.next }}"
           git push origin HEAD:main "refs/tags/v${{ steps.version.outputs.next }}"
+      - name: Sync dev with main
+        run: |
+          if git push origin HEAD:dev; then
+            echo "dev is now at the release commit"
+          else
+            echo "::warning::dev has diverged from main; skipped the dev sync"
+          fi
       - name: Dispatch the publisher
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
