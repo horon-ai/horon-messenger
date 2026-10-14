@@ -58,7 +58,7 @@ impl WhatsAppProvider {
     }
 
     async fn auth_status(&self) -> Result<SidecarAuthStatus> {
-        self.request("auth.status", json!({ "auth_dir": self.auth_dir() }))
+        self.request("auth.status", json!({ "auth_dir": self.auth_dir() }), true)
             .await
     }
 
@@ -71,8 +71,13 @@ impl WhatsAppProvider {
         }
     }
 
-    async fn request<T: DeserializeOwned>(&self, method: &str, params: Value) -> Result<T> {
-        let value = self.sidecar.request(method, params).await?;
+    async fn request<T: DeserializeOwned>(
+        &self,
+        method: &str,
+        params: Value,
+        idempotent: bool,
+    ) -> Result<T> {
+        let value = self.sidecar.request(method, params, idempotent).await?;
         serde_json::from_value(value).map_err(|error| Error::Protocol {
             provider: PROVIDER,
             message: format!("{method} returned an unexpected shape: {error}"),
@@ -80,7 +85,7 @@ impl WhatsAppProvider {
     }
 
     async fn chats(&self, params: Value) -> Result<Vec<SidecarChat>> {
-        self.request("chats.list", params).await
+        self.request("chats.list", params, true).await
     }
 }
 
@@ -159,6 +164,7 @@ impl Provider for WhatsAppProvider {
                     "before": &query.before,
                     "after": &query.after,
                 }),
+                true,
             )
             .await?;
         let has_more = messages.len() >= limit;
@@ -182,6 +188,7 @@ impl Provider for WhatsAppProvider {
                     "text": &request.text,
                     "reply_to": &request.reply_to,
                 }),
+                false,
             )
             .await?;
         let sent_at = message
@@ -286,6 +293,7 @@ impl AuthProvider for WhatsAppProvider {
                     }),
                     "phone_number": &phone_number,
                 }),
+                false,
             )
             .await?;
         Ok(LoginOutcome {

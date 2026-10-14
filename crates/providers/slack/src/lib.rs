@@ -14,6 +14,8 @@ use horon_messenger_core::{
     SendRequest, SendResult, Snapshot, now_rfc3339,
 };
 
+use horon_messenger_provider_common::HttpClient;
+
 use client::SlackClient;
 
 const PROVIDER: ProviderKind = ProviderKind::Slack;
@@ -26,6 +28,7 @@ const COOKIE_ENV: &str = "HORON_MESSENGER_SLACK_COOKIE";
 pub struct SlackProvider {
     paths: ConfigPaths,
     credentials: FileCredentialStore,
+    http: HttpClient,
 }
 
 impl SlackProvider {
@@ -33,6 +36,7 @@ impl SlackProvider {
         Self {
             credentials: FileCredentialStore::new(paths.clone()),
             paths,
+            http: HttpClient::shared(),
         }
     }
 
@@ -69,7 +73,7 @@ impl SlackProvider {
     fn client(&self) -> Result<SlackClient> {
         let (token, cookie) = self.credentials_pair()?;
         let token = token.ok_or(Error::AuthRequired { provider: PROVIDER })?;
-        SlackClient::new(token, cookie)
+        SlackClient::new(self.http.clone(), token, cookie)
     }
 }
 

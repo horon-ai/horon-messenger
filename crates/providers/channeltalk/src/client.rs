@@ -82,14 +82,18 @@ pub struct ChannelTalkClient {
 }
 
 impl ChannelTalkClient {
-    pub fn new(account_cookie: impl Into<String>, session_cookie: Option<String>) -> Result<Self> {
+    pub fn new(
+        http: HttpClient,
+        account_cookie: impl Into<String>,
+        session_cookie: Option<String>,
+    ) -> Self {
         let base_url = std::env::var(BASE_URL_ENV).unwrap_or_else(|_| DEFAULT_BASE_URL.to_owned());
-        Ok(Self {
-            http: HttpClient::new()?,
+        Self {
+            http,
             base_url: base_url.trim_end_matches('/').to_owned(),
             account_cookie: account_cookie.into(),
             session_cookie,
-        })
+        }
     }
 
     fn cookie_header(&self) -> String {
@@ -258,7 +262,7 @@ mod tests {
     #[test]
     fn base_url_honours_the_env_override() {
         unsafe { std::env::set_var(BASE_URL_ENV, "http://127.0.0.1:9998") };
-        let client = ChannelTalkClient::new("cookie", None).unwrap();
+        let client = ChannelTalkClient::new(HttpClient::shared(), "cookie", None);
         assert_eq!(client.base_url, "http://127.0.0.1:9998");
         assert_eq!(client.cookie_header(), "x-account=cookie");
         unsafe { std::env::remove_var(BASE_URL_ENV) };

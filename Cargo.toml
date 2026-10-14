@@ -34,7 +34,7 @@ description = "Multi-messenger bridge for AI agents: one CLI, SDK, MCP server an
 
 [workspace.dependencies]
 horon-messenger-core = { path = "crates/core", version = "0.1.0" }
-horon-messenger-sdk = { path = "crates/sdk", version = "0.1.0" }
+horon-messenger-sdk = { path = "crates/sdk", version = "0.1.0", default-features = false }
 horon-messenger-provider-common = { path = "crates/providers/common", version = "0.1.0" }
 horon-messenger-provider-mock = { path = "crates/providers/mock", version = "0.1.0" }
 horon-messenger-provider-kakaotalk = { path = "crates/providers/kakaotalk", version = "0.1.0" }
@@ -73,3 +73,4 @@ uuid = { version = "1", features = ["v4"] }
 [profile.release]
 lto = "thin"
 strip = true
+codegen-units = 1

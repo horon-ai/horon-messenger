@@ -95,9 +95,9 @@ pub struct InstagramClient {
 
 impl InstagramClient {
     /// Builds a client, defaulting the base URL to `https://i.instagram.com/api/v1`.
-    pub fn new(session: InstagramSession) -> Result<Self> {
+    pub fn new(http: HttpClient, session: InstagramSession) -> Result<Self> {
         Ok(Self {
-            http: HttpClient::new()?,
+            http,
             base_url: base_url_from(std::env::var(BASE_URL_ENV).ok()),
             session,
             timeout: DEFAULT_TIMEOUT,
