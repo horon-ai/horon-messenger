@@ -21,6 +21,7 @@ const targets = [
   "npm/bundles/server-mcp/package.json",
   "npm/bundles/server-tui/package.json",
   "npm/bundles/server-mcp-tui/package.json",
+  "npm/full/package.json",
 ];
 
 for (const relative of targets) {

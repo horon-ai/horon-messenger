@@ -4,7 +4,8 @@
 const { spawn } = require("node:child_process");
 const path = require("node:path");
 
-const PACKAGE = "@horon-ai/messenger";
+const PACKAGE = "@horon-ai/messenger-cli";
+const UPDATE_PACKAGE = "@horon-ai/messenger-cli";
 const BINARY = "horon-messenger";
 
 const PLATFORM_SUFFIX = {
@@ -14,6 +15,15 @@ const PLATFORM_SUFFIX = {
   "linux-arm64": "linux-arm64-gnu",
   "win32-x64": "win32-x64-msvc",
 };
+
+function detectManager() {
+  const agent = process.env.npm_config_user_agent || "";
+  if (agent.startsWith("npm")) return "npm";
+  if (agent.startsWith("pnpm")) return "pnpm";
+  if (agent.startsWith("yarn")) return "yarn";
+  if (typeof Bun !== "undefined" || process.versions.bun) return "bun";
+  return "";
+}
 
 const key = `${process.platform}-${process.arch}`;
 const suffix = PLATFORM_SUFFIX[key];
@@ -32,7 +42,11 @@ try {
 }
 
 const executable = path.join(directory, "bin", process.platform === "win32" ? `${BINARY}.exe` : BINARY);
-const child = spawn(executable, process.argv.slice(2), { stdio: "inherit" });
+const env = { ...process.env, HORON_MESSENGER_PACKAGE: UPDATE_PACKAGE };
+const manager = detectManager();
+if (manager) env.HORON_MESSENGER_INSTALL_MANAGER = manager;
+
+const child = spawn(executable, process.argv.slice(2), { stdio: "inherit", env });
 
 child.on("error", (error) => {
   console.error(`${BINARY}: failed to launch ${executable}: ${error.message}`);

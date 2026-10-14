@@ -1,5 +1,5 @@
 {
-  "name": "@horon-ai/messenger",
+  "name": "@horon-ai/messenger-cli",
   "version": "0.1.0",
   "description": "horon-messenger command line interface. Installs the prebuilt Rust binary for your platform.",
   "keywords": [
@@ -34,10 +34,10 @@
     "access": "public"
   },
   "optionalDependencies": {
-    "@horon-ai/messenger-darwin-arm64": "0.1.0",
-    "@horon-ai/messenger-darwin-x64": "0.1.0",
-    "@horon-ai/messenger-linux-x64-gnu": "0.1.0",
-    "@horon-ai/messenger-linux-arm64-gnu": "0.1.0",
-    "@horon-ai/messenger-win32-x64-msvc": "0.1.0"
+    "@horon-ai/messenger-cli-darwin-arm64": "0.1.0",
+    "@horon-ai/messenger-cli-darwin-x64": "0.1.0",
+    "@horon-ai/messenger-cli-linux-x64-gnu": "0.1.0",
+    "@horon-ai/messenger-cli-linux-arm64-gnu": "0.1.0",
+    "@horon-ai/messenger-cli-win32-x64-msvc": "0.1.0"
   }
 }

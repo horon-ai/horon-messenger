@@ -103,3 +103,21 @@ jobs:
           for bundle in server-mcp server-tui server-mcp-tui; do
             (cd "npm/bundles/$bundle" && npm publish --access public)
           done
+
+  full:
+    name: publish full package
+    needs: bundles
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          registry-url: https://registry.npmjs.org
+      - name: Publish the all-in-one package
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+        run: |
+          set -euo pipefail
+          node npm/scripts/sync-version.mjs
+          (cd npm/full && npm publish --access public)

@@ -11,7 +11,7 @@ import { dirname, join, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
 
 const SURFACES = {
-  cli: { pkg: "@horon-ai/messenger", bin: "horon-messenger" },
+  cli: { pkg: "@horon-ai/messenger-cli", bin: "horon-messenger" },
   mcp: { pkg: "@horon-ai/messenger-mcp", bin: "horon-messenger-mcp" },
   server: { pkg: "@horon-ai/messenger-server", bin: "horon-messenger-server" },
   ui: { pkg: "@horon-ai/messenger-tui", bin: "horon-messenger-tui" },
