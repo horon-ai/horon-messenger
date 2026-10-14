@@ -284,9 +284,12 @@ mod tests {
 
     #[test]
     fn headers_carry_bearer_token_and_cookie() {
-        let client =
-            SlackClient::new(HttpClient::shared(), "xoxc-abc", Some("secret-cookie".to_owned()))
-                .unwrap();
+        let client = SlackClient::new(
+            HttpClient::shared(),
+            "xoxc-abc",
+            Some("secret-cookie".to_owned()),
+        )
+        .unwrap();
         let headers = client.headers();
         assert_eq!(headers.get("authorization").unwrap(), "Bearer xoxc-abc");
         assert_eq!(headers.get("cookie").unwrap(), "d=secret-cookie");
