@@ -16,6 +16,7 @@ use horon_messenger_core::{
 };
 
 use client::SlackBotClient;
+use horon_messenger_provider_common::HttpClient;
 
 const PROVIDER: ProviderKind = ProviderKind::SlackBot;
 const DEFAULT_ACCOUNT: &str = "default";
@@ -26,6 +27,7 @@ const TOKEN_ENV: &str = "HORON_MESSENGER_SLACKBOT_TOKEN";
 pub struct SlackBotProvider {
     paths: ConfigPaths,
     credentials: FileCredentialStore,
+    http: HttpClient,
 }
 
 impl SlackBotProvider {
@@ -33,6 +35,7 @@ impl SlackBotProvider {
         Self {
             credentials: FileCredentialStore::new(paths.clone()),
             paths,
+            http: HttpClient::shared(),
         }
     }
 
@@ -71,7 +74,7 @@ impl SlackBotProvider {
         let token = self
             .resolve()?
             .ok_or(Error::AuthRequired { provider: PROVIDER })?;
-        SlackBotClient::new(token)
+        Ok(SlackBotClient::new(self.http.clone(), token))
     }
 }
 

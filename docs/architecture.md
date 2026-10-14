@@ -82,3 +82,49 @@ Every timestamp that crosses a surface boundary is produced by
 `core::now_rfc3339` (RFC 3339, milliseconds, UTC), so surfaces cannot drift.
 Identifiers that cross a boundary are strings, so a platform's 64-bit or
 snowflake id survives JSON without precision loss.
+
+## Performance model
+
+The port exists because the JavaScript original paid a per-call cost behind a
+long-running process. Three choices remove that cost, and one harness measures
+whether they hold.
+
+**One HTTP client per provider.** Every HTTP provider builds its client once, in
+`new()`, from `HttpClient::shared()` in `horon-messenger-provider-common`. That
+constructor returns a clone of one process-global `reqwest::Client`, so all
+providers and every operation share one connection pool and one rate-limit
+bucket map. A repeated operation reuses an open connection instead of paying a
+fresh TLS handshake, and the clone itself is cheap because `reqwest::Client` is
+reference counted internally.
+
+**One sidecar process per sidecar provider.** iMessage, WhatsApp and LINE hold a
+`SidecarSession`. The child is started lazily on the first call and kept alive
+for later calls, and clones of the session share the same child. A call whose
+request was already written is never retried unless the method is marked
+idempotent, so a retried send cannot duplicate a message; a call that failed
+before anything was written may restart the process once and retry. When the
+child dies, the next call starts a fresh one, and the child is reaped when the
+session drops.
+
+**A current-thread runtime in the CLI.** A CLI invocation runs exactly one
+command and awaits one operation, so `main` builds a `new_current_thread` tokio
+runtime rather than a multi-threaded worker pool. The MCP server and the HTTP
+server are long-lived, so they keep a multi-threaded runtime and reuse the
+shared client and the sidecar sessions across requests.
+
+### Measuring it
+
+The harness lives in `scripts/perf/`. Build the release binaries first, then:
+
+```bash
+bash scripts/perf/measure.sh --label baseline          # writes target/perf/baseline.json
+bash scripts/perf/compare.sh target/perf/before.json target/perf/after.json
+```
+
+`measure.sh` records CLI start-up plus operation latency for `providers`,
+`chats mock` and `send mock general hi`, the bare process-spawn floor
+(`/usr/bin/true`), operation latency through a locally started HTTP server, and
+the byte size of the three release binaries. It writes the numbers as JSON to
+`target/perf/<label>.json` and prints a table. `compare.sh` prints a side-by-side
+delta of two runs. Neither script needs the network, a live platform or a fixed
+port.

@@ -13,6 +13,8 @@ name = "horon-messenger"
 path = "src/main.rs"
 
 [features]
+default = ["mock"]
+mock = ["horon-messenger-sdk/mock"]
 kakaotalk = ["horon-messenger-sdk/kakaotalk"]
 discord = ["horon-messenger-sdk/discord"]
 telegram = ["horon-messenger-sdk/telegram"]
@@ -25,7 +27,7 @@ imessage = ["horon-messenger-sdk/imessage"]
 whatsapp = ["horon-messenger-sdk/whatsapp"]
 line = ["horon-messenger-sdk/line"]
 instagram = ["horon-messenger-sdk/instagram"]
-all = ["horon-messenger-sdk/all"]
+all = ["mock", "kakaotalk", "discord", "telegram", "channeltalk", "telegrambot", "whatsappbot", "slackbot", "slack", "imessage", "whatsapp", "line", "instagram"]
 
 [dependencies]
 horon-messenger-sdk.workspace = true

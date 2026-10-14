@@ -12,6 +12,8 @@ use horon_messenger_core::{
     Provider, ProviderKind, Result, SendRequest, SendResult, now_rfc3339,
 };
 
+use horon_messenger_provider_common::HttpClient;
+
 use client::WhatsAppBotClient;
 
 const PROVIDER: ProviderKind = ProviderKind::WhatsAppBot;
@@ -32,6 +34,7 @@ struct Credentials {
 pub struct WhatsAppBotProvider {
     paths: ConfigPaths,
     credentials: FileCredentialStore,
+    http: HttpClient,
 }
 
 impl WhatsAppBotProvider {
@@ -39,6 +42,7 @@ impl WhatsAppBotProvider {
         Self {
             credentials: FileCredentialStore::new(paths.clone()),
             paths,
+            http: HttpClient::shared(),
         }
     }
 
@@ -65,7 +69,11 @@ impl WhatsAppBotProvider {
 
     fn client(&self) -> Result<WhatsAppBotClient> {
         let credentials = self.resolve_credentials()?;
-        WhatsAppBotClient::new(credentials.phone_number_id, credentials.access_token)
+        WhatsAppBotClient::new(
+            self.http.clone(),
+            credentials.phone_number_id,
+            credentials.access_token,
+        )
     }
 }
 
@@ -122,6 +130,7 @@ impl Provider for WhatsAppBotProvider {
     async fn whoami(&self) -> Result<Profile> {
         let credentials = self.resolve_credentials()?;
         let phone = WhatsAppBotClient::new(
+            self.http.clone(),
             credentials.phone_number_id.clone(),
             credentials.access_token,
         )?

@@ -143,6 +143,17 @@ cargo test --workspace                      # unit and integration tests
 cargo clippy --workspace --all-targets      # lints
 ```
 
+Every surface controls its own provider set. Each defaults to `mock` and takes
+one feature per platform (`discord`, `telegram`, `channeltalk`, `whatsapp`,
+`line`, `instagram` and the rest), plus `all` for every provider:
+
+```bash
+cargo build -p horon-messenger-cli --features discord
+cargo build -p horon-messenger-mcp --features all
+cargo build -p horon-messenger-server --features telegram,discord
+cargo build -p horon-messenger-ui --features all
+```
+
 The toolchain is pinned in `rust-toolchain.toml` (1.97.1, edition 2024).
 
 ## Surfaces

@@ -1,0 +1,16 @@
+{
+  "binaries": {
+    "horon-messenger": 1069760,
+    "horon-messenger-mcp": 2448832,
+    "horon-messenger-server": 2339696
+  },
+  "http_ms": 22.1097,
+  "label": "after",
+  "n": 30,
+  "spawn_floor_ms": 9.0411,
+  "startup_ms": {
+    "chats": 10.5315,
+    "providers": 11.0381,
+    "send": 10.9385
+  }
+}

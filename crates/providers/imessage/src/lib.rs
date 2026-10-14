@@ -3,10 +3,12 @@
 mod client;
 mod models;
 
+use std::sync::Arc;
 use std::time::Duration;
 
 use async_trait::async_trait;
 use serde_json::{Value, json};
+use tokio::sync::Mutex;
 
 use horon_messenger_core::{
     AccountSummary, AuthMethod, AuthProvider, AuthStatus, Capabilities, Chat, ChatKind, ChatQuery,
@@ -34,6 +36,7 @@ pub struct IMessageProvider {
     credentials: FileCredentialStore,
     sidecar: Option<SidecarSpec>,
     timeout: Duration,
+    client: Arc<Mutex<Option<IMessageClient>>>,
 }
 
 impl IMessageProvider {
@@ -43,6 +46,7 @@ impl IMessageProvider {
             paths,
             sidecar: None,
             timeout: DEFAULT_TIMEOUT,
+            client: Arc::new(Mutex::new(None)),
         }
     }
 
@@ -62,7 +66,20 @@ impl IMessageProvider {
     }
 
     async fn client(&self) -> Result<IMessageClient> {
-        IMessageClient::connect(self.spec()?, self.timeout).await
+        let mut guard = self.client.lock().await;
+        if let Some(client) = guard.as_ref() {
+            return Ok(client.clone());
+        }
+        let client = IMessageClient::connect(self.spec()?, self.timeout).await?;
+        *guard = Some(client.clone());
+        Ok(client)
+    }
+
+    async fn invalidate_if_dead<T>(&self, result: &Result<T>) {
+        if matches!(result, Err(Error::Network { .. })) {
+            let mut guard = self.client.lock().await;
+            *guard = None;
+        }
     }
 
     fn chat(chat: &ImsgChat) -> Chat {
@@ -174,7 +191,7 @@ impl IMessageProvider {
         }
     }
 
-    #[cfg(test)]
+    #[cfg(all(test, target_os = "macos"))]
     fn for_test(spec: SidecarSpec, timeout: Duration) -> Self {
         let paths = ConfigPaths::at(std::env::temp_dir().join("horon-messenger-imessage-tests"));
         Self {
@@ -182,6 +199,7 @@ impl IMessageProvider {
             paths,
             sidecar: Some(spec),
             timeout,
+            client: Arc::new(Mutex::new(None)),
         }
     }
 }
@@ -210,9 +228,9 @@ impl Provider for IMessageProvider {
         Self::ensure_macos("whoami")?;
         let spec = self.spec()?;
         let binary = spec.program().display().to_string();
-        let mut client = IMessageClient::connect(spec, self.timeout).await?;
+        let mut client = self.client().await?;
         let probe = client.list_chats(1).await;
-        let _ = client.shutdown().await;
+        self.invalidate_if_dead(&probe).await;
         probe?;
         Ok(Profile {
             provider: PROVIDER,
@@ -228,7 +246,7 @@ impl Provider for IMessageProvider {
         let limit = query.limit.unwrap_or(DEFAULT_LIMIT);
         let mut client = self.client().await?;
         let result = client.list_chats(limit).await;
-        let _ = client.shutdown().await;
+        self.invalidate_if_dead(&result).await;
         let mut chats: Vec<Chat> = result?.iter().map(Self::chat).collect();
         if let Some(search) = &query.search {
             let needle = search.to_lowercase();
@@ -248,7 +266,7 @@ impl Provider for IMessageProvider {
         Self::ensure_macos("get_chat")?;
         let mut client = self.client().await?;
         let result = client.list_chats(CHAT_SCAN_LIMIT).await;
-        let _ = client.shutdown().await;
+        self.invalidate_if_dead(&result).await;
         let chats = result?;
         chats
             .iter()
@@ -276,7 +294,7 @@ impl Provider for IMessageProvider {
             Ok::<_, Error>(messages)
         }
         .await;
-        let _ = client.shutdown().await;
+        self.invalidate_if_dead(&outcome).await;
         let messages = outcome?;
         let has_more = messages.len() >= limit;
         let mut mapped: Vec<Message> = messages.iter().map(Self::message).collect();
@@ -298,7 +316,7 @@ impl Provider for IMessageProvider {
         let params = Self::send_params(&request.chat_id, &request.text);
         let mut client = self.client().await?;
         let result = client.send(params).await;
-        let _ = client.shutdown().await;
+        self.invalidate_if_dead(&result).await;
         let response = result?;
         let message_id = response
             .guid
@@ -319,7 +337,7 @@ impl Provider for IMessageProvider {
         Self::ensure_macos("list_members")?;
         let mut client = self.client().await?;
         let result = client.list_chats(CHAT_SCAN_LIMIT).await;
-        let _ = client.shutdown().await;
+        self.invalidate_if_dead(&result).await;
         let chats = result?;
         let chat = chats
             .iter()
@@ -382,7 +400,7 @@ impl AuthProvider for IMessageProvider {
     }
 }
 
-#[cfg(test)]
+#[cfg(all(test, target_os = "macos"))]
 mod tests {
     use super::*;
     use horon_messenger_core::Delivery;
@@ -676,5 +694,137 @@ sys.exit(0)
             .await
             .unwrap_err();
         assert!(matches!(error, Error::Network { .. }), "got {error:?}");
+    }
+
+    const STUB: &str = r#"
+import sys, os, json
+pidfile = sys.argv[1]
+limit = int(sys.argv[2])
+with open(pidfile, 'a') as f:
+    f.write(str(os.getpid()) + '\n')
+answered = 0
+for line in sys.stdin:
+    line = line.strip()
+    if not line:
+        continue
+    req = json.loads(line)
+    m = req.get('method')
+    if m == 'chats.list':
+        result = {'chats': []}
+    else:
+        result = {}
+    sys.stdout.write(json.dumps({'jsonrpc': '2.0', 'id': req['id'], 'result': result}) + '\n')
+    sys.stdout.flush()
+    answered += 1
+    if limit and answered >= limit:
+        break
+"#;
+
+    fn stub_spec(pid_file: &std::path::Path, limit: u32) -> SidecarSpec {
+        SidecarSpec::new(
+            PROVIDER,
+            "python3",
+            vec![
+                "-c".to_owned(),
+                STUB.to_owned(),
+                pid_file.to_string_lossy().into_owned(),
+                limit.to_string(),
+            ],
+        )
+    }
+
+    fn temp_pid_file(name: &str) -> std::path::PathBuf {
+        let path = std::env::temp_dir().join(format!(
+            "hm-imessage-sidecar-{name}-{}.txt",
+            std::process::id()
+        ));
+        let _ = std::fs::remove_file(&path);
+        path
+    }
+
+    fn recorded_pids(path: &std::path::Path) -> Vec<u32> {
+        std::fs::read_to_string(path)
+            .unwrap_or_default()
+            .lines()
+            .filter_map(|line| line.trim().parse::<u32>().ok())
+            .collect()
+    }
+
+    fn process_alive(pid: u32) -> bool {
+        std::process::Command::new("kill")
+            .arg("-0")
+            .arg(pid.to_string())
+            .stdout(std::process::Stdio::null())
+            .stderr(std::process::Stdio::null())
+            .status()
+            .map(|status| status.success())
+            .unwrap_or(false)
+    }
+
+    async fn wait_until_dead(pid: u32) {
+        for _ in 0..500 {
+            if !process_alive(pid) {
+                return;
+            }
+            tokio::time::sleep(Duration::from_millis(10)).await;
+        }
+        panic!("child process {pid} was still alive after the drop");
+    }
+
+    #[tokio::test]
+    async fn sidecar_process_is_reused() {
+        let pid_file = temp_pid_file("reused");
+        let provider = IMessageProvider::for_test(stub_spec(&pid_file, 0), Duration::from_secs(5));
+        for _ in 0..3 {
+            provider.list_chats(&ChatQuery::default()).await.unwrap();
+        }
+        let pids = recorded_pids(&pid_file);
+        assert_eq!(
+            pids.len(),
+            1,
+            "three operations must reuse one sidecar process: {pids:?}"
+        );
+        drop(provider);
+        let _ = std::fs::remove_file(&pid_file);
+    }
+
+    #[tokio::test]
+    async fn sidecar_restarts_after_death() {
+        let pid_file = temp_pid_file("restart");
+        let provider = IMessageProvider::for_test(stub_spec(&pid_file, 1), Duration::from_secs(5));
+        provider.list_chats(&ChatQuery::default()).await.unwrap();
+        let first = recorded_pids(&pid_file);
+        assert_eq!(
+            first.len(),
+            1,
+            "the first call starts one process: {first:?}"
+        );
+
+        provider.list_chats(&ChatQuery::default()).await.unwrap();
+        let after = recorded_pids(&pid_file);
+        assert!(
+            after.len() >= 2,
+            "the call after a death must start a new process: {after:?}"
+        );
+        assert_ne!(
+            after[after.len() - 1],
+            first[0],
+            "the restarted process must have a new pid: {after:?}"
+        );
+        drop(provider);
+        let _ = std::fs::remove_file(&pid_file);
+    }
+
+    #[tokio::test]
+    async fn sidecar_child_is_reaped_on_drop() {
+        let pid_file = temp_pid_file("reaped");
+        let provider = IMessageProvider::for_test(stub_spec(&pid_file, 0), Duration::from_secs(5));
+        provider.list_chats(&ChatQuery::default()).await.unwrap();
+        let pids = recorded_pids(&pid_file);
+        assert_eq!(pids.len(), 1, "expected one live process: {pids:?}");
+        let child = pids[0];
+        drop(provider);
+        wait_until_dead(child).await;
+        let _ = std::fs::remove_file(&pid_file);
     }
 }

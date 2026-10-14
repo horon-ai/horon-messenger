@@ -21,6 +21,7 @@ use horon_messenger_core::{
 };
 
 use client::TelegramBotClient;
+use horon_messenger_provider_common::HttpClient;
 use models::{BotUser, Message as TelegramMessage, TelegramChat};
 
 const PROVIDER: ProviderKind = ProviderKind::TelegramBot;
@@ -32,6 +33,7 @@ const TOKEN_ENV: &str = "HORON_MESSENGER_TELEGRAMBOT_TOKEN";
 pub struct TelegramBotProvider {
     paths: ConfigPaths,
     credentials: FileCredentialStore,
+    http: HttpClient,
 }
 
 impl TelegramBotProvider {
@@ -40,6 +42,7 @@ impl TelegramBotProvider {
         Self {
             credentials: FileCredentialStore::new(paths.clone()),
             paths,
+            http: HttpClient::shared(),
         }
     }
 
@@ -74,7 +77,7 @@ impl TelegramBotProvider {
         let token = self
             .token()?
             .ok_or(Error::AuthRequired { provider: PROVIDER })?;
-        TelegramBotClient::new(token)
+        Ok(TelegramBotClient::new(self.http.clone(), token))
     }
 
     fn chat(chat: &TelegramChat) -> Chat {

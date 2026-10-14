@@ -15,6 +15,8 @@ use horon_messenger_core::{
     SendRequest, SendResult, Snapshot, now_rfc3339,
 };
 
+use horon_messenger_provider_common::HttpClient;
+
 use client::InstagramClient;
 use models::Item;
 use session::InstagramSession;
@@ -31,6 +33,7 @@ const CSRFTOKEN_ENV: &str = "HORON_MESSENGER_INSTAGRAM_CSRFTOKEN";
 pub struct InstagramProvider {
     paths: ConfigPaths,
     credentials: FileCredentialStore,
+    http: HttpClient,
 }
 
 impl InstagramProvider {
@@ -39,6 +42,7 @@ impl InstagramProvider {
         Self {
             credentials: FileCredentialStore::new(paths.clone()),
             paths,
+            http: HttpClient::shared(),
         }
     }
 
@@ -86,7 +90,7 @@ impl InstagramProvider {
     }
 
     fn client(&self) -> Result<InstagramClient> {
-        InstagramClient::new(self.session()?)
+        InstagramClient::new(self.http.clone(), self.session()?)
     }
 }
 

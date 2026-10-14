@@ -95,8 +95,25 @@ impl Envelope {
         }
     }
 
+    /// Builds the wire `Value` directly, moving the already-serialized `data`
+    /// payload instead of serializing the whole envelope a second time.
     pub fn into_value(self) -> Value {
-        serde_json::to_value(self).unwrap_or(Value::Null)
+        let mut map = serde_json::Map::new();
+        map.insert("ok".to_owned(), Value::Bool(self.ok));
+        if let Some(data) = self.data {
+            map.insert("data".to_owned(), data);
+        }
+        if let Some(error) = self.error {
+            map.insert(
+                "error".to_owned(),
+                serde_json::to_value(error).unwrap_or(Value::Null),
+            );
+        }
+        map.insert(
+            "meta".to_owned(),
+            serde_json::to_value(self.meta).unwrap_or(Value::Null),
+        );
+        Value::Object(map)
     }
 
     pub fn to_json(&self) -> String {

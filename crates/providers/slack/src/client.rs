@@ -87,10 +87,10 @@ pub struct SlackClient {
 
 impl SlackClient {
     /// Builds a client, defaulting the base URL to `https://slack.com/api`.
-    pub fn new(token: impl Into<String>, cookie: Option<String>) -> Result<Self> {
+    pub fn new(http: HttpClient, token: impl Into<String>, cookie: Option<String>) -> Result<Self> {
         let base_url = std::env::var(BASE_URL_ENV).unwrap_or_else(|_| DEFAULT_BASE_URL.to_owned());
         Ok(Self {
-            http: HttpClient::new()?,
+            http,
             base_url: base_url.trim_end_matches('/').to_owned(),
             token: token.into(),
             cookie,
@@ -284,7 +284,12 @@ mod tests {
 
     #[test]
     fn headers_carry_bearer_token_and_cookie() {
-        let client = SlackClient::new("xoxc-abc", Some("secret-cookie".to_owned())).unwrap();
+        let client = SlackClient::new(
+            HttpClient::shared(),
+            "xoxc-abc",
+            Some("secret-cookie".to_owned()),
+        )
+        .unwrap();
         let headers = client.headers();
         assert_eq!(headers.get("authorization").unwrap(), "Bearer xoxc-abc");
         assert_eq!(headers.get("cookie").unwrap(), "d=secret-cookie");
@@ -299,7 +304,7 @@ mod tests {
 
     #[test]
     fn headers_omit_cookie_when_absent() {
-        let client = SlackClient::new("xoxc-abc", None).unwrap();
+        let client = SlackClient::new(HttpClient::shared(), "xoxc-abc", None).unwrap();
         assert!(client.headers().get("cookie").is_none());
     }
 
@@ -334,7 +339,7 @@ mod tests {
     #[test]
     fn base_url_honours_the_env_override() {
         unsafe { std::env::set_var(BASE_URL_ENV, "http://127.0.0.1:9997") };
-        let client = SlackClient::new("token", None).unwrap();
+        let client = SlackClient::new(HttpClient::shared(), "token", None).unwrap();
         assert_eq!(client.base_url, "http://127.0.0.1:9997");
         unsafe { std::env::remove_var(BASE_URL_ENV) };
     }

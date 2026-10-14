@@ -192,7 +192,10 @@ fn main() -> ExitCode {
     let cli = Cli::parse();
     let pretty = cli.pretty;
     let envelope = match build_client(&cli) {
-        Ok(client) => match tokio::runtime::Runtime::new() {
+        Ok(client) => match tokio::runtime::Builder::new_current_thread()
+            .enable_all()
+            .build()
+        {
             Ok(runtime) => runtime.block_on(dispatch(&client, cli.command, pretty)),
             Err(error) => Envelope::failure(
                 &Error::Internal {

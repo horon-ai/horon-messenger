@@ -2,6 +2,7 @@
 
 use std::path::{Path, PathBuf};
 use std::process::Stdio;
+use std::sync::Arc;
 use std::time::Duration;
 
 use horon_messenger_core::{Error, ProviderKind, Result};
@@ -275,6 +276,97 @@ impl JsonRpcProcess {
     }
 }
 
+/// A reusable, cheaply cloneable handle to one lazily started sidecar process.
+///
+/// The process is started on the first [`SidecarSession::call`] and kept alive
+/// for later calls; clones share the same child. A call whose request was
+/// already written is never retried unless it is marked idempotent.
+#[derive(Debug, Clone)]
+pub struct SidecarSession {
+    inner: Arc<SidecarSessionInner>,
+}
+
+#[derive(Debug)]
+struct SidecarSessionInner {
+    spec: SidecarSpec,
+    timeout: Duration,
+    process: tokio::sync::Mutex<Option<JsonRpcProcess>>,
+}
+
+impl SidecarSession {
+    /// Builds a session that starts `spec` on the first call with the given timeout.
+    pub fn new(spec: SidecarSpec, timeout: Duration) -> Self {
+        Self {
+            inner: Arc::new(SidecarSessionInner {
+                spec,
+                timeout,
+                process: tokio::sync::Mutex::new(None),
+            }),
+        }
+    }
+
+    /// Builds a session that starts `spec` on the first call with [`DEFAULT_TIMEOUT`].
+    pub fn with_default_timeout(spec: SidecarSpec) -> Self {
+        Self::new(spec, DEFAULT_TIMEOUT)
+    }
+
+    async fn start(&self) -> Result<JsonRpcProcess> {
+        JsonRpcProcess::start_with_timeout(self.inner.spec.clone(), self.inner.timeout).await
+    }
+
+    /// Sends a JSON-RPC request, starting the process on demand and reusing it.
+    ///
+    /// A call is retried once only when nothing was written yet (the lazy start
+    /// itself failed) or when `idempotent` is true. A non-idempotent call whose
+    /// request was already written returns the error without retrying, because
+    /// the sidecar may already have applied it.
+    pub async fn call(&self, method: &str, params: Value, idempotent: bool) -> Result<Value> {
+        let mut guard = self.inner.process.lock().await;
+
+        if guard.is_none() {
+            match self.start().await {
+                Ok(process) => *guard = Some(process),
+                Err(first_error) => match self.start().await {
+                    Ok(process) => *guard = Some(process),
+                    Err(_) => return Err(first_error),
+                },
+            }
+        }
+
+        let result = match guard.as_mut() {
+            Some(process) => process.call(method, params.clone()).await,
+            None => {
+                return Err(Error::Internal {
+                    message: "sidecar session could not start a process".to_owned(),
+                });
+            }
+        };
+
+        match result {
+            Ok(value) => Ok(value),
+            Err(error) => {
+                *guard = None;
+                if !idempotent {
+                    return Err(error);
+                }
+                let mut process = self.start().await?;
+                let value = process.call(method, params).await?;
+                *guard = Some(process);
+                Ok(value)
+            }
+        }
+    }
+
+    /// Kills the child process if one is running.
+    pub async fn shutdown(&self) -> Result<()> {
+        let mut guard = self.inner.process.lock().await;
+        if let Some(mut process) = guard.take() {
+            process.shutdown().await?;
+        }
+        Ok(())
+    }
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -320,6 +412,120 @@ while True:
             "python3",
             vec!["-c".to_owned(), script.to_owned()],
         )
+    }
+
+    const PID_RECORDING_STUB: &str = "\
+import sys, os, json
+with open(sys.argv[1], 'a') as f:
+    f.write(str(os.getpid()) + '\\n')
+while True:
+    line = sys.stdin.readline()
+    if not line:
+        break
+    line = line.strip()
+    if not line:
+        continue
+    req = json.loads(line)
+    if 'id' in req:
+        resp = {'jsonrpc': '2.0', 'id': req['id'], 'result': {'echo': req.get('params')}}
+        sys.stdout.write(json.dumps(resp) + '\\n')
+        sys.stdout.flush()
+";
+
+    const INFLIGHT_EXIT_STUB: &str = "\
+import sys, os
+with open(sys.argv[1], 'a') as f:
+    f.write(str(os.getpid()) + '\\n')
+line = sys.stdin.readline()
+sys.exit(0)
+";
+
+    fn stub_session(script: &str, pid_file: &Path) -> SidecarSession {
+        let spec = SidecarSpec::new(
+            ProviderKind::Mock,
+            "python3",
+            vec![
+                "-c".to_owned(),
+                script.to_owned(),
+                pid_file.to_string_lossy().into_owned(),
+            ],
+        );
+        SidecarSession::with_default_timeout(spec)
+    }
+
+    fn temp_pid_file(name: &str) -> PathBuf {
+        let path =
+            std::env::temp_dir().join(format!("hm-sidecar-{name}-{}.txt", std::process::id()));
+        let _ = std::fs::remove_file(&path);
+        path
+    }
+
+    fn pid_lines(path: &Path) -> Vec<String> {
+        std::fs::read_to_string(path)
+            .unwrap_or_default()
+            .lines()
+            .map(str::trim)
+            .filter(|line| !line.is_empty())
+            .map(str::to_owned)
+            .collect()
+    }
+
+    #[test]
+    fn sidecar_session_is_clone() {
+        fn assert_clone<T: Clone>() {}
+        assert_clone::<SidecarSession>();
+    }
+
+    #[tokio::test]
+    async fn sidecar_session_spawns_once() {
+        let pid_file = temp_pid_file("spawn-once");
+        let session = stub_session(PID_RECORDING_STUB, &pid_file);
+        for _ in 0..3 {
+            let value = session
+                .call("echo", serde_json::json!({ "ping": true }), true)
+                .await
+                .unwrap();
+            assert_eq!(value, serde_json::json!({ "echo": { "ping": true } }));
+        }
+        let pids = pid_lines(&pid_file);
+        assert_eq!(
+            pids.len(),
+            1,
+            "three calls must reuse one sidecar process: {pids:?}"
+        );
+        session.shutdown().await.unwrap();
+        let _ = std::fs::remove_file(&pid_file);
+    }
+
+    #[tokio::test]
+    async fn sidecar_session_does_not_retry_an_inflight_call() {
+        let non_idempotent_file = temp_pid_file("inflight-nonidem");
+        let session = stub_session(INFLIGHT_EXIT_STUB, &non_idempotent_file);
+        let error = session
+            .call("send", serde_json::json!({ "to": "x" }), false)
+            .await
+            .unwrap_err();
+        assert!(matches!(error, Error::Network { .. }), "got {error:?}");
+        assert_eq!(
+            pid_lines(&non_idempotent_file).len(),
+            1,
+            "a non-idempotent in-flight call must not respawn"
+        );
+        let _ = std::fs::remove_file(&non_idempotent_file);
+
+        let idempotent_file = temp_pid_file("inflight-idem");
+        let session = stub_session(INFLIGHT_EXIT_STUB, &idempotent_file);
+        let error = session
+            .call("read", serde_json::json!({}), true)
+            .await
+            .unwrap_err();
+        assert!(matches!(error, Error::Network { .. }), "got {error:?}");
+        assert_eq!(
+            pid_lines(&idempotent_file).len(),
+            2,
+            "an idempotent in-flight call restarts exactly once"
+        );
+        let _ = std::fs::remove_file(&idempotent_file);
     }
 
     #[tokio::test]
