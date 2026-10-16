@@ -5,11 +5,7 @@ use clap::Parser;
 use horon_messenger_sdk::Client;
 
 #[derive(Debug, Parser)]
-#[command(
-    name = "horon-messenger-server",
-    version,
-    about = "HTTP API for horon-messenger"
-)]
+#[command(name = "horon-messenger-server", version, about = "HTTP API for horon-messenger")]
 struct Args {
     #[arg(long, default_value = "127.0.0.1")]
     host: String,
@@ -36,11 +32,7 @@ async fn main() -> anyhow::Result<()> {
     let app = horon_messenger_server::build_router(client);
 
     let listener = tokio::net::TcpListener::bind((args.host.as_str(), args.port)).await?;
-    tracing::info!(
-        "horon-messenger-server listening on http://{}:{}",
-        args.host,
-        args.port
-    );
+    tracing::info!("horon-messenger-server listening on http://{}:{}", args.host, args.port);
     axum::serve(listener, app).await?;
     Ok(())
 }

@@ -5,10 +5,7 @@ use serde_json::Value;
 fn run(args: &[&str]) -> (bool, Value) {
     let output = Command::new(env!("CARGO_BIN_EXE_horon-messenger"))
         .args(args)
-        .env(
-            "HORON_MESSENGER_CONFIG_DIR",
-            "/tmp/horon-messenger-cli-test",
-        )
+        .env("HORON_MESSENGER_CONFIG_DIR", "/tmp/horon-messenger-cli-test")
         .env_remove("HORON_MESSENGER_DISCORD_TOKEN")
         .env_remove("E2E_DISCORD_TOKEN")
         .env_remove("HORON_MESSENGER_CHANNELTALK_ACCOUNT_COOKIE")
@@ -27,10 +24,7 @@ fn run(args: &[&str]) -> (bool, Value) {
 fn run_status(args: &[&str]) -> i32 {
     Command::new(env!("CARGO_BIN_EXE_horon-messenger"))
         .args(args)
-        .env(
-            "HORON_MESSENGER_CONFIG_DIR",
-            "/tmp/horon-messenger-cli-test",
-        )
+        .env("HORON_MESSENGER_CONFIG_DIR", "/tmp/horon-messenger-cli-test")
         .output()
         .expect("run the cli")
         .status

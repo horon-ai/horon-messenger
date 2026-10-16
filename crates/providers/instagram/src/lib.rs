@@ -9,10 +9,9 @@ use async_trait::async_trait;
 use serde_json::Value;
 
 use horon_messenger_core::{
-    AccountSummary, AuthMethod, AuthProvider, AuthStatus, Capabilities, Chat, ChatQuery,
-    ConfigPaths, CredentialStore, Delivery, Error, FileCredentialStore, LoginOptions, LoginOutcome,
-    Member, Message, MessagePage, MessageQuery, Profile, Provider, ProviderKind, Result,
-    SendRequest, SendResult, Snapshot, now_rfc3339,
+    AccountSummary, AuthMethod, AuthProvider, AuthStatus, Capabilities, Chat, ChatQuery, ConfigPaths, CredentialStore,
+    Delivery, Error, FileCredentialStore, LoginOptions, LoginOutcome, Member, Message, MessagePage, MessageQuery,
+    Profile, Provider, ProviderKind, Result, SendRequest, SendResult, Snapshot, now_rfc3339,
 };
 
 use horon_messenger_provider_common::HttpClient;
@@ -130,9 +129,7 @@ impl Provider for InstagramProvider {
         let mut chats: Vec<Chat> = threads.iter().map(mappers::chat).collect();
         if let Some(search) = &query.search {
             let needle = search.to_lowercase();
-            chats.retain(|chat| {
-                chat.name.to_lowercase().contains(&needle) || chat.id.contains(search.as_str())
-            });
+            chats.retain(|chat| chat.name.to_lowercase().contains(&needle) || chat.id.contains(search.as_str()));
         }
         if let Some(limit) = query.limit {
             chats.truncate(limit);
@@ -150,10 +147,7 @@ impl Provider for InstagramProvider {
         let thread = self.client()?.thread(chat_id, limit).await?;
         let mut items: Vec<&Item> = thread.items.iter().collect();
         items.reverse();
-        let mut messages: Vec<Message> = items
-            .into_iter()
-            .map(|item| mappers::message(item, chat_id))
-            .collect();
+        let mut messages: Vec<Message> = items.into_iter().map(|item| mappers::message(item, chat_id)).collect();
         if let Some(search) = &query.search {
             let needle = search.to_lowercase();
             messages.retain(|message| message.text.to_lowercase().contains(&needle));
@@ -167,11 +161,7 @@ impl Provider for InstagramProvider {
         })
     }
 
-    async fn search_messages(
-        &self,
-        chat_id: Option<&str>,
-        query: &MessageQuery,
-    ) -> Result<MessagePage> {
+    async fn search_messages(&self, chat_id: Option<&str>, query: &MessageQuery) -> Result<MessagePage> {
         let term = query.search.clone().unwrap_or_default().to_lowercase();
         let limit = query.limit.unwrap_or(20);
         let client = self.client()?;
@@ -213,10 +203,7 @@ impl Provider for InstagramProvider {
     }
 
     async fn send_message(&self, request: &SendRequest) -> Result<SendResult> {
-        let response = self
-            .client()?
-            .send_text(&request.chat_id, &request.text)
-            .await?;
+        let response = self.client()?.send_text(&request.chat_id, &request.text).await?;
         let message_id = response
             .payload
             .as_ref()
@@ -243,11 +230,7 @@ impl Provider for InstagramProvider {
         let client = self.client()?;
         let viewer = client.user_id().to_owned();
         let thread = client.thread(chat_id, 1).await?;
-        Ok(thread
-            .users
-            .iter()
-            .map(|user| mappers::member(user, &viewer))
-            .collect())
+        Ok(thread.users.iter().map(|user| mappers::member(user, &viewer)).collect())
     }
 
     async fn snapshot(&self) -> Result<Snapshot> {

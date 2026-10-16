@@ -31,10 +31,7 @@ pub async fn latest_version(package: &str) -> Result<String> {
         })?;
     if !response.status().is_success() {
         return Err(Error::Internal {
-            message: format!(
-                "the npm registry returned {} for {package}",
-                response.status()
-            ),
+            message: format!("the npm registry returned {} for {package}", response.status()),
         });
     }
     let body: Value = response.json().await.map_err(|error| Error::Internal {
@@ -94,10 +91,7 @@ pub fn install(package: &str, current: &str, latest: &str) -> Result<Value> {
     }
     if !output.status.success() {
         return Err(Error::Internal {
-            message: format!(
-                "`{manager}` exited with {}; the update did not complete",
-                output.status
-            ),
+            message: format!("`{manager}` exited with {}; the update did not complete", output.status),
         });
     }
     Ok(json!({

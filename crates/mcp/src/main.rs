@@ -1,9 +1,7 @@
 use std::sync::Arc;
 
 use futures_util::StreamExt;
-use horon_messenger_sdk::{
-    ChatQuery, Client, Envelope, MessageQuery, Meta, ProviderKind, SendRequest,
-};
+use horon_messenger_sdk::{ChatQuery, Client, Envelope, MessageQuery, Meta, ProviderKind, SendRequest};
 use rmcp::{
     ServerHandler, ServiceExt,
     handler::server::{router::tool::ToolRouter, wrapper::Parameters},
@@ -128,10 +126,7 @@ impl MessengerServer {
         tool_result(Envelope::success(self.client.describe(), Meta::now(None)))
     }
 
-    #[tool(
-        name = "whoami",
-        description = "Show the authenticated account a provider is using."
-    )]
+    #[tool(name = "whoami", description = "Show the authenticated account a provider is using.")]
     async fn whoami(&self, Parameters(input): Parameters<ProviderInput>) -> CallToolResult {
         let envelope = Envelope::from_result(
             self.client.whoami(input.provider).await,
@@ -160,10 +155,7 @@ impl MessengerServer {
         name = "list_messages",
         description = "List messages in one chat, optionally filtered by a text substring."
     )]
-    async fn list_messages(
-        &self,
-        Parameters(input): Parameters<ListMessagesInput>,
-    ) -> CallToolResult {
+    async fn list_messages(&self, Parameters(input): Parameters<ListMessagesInput>) -> CallToolResult {
         let query = MessageQuery {
             search: input.search,
             limit: input.limit,
@@ -171,9 +163,7 @@ impl MessengerServer {
             after: None,
         };
         let envelope = Envelope::from_result(
-            self.client
-                .list_messages(input.provider, &input.chat_id, &query)
-                .await,
+            self.client.list_messages(input.provider, &input.chat_id, &query).await,
             Meta::now(Some(input.provider)),
         );
         tool_result(envelope)
@@ -183,10 +173,7 @@ impl MessengerServer {
         name = "send_message",
         description = "Send one message to a chat through a provider."
     )]
-    async fn send_message(
-        &self,
-        Parameters(input): Parameters<SendMessageInput>,
-    ) -> CallToolResult {
+    async fn send_message(&self, Parameters(input): Parameters<SendMessageInput>) -> CallToolResult {
         let request = SendRequest {
             chat_id: input.chat_id,
             text: input.text,
@@ -204,9 +191,7 @@ impl MessengerServer {
     #[tool(name = "list_members", description = "List the members of one chat.")]
     async fn list_members(&self, Parameters(input): Parameters<MembersInput>) -> CallToolResult {
         let envelope = Envelope::from_result(
-            self.client
-                .list_members(input.provider, &input.chat_id)
-                .await,
+            self.client.list_members(input.provider, &input.chat_id).await,
             Meta::now(Some(input.provider)),
         );
         tool_result(envelope)
@@ -225,10 +210,7 @@ impl MessengerServer {
         name = "search_messages",
         description = "Search messages by a text substring, in one chat or across every chat."
     )]
-    async fn search_messages(
-        &self,
-        Parameters(input): Parameters<SearchMessagesInput>,
-    ) -> CallToolResult {
+    async fn search_messages(&self, Parameters(input): Parameters<SearchMessagesInput>) -> CallToolResult {
         let query = MessageQuery {
             search: input.search,
             limit: input.limit,
@@ -271,11 +253,7 @@ impl MessengerServer {
     )]
     async fn listen(&self, Parameters(input): Parameters<ListenInput>) -> CallToolResult {
         let limit = input.limit.unwrap_or(20);
-        let mut stream = match self
-            .client
-            .listen(input.provider, input.chat_id.as_deref())
-            .await
-        {
+        let mut stream = match self.client.listen(input.provider, input.chat_id.as_deref()).await {
             Ok(stream) => stream,
             Err(error) => {
                 return tool_result(Envelope::failure(&error, Meta::now(Some(input.provider))));

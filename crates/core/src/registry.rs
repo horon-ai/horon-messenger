@@ -37,8 +37,7 @@ impl ProviderRegistry {
     }
 
     pub fn require(&self, kind: ProviderKind) -> Result<DynProvider> {
-        self.get(kind)
-            .ok_or(Error::NotRegistered { provider: kind })
+        self.get(kind).ok_or(Error::NotRegistered { provider: kind })
     }
 
     pub fn kinds(&self) -> Vec<ProviderKind> {
@@ -46,9 +45,7 @@ impl ProviderRegistry {
     }
 
     pub fn iter(&self) -> impl Iterator<Item = (ProviderKind, &DynProvider)> {
-        self.providers
-            .iter()
-            .map(|(kind, provider)| (*kind, provider))
+        self.providers.iter().map(|(kind, provider)| (*kind, provider))
     }
 
     pub fn len(&self) -> usize {

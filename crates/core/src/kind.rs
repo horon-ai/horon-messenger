@@ -80,9 +80,7 @@ impl ProviderKind {
 
     pub const fn description(self) -> &'static str {
         match self {
-            ProviderKind::KakaoTalk => {
-                "KakaoTalk, driven from the local desktop app's session and database"
-            }
+            ProviderKind::KakaoTalk => "KakaoTalk, driven from the local desktop app's session and database",
             ProviderKind::Discord => "Discord, as your user account or a bot token",
             ProviderKind::Telegram => "Telegram, as your user account or a bot token",
             ProviderKind::ChannelTalk => "Channel Talk, as an operator or with API credentials",
@@ -109,10 +107,7 @@ impl FromStr for ProviderKind {
     type Err = Error;
 
     fn from_str(value: &str) -> Result<Self, Self::Err> {
-        let normalized = value
-            .trim()
-            .to_ascii_lowercase()
-            .replace(['-', '_', ' '], "");
+        let normalized = value.trim().to_ascii_lowercase().replace(['-', '_', ' '], "");
         let kind = match normalized.as_str() {
             "kakaotalk" | "kakao" => ProviderKind::KakaoTalk,
             "discord" => ProviderKind::Discord,

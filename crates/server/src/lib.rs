@@ -9,9 +9,7 @@ use axum::{
     routing::{get, post},
 };
 use futures_util::StreamExt;
-use horon_messenger_sdk::{
-    ChatQuery, Client, Envelope, MessageQuery, Meta, ProviderKind, SendRequest,
-};
+use horon_messenger_sdk::{ChatQuery, Client, Envelope, MessageQuery, Meta, ProviderKind, SendRequest};
 use serde::Deserialize;
 use tower_http::trace::TraceLayer;
 
@@ -74,10 +72,7 @@ pub fn build_router(client: Arc<Client>) -> Router {
             "/v1/providers/{kind}/chats/{chat_id}/messages",
             get(list_messages).post(send_message),
         )
-        .route(
-            "/v1/providers/{kind}/chats/{chat_id}/members",
-            get(list_members),
-        )
+        .route("/v1/providers/{kind}/chats/{chat_id}/members", get(list_members))
         .route("/v1/providers/{kind}/chats/{chat_id}/read", post(mark_read))
         .route("/v1/providers/{kind}/messages", get(search_messages))
         .route("/v1/providers/{kind}/events", get(listen))
@@ -229,11 +224,10 @@ async fn listen(
         };
         Ok::<Bytes, std::io::Error>(Bytes::from(format!("{line}\n")))
     });
-    let stream: futures_util::stream::BoxStream<'static, Result<Bytes, std::io::Error>> =
-        match params.limit {
-            Some(limit) => stream.take(limit).boxed(),
-            None => stream.boxed(),
-        };
+    let stream: futures_util::stream::BoxStream<'static, Result<Bytes, std::io::Error>> = match params.limit {
+        Some(limit) => stream.take(limit).boxed(),
+        None => stream.boxed(),
+    };
     Response::builder()
         .header(header::CONTENT_TYPE, "application/x-ndjson")
         .body(Body::from_stream(stream))

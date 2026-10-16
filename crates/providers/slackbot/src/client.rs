@@ -6,9 +6,7 @@ use serde_json::Value;
 use horon_messenger_core::{Error, ProviderKind, Result};
 use horon_messenger_provider_common::{HttpClient, Request};
 
-use crate::models::{
-    AuthTest, Channel, ChannelInfo, ChannelList, History, MemberList, PostedMessage, UserInfo,
-};
+use crate::models::{AuthTest, Channel, ChannelInfo, ChannelList, History, MemberList, PostedMessage, UserInfo};
 
 pub const DEFAULT_BASE_URL: &str = "https://slack.com/api";
 pub const BASE_URL_ENV: &str = "HORON_MESSENGER_SLACKBOT_API_BASE";
@@ -34,10 +32,7 @@ pub fn check_response(value: Value) -> Result<Value> {
     match value.get("ok").and_then(Value::as_bool) {
         Some(true) => Ok(value),
         _ => {
-            let code = value
-                .get("error")
-                .and_then(Value::as_str)
-                .unwrap_or("api_error");
+            let code = value.get("error").and_then(Value::as_str).unwrap_or("api_error");
             Err(map_slack_error(code))
         }
     }
@@ -71,12 +66,7 @@ impl SlackBotClient {
         headers
     }
 
-    async fn call<T: DeserializeOwned>(
-        &self,
-        endpoint: &str,
-        body: Value,
-        idempotent: bool,
-    ) -> Result<T> {
+    async fn call<T: DeserializeOwned>(&self, endpoint: &str, body: Value, idempotent: bool) -> Result<T> {
         let url = format!("{}/{}", self.base_url, endpoint);
         let request = Request::new(Method::POST, url, ProviderKind::SlackBot)
             .headers(self.headers())
@@ -114,12 +104,7 @@ impl SlackBotClient {
         self.call("conversations.history", body, true).await
     }
 
-    pub async fn post_message(
-        &self,
-        channel: &str,
-        text: &str,
-        thread_ts: Option<&str>,
-    ) -> Result<PostedMessage> {
+    pub async fn post_message(&self, channel: &str, text: &str, thread_ts: Option<&str>) -> Result<PostedMessage> {
         let mut body = serde_json::json!({ "channel": channel, "text": text });
         if let Some(thread_ts) = thread_ts {
             body["thread_ts"] = Value::String(thread_ts.to_owned());
@@ -156,19 +141,13 @@ mod tests {
     #[test]
     fn ok_false_maps_other_codes_to_protocol() {
         let value = serde_json::json!({ "ok": false, "error": "channel_not_found" });
-        assert_eq!(
-            check_response(value).unwrap_err().code(),
-            ErrorCode::Protocol
-        );
+        assert_eq!(check_response(value).unwrap_err().code(), ErrorCode::Protocol);
     }
 
     #[test]
     fn missing_ok_is_protocol() {
         let value = serde_json::json!({ "channels": [] });
-        assert_eq!(
-            check_response(value).unwrap_err().code(),
-            ErrorCode::Protocol
-        );
+        assert_eq!(check_response(value).unwrap_err().code(), ErrorCode::Protocol);
     }
 
     #[test]

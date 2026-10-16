@@ -48,16 +48,10 @@ pub enum Error {
     AuthRequired { provider: ProviderKind },
 
     #[error("authentication failed for provider {provider}: {message}")]
-    AuthFailed {
-        provider: ProviderKind,
-        message: String,
-    },
+    AuthFailed { provider: ProviderKind, message: String },
 
     #[error("{resource} was not found for provider {provider}")]
-    NotFound {
-        provider: ProviderKind,
-        resource: String,
-    },
+    NotFound { provider: ProviderKind, resource: String },
 
     #[error("{resource} is ambiguous for provider {provider}: {message}")]
     Ambiguous {
@@ -73,16 +67,10 @@ pub enum Error {
     },
 
     #[error("network error talking to provider {provider}: {message}")]
-    Network {
-        provider: ProviderKind,
-        message: String,
-    },
+    Network { provider: ProviderKind, message: String },
 
     #[error("protocol error for provider {provider}: {message}")]
-    Protocol {
-        provider: ProviderKind,
-        message: String,
-    },
+    Protocol { provider: ProviderKind, message: String },
 
     #[error("invalid input: {message}")]
     InvalidInput { message: String },
@@ -123,10 +111,7 @@ impl Error {
 
     /// Whether retrying the same call could plausibly succeed.
     pub fn retryable(&self) -> bool {
-        matches!(
-            self,
-            Error::RateLimited { .. } | Error::Network { .. } | Error::Io(_)
-        )
+        matches!(self, Error::RateLimited { .. } | Error::Network { .. } | Error::Io(_))
     }
 
     pub fn provider(&self) -> Option<ProviderKind> {

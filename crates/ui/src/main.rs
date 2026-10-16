@@ -18,26 +18,17 @@ use ratatui::{
 };
 
 #[derive(Debug, Parser)]
-#[command(
-    name = "horon-messenger-tui",
-    version,
-    about = "Terminal UI for horon-messenger"
-)]
+#[command(name = "horon-messenger-tui", version, about = "Terminal UI for horon-messenger")]
 struct Args {
     #[arg(long, value_parser = parse_provider, default_value = "mock")]
     provider: ProviderKind,
 
-    #[arg(
-        long,
-        help = "Print a text snapshot and exit instead of starting the TUI"
-    )]
+    #[arg(long, help = "Print a text snapshot and exit instead of starting the TUI")]
     snapshot: bool,
 }
 
 fn parse_provider(value: &str) -> Result<ProviderKind, String> {
-    value
-        .parse::<ProviderKind>()
-        .map_err(|error| error.to_string())
+    value.parse::<ProviderKind>().map_err(|error| error.to_string())
 }
 
 fn main() -> anyhow::Result<()> {
@@ -55,12 +46,7 @@ async fn print_snapshot(client: &Client, provider: ProviderKind) -> anyhow::Resu
     let chats = client.list_chats(provider, &ChatQuery::default()).await?;
     println!("{}: {} chats", provider.display_name(), chats.len());
     for chat in &chats {
-        println!(
-            "  {:<16} {:<8} {}",
-            chat.id,
-            chat_kind_label(chat.kind),
-            chat.name
-        );
+        println!("  {:<16} {:<8} {}", chat.id, chat_kind_label(chat.kind), chat.name);
     }
     if let Some(first) = chats.first() {
         let page = client
@@ -68,10 +54,7 @@ async fn print_snapshot(client: &Client, provider: ProviderKind) -> anyhow::Resu
             .await?;
         println!("\n{} ({} messages):", first.name, page.messages.len());
         for message in &page.messages {
-            let who = message
-                .sender_name
-                .clone()
-                .unwrap_or_else(|| "?".to_owned());
+            let who = message.sender_name.clone().unwrap_or_else(|| "?".to_owned());
             println!("  {who}: {}", message.text);
         }
     }
@@ -97,11 +80,7 @@ struct App {
 }
 
 impl App {
-    fn load(
-        runtime: &tokio::runtime::Runtime,
-        client: &Client,
-        provider: ProviderKind,
-    ) -> anyhow::Result<Self> {
+    fn load(runtime: &tokio::runtime::Runtime, client: &Client, provider: ProviderKind) -> anyhow::Result<Self> {
         let chats = runtime.block_on(client.list_chats(provider, &ChatQuery::default()))?;
         let mut app = Self {
             provider,
@@ -117,28 +96,16 @@ impl App {
     }
 
     fn reload(&mut self, runtime: &tokio::runtime::Runtime, client: &Client) -> anyhow::Result<()> {
-        let Some(chat) = self
-            .chat_state
-            .selected()
-            .and_then(|index| self.chats.get(index))
-        else {
+        let Some(chat) = self.chat_state.selected().and_then(|index| self.chats.get(index)) else {
             self.messages.clear();
             return Ok(());
         };
-        let page = runtime.block_on(client.list_messages(
-            self.provider,
-            &chat.id,
-            &MessageQuery::default(),
-        ))?;
+        let page = runtime.block_on(client.list_messages(self.provider, &chat.id, &MessageQuery::default()))?;
         self.messages = page.messages;
         Ok(())
     }
 
-    fn select_next(
-        &mut self,
-        runtime: &tokio::runtime::Runtime,
-        client: &Client,
-    ) -> anyhow::Result<()> {
+    fn select_next(&mut self, runtime: &tokio::runtime::Runtime, client: &Client) -> anyhow::Result<()> {
         let len = self.chats.len();
         if len == 0 {
             return Ok(());
@@ -151,11 +118,7 @@ impl App {
         self.reload(runtime, client)
     }
 
-    fn select_previous(
-        &mut self,
-        runtime: &tokio::runtime::Runtime,
-        client: &Client,
-    ) -> anyhow::Result<()> {
+    fn select_previous(&mut self, runtime: &tokio::runtime::Runtime, client: &Client) -> anyhow::Result<()> {
         let len = self.chats.len();
         if len == 0 {
             return Ok(());
@@ -169,11 +132,7 @@ impl App {
     }
 }
 
-fn run_tui(
-    runtime: &tokio::runtime::Runtime,
-    client: &Client,
-    provider: ProviderKind,
-) -> anyhow::Result<()> {
+fn run_tui(runtime: &tokio::runtime::Runtime, client: &Client, provider: ProviderKind) -> anyhow::Result<()> {
     enable_raw_mode()?;
     let mut stdout = io::stdout();
     execute!(stdout, EnterAlternateScreen)?;
@@ -235,10 +194,7 @@ fn draw(frame: &mut ratatui::Frame, app: &App) {
         .messages
         .iter()
         .map(|message| {
-            let who = message
-                .sender_name
-                .clone()
-                .unwrap_or_else(|| "?".to_owned());
+            let who = message.sender_name.clone().unwrap_or_else(|| "?".to_owned());
             Line::from(format!("{who}: {}", message.text))
         })
         .collect();

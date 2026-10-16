@@ -7,10 +7,9 @@ use async_trait::async_trait;
 use serde_json::Value;
 
 use horon_messenger_core::{
-    AccountSummary, AuthMethod, AuthProvider, AuthStatus, Capabilities, Chat, ChatKind, ChatQuery,
-    ConfigPaths, CredentialStore, Delivery, Error, FileCredentialStore, LoginOptions, LoginOutcome,
-    Member, Message, MessagePage, MessageQuery, Profile, Provider, ProviderKind, Result,
-    SendRequest, SendResult, Snapshot, now_rfc3339,
+    AccountSummary, AuthMethod, AuthProvider, AuthStatus, Capabilities, Chat, ChatKind, ChatQuery, ConfigPaths,
+    CredentialStore, Delivery, Error, FileCredentialStore, LoginOptions, LoginOutcome, Member, Message, MessagePage,
+    MessageQuery, Profile, Provider, ProviderKind, Result, SendRequest, SendResult, Snapshot, now_rfc3339,
 };
 
 use client::DiscordClient;
@@ -57,19 +56,12 @@ impl DiscordProvider {
         }
         let stored = self.credentials.load(PROVIDER, DEFAULT_ACCOUNT)?;
         Ok(stored
-            .and_then(|value| {
-                value
-                    .get("token")
-                    .and_then(Value::as_str)
-                    .map(str::to_owned)
-            })
+            .and_then(|value| value.get("token").and_then(Value::as_str).map(str::to_owned))
             .filter(|token| !token.is_empty()))
     }
 
     fn client(&self) -> Result<DiscordClient> {
-        let token = self
-            .token()?
-            .ok_or(Error::AuthRequired { provider: PROVIDER })?;
+        let token = self.token()?.ok_or(Error::AuthRequired { provider: PROVIDER })?;
         Ok(DiscordClient::new(self.http.clone(), token))
     }
 
@@ -137,13 +129,7 @@ impl Provider for DiscordProvider {
     }
 
     async fn list_chats(&self, query: &ChatQuery) -> Result<Vec<Chat>> {
-        let mut chats: Vec<Chat> = self
-            .client()?
-            .list_guilds()
-            .await?
-            .iter()
-            .map(Self::chat)
-            .collect();
+        let mut chats: Vec<Chat> = self.client()?.list_guilds().await?.iter().map(Self::chat).collect();
         if let Some(search) = &query.search {
             let needle = search.to_lowercase();
             chats.retain(|chat| chat.name.to_lowercase().contains(&needle));
@@ -177,11 +163,7 @@ impl Provider for DiscordProvider {
         })
     }
 
-    async fn search_messages(
-        &self,
-        chat_id: Option<&str>,
-        query: &MessageQuery,
-    ) -> Result<MessagePage> {
+    async fn search_messages(&self, chat_id: Option<&str>, query: &MessageQuery) -> Result<MessagePage> {
         let guild_id = chat_id.ok_or_else(|| Error::InvalidInput {
             message: "Discord search needs a guild id".to_owned(),
         })?;
@@ -312,11 +294,8 @@ impl AuthProvider for DiscordProvider {
             .ok_or_else(|| Error::InvalidInput {
                 message: "Discord login needs a token".to_owned(),
             })?;
-        self.credentials.save(
-            PROVIDER,
-            DEFAULT_ACCOUNT,
-            &serde_json::json!({ "token": token }),
-        )?;
+        self.credentials
+            .save(PROVIDER, DEFAULT_ACCOUNT, &serde_json::json!({ "token": token }))?;
         Ok(LoginOutcome {
             provider: PROVIDER,
             authenticated: true,

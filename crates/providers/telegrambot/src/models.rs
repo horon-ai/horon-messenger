@@ -91,10 +91,7 @@ pub struct Message {
 impl Message {
     /// The message text, falling back to the caption for media messages.
     pub fn body(&self) -> String {
-        self.text
-            .clone()
-            .or_else(|| self.caption.clone())
-            .unwrap_or_default()
+        self.text.clone().or_else(|| self.caption.clone()).unwrap_or_default()
     }
 }
 
@@ -142,11 +139,7 @@ impl Update {
         .into_iter()
         .flatten()
         .collect();
-        if let Some(message) = self
-            .callback_query
-            .as_ref()
-            .and_then(|query| query.message.as_ref())
-        {
+        if let Some(message) = self.callback_query.as_ref().and_then(|query| query.message.as_ref()) {
             out.push(message);
         }
         out

@@ -1,6 +1,5 @@
 use horon_messenger_core::{
-    Capabilities, ConfigPaths, CredentialStore, Error, ErrorCode, FileCredentialStore, Provider,
-    ProviderKind,
+    Capabilities, ConfigPaths, CredentialStore, Error, ErrorCode, FileCredentialStore, Provider, ProviderKind,
 };
 use serde_json::json;
 
@@ -9,10 +8,7 @@ fn provider_kind_round_trips_through_strings() {
     for kind in ProviderKind::ALL {
         assert_eq!(kind.as_str().parse::<ProviderKind>().unwrap(), kind);
     }
-    assert_eq!(
-        "kakao".parse::<ProviderKind>().unwrap(),
-        ProviderKind::KakaoTalk
-    );
+    assert_eq!("kakao".parse::<ProviderKind>().unwrap(), ProviderKind::KakaoTalk);
     assert_eq!(
         "Channel-Talk".parse::<ProviderKind>().unwrap(),
         ProviderKind::ChannelTalk
@@ -90,19 +86,11 @@ fn credential_store_round_trips_and_rejects_escaping_ids() {
         store.load(ProviderKind::Mock, "alice").unwrap(),
         Some(json!({"token": "secret"}))
     );
-    assert_eq!(
-        store.list(ProviderKind::Mock).unwrap(),
-        vec!["alice".to_owned()]
-    );
+    assert_eq!(store.list(ProviderKind::Mock).unwrap(), vec!["alice".to_owned()]);
     store.delete(ProviderKind::Mock, "alice").unwrap();
-    assert_eq!(
-        store.list(ProviderKind::Mock).unwrap(),
-        Vec::<String>::new()
-    );
+    assert_eq!(store.list(ProviderKind::Mock).unwrap(), Vec::<String>::new());
 
-    let error = store
-        .save(ProviderKind::Mock, "../escape", &json!({}))
-        .unwrap_err();
+    let error = store.save(ProviderKind::Mock, "../escape", &json!({})).unwrap_err();
     assert_eq!(error.code(), ErrorCode::InvalidInput);
 
     let _ = std::fs::remove_dir_all(&dir);
@@ -116,14 +104,9 @@ fn credential_files_are_owner_only() {
     let dir = std::env::temp_dir().join(format!("hm-perm-{}", std::process::id()));
     let _ = std::fs::remove_dir_all(&dir);
     let store = FileCredentialStore::new(ConfigPaths::at(&dir));
-    store
-        .save(ProviderKind::Mock, "bob", &json!({"token": "x"}))
-        .unwrap();
+    store.save(ProviderKind::Mock, "bob", &json!({"token": "x"})).unwrap();
 
-    let file = store
-        .paths()
-        .accounts_dir(ProviderKind::Mock)
-        .join("bob.json");
+    let file = store.paths().accounts_dir(ProviderKind::Mock).join("bob.json");
     let mode = std::fs::metadata(&file).unwrap().permissions().mode();
     assert_eq!(mode & 0o777, 0o600);
 

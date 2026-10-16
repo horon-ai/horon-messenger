@@ -54,16 +54,11 @@ impl ChatRef {
         let parts: Vec<&str> = value.split('/').collect();
         if parts.len() != 3 || parts.iter().any(|part| part.is_empty()) {
             return Err(Error::InvalidInput {
-                message: format!(
-                    "chat id must be <channel_id>/<chat_type>/<chat_id>, got `{value}`"
-                ),
+                message: format!("chat id must be <channel_id>/<chat_type>/<chat_id>, got `{value}`"),
             });
         }
         let chat_type = ChatType::parse(parts[1]).ok_or_else(|| Error::InvalidInput {
-            message: format!(
-                "chat type must be group, user-chat or direct-chat, got `{}`",
-                parts[1]
-            ),
+            message: format!("chat type must be group, user-chat or direct-chat, got `{}`", parts[1]),
         })?;
         Ok(Self {
             channel_id: parts[0].to_owned(),
@@ -82,11 +77,7 @@ pub struct ChannelTalkClient {
 }
 
 impl ChannelTalkClient {
-    pub fn new(
-        http: HttpClient,
-        account_cookie: impl Into<String>,
-        session_cookie: Option<String>,
-    ) -> Self {
+    pub fn new(http: HttpClient, account_cookie: impl Into<String>, session_cookie: Option<String>) -> Self {
         let base_url = std::env::var(BASE_URL_ENV).unwrap_or_else(|_| DEFAULT_BASE_URL.to_owned());
         Self {
             http,
@@ -98,10 +89,7 @@ impl ChannelTalkClient {
 
     fn cookie_header(&self) -> String {
         match &self.session_cookie {
-            Some(session) => format!(
-                "x-account={}; ch-session-1={}",
-                self.account_cookie, session
-            ),
+            Some(session) => format!("x-account={}; ch-session-1={}", self.account_cookie, session),
             None => format!("x-account={}", self.account_cookie),
         }
     }
@@ -177,11 +165,7 @@ impl ChannelTalkClient {
         .await
     }
 
-    pub async fn list_messages(
-        &self,
-        reference: &ChatRef,
-        limit: usize,
-    ) -> Result<Vec<ChannelMessage>> {
+    pub async fn list_messages(&self, reference: &ChatRef, limit: usize) -> Result<Vec<ChannelMessage>> {
         self.request(
             Method::GET,
             &format!(

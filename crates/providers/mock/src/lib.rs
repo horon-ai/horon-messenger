@@ -4,10 +4,9 @@ use async_trait::async_trait;
 use serde_json::Value;
 
 use horon_messenger_core::{
-    AccountSummary, AuthMethod, AuthProvider, AuthStatus, Capabilities, Chat, ChatKind, ChatQuery,
-    Delivery, Error, Event, EventKind, EventStream, LoginOptions, LoginOutcome, Member, Message,
-    MessagePage, MessageQuery, Profile, Provider, ProviderKind, Result, SendRequest, SendResult,
-    Snapshot, now_rfc3339,
+    AccountSummary, AuthMethod, AuthProvider, AuthStatus, Capabilities, Chat, ChatKind, ChatQuery, Delivery, Error,
+    Event, EventKind, EventStream, LoginOptions, LoginOutcome, Member, Message, MessagePage, MessageQuery, Profile,
+    Provider, ProviderKind, Result, SendRequest, SendResult, Snapshot, now_rfc3339,
 };
 
 const ACCOUNT_ID: &str = "mock-user";
@@ -146,10 +145,7 @@ impl Provider for MockProvider {
         let mut chats = Self::chats();
         if let Some(search) = &query.search {
             let needle = search.to_lowercase();
-            chats.retain(|chat| {
-                chat.name.to_lowercase().contains(&needle)
-                    || chat.id.to_lowercase().contains(&needle)
-            });
+            chats.retain(|chat| chat.name.to_lowercase().contains(&needle) || chat.id.to_lowercase().contains(&needle));
         }
         if let Some(limit) = query.limit {
             chats.truncate(limit);
@@ -171,13 +167,7 @@ impl Provider for MockProvider {
         let mut messages = Self::seed(chat_id);
         {
             let state = self.state.lock().expect("mock state lock");
-            messages.extend(
-                state
-                    .sent
-                    .iter()
-                    .filter(|message| message.chat_id == chat_id)
-                    .cloned(),
-            );
+            messages.extend(state.sent.iter().filter(|message| message.chat_id == chat_id).cloned());
         }
         if let Some(search) = &query.search {
             let needle = search.to_lowercase();
@@ -196,11 +186,7 @@ impl Provider for MockProvider {
         })
     }
 
-    async fn search_messages(
-        &self,
-        chat_id: Option<&str>,
-        query: &MessageQuery,
-    ) -> Result<MessagePage> {
+    async fn search_messages(&self, chat_id: Option<&str>, query: &MessageQuery) -> Result<MessagePage> {
         match chat_id {
             Some(id) => self.list_messages(id, query).await,
             None => {
@@ -290,10 +276,7 @@ impl Provider for MockProvider {
     async fn listen(&self, chat_id: Option<&str>) -> Result<EventStream> {
         let mut messages = match chat_id {
             Some(id) => Self::seed(id),
-            None => Self::chats()
-                .iter()
-                .flat_map(|chat| Self::seed(&chat.id))
-                .collect(),
+            None => Self::chats().iter().flat_map(|chat| Self::seed(&chat.id)).collect(),
         };
         {
             let state = self.state.lock().expect("mock state lock");
@@ -379,23 +362,13 @@ mod tests {
             search: Some("standup".to_owned()),
             ..MessageQuery::default()
         };
-        let page = provider
-            .search_messages(None, &query)
-            .await
-            .expect("search");
-        assert!(
-            page.messages
-                .iter()
-                .any(|message| message.chat_id == "team")
-        );
+        let page = provider.search_messages(None, &query).await.expect("search");
+        assert!(page.messages.iter().any(|message| message.chat_id == "team"));
     }
 
     #[tokio::test]
     async fn mark_read_succeeds() {
-        MockProvider::new()
-            .mark_read("general")
-            .await
-            .expect("mark_read");
+        MockProvider::new().mark_read("general").await.expect("mark_read");
     }
 
     #[tokio::test]

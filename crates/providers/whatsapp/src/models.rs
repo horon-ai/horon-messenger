@@ -121,11 +121,7 @@ pub fn message_from_sidecar(message: &SidecarMessage) -> Message {
     let mut extra = Map::new();
     extra.insert(
         "type".to_owned(),
-        message
-            .message_type
-            .clone()
-            .map(Value::String)
-            .unwrap_or(Value::Null),
+        message.message_type.clone().map(Value::String).unwrap_or(Value::Null),
     );
     extra.insert("is_outgoing".to_owned(), Value::Bool(message.is_outgoing));
     Message {
@@ -177,10 +173,7 @@ mod tests {
         assert_eq!(mapped.provider, ProviderKind::WhatsApp);
         assert_eq!(mapped.id, "msg-1");
         assert_eq!(mapped.chat_id, "12025551234@s.whatsapp.net");
-        assert_eq!(
-            mapped.sender_id.as_deref(),
-            Some("12025551234@s.whatsapp.net")
-        );
+        assert_eq!(mapped.sender_id.as_deref(), Some("12025551234@s.whatsapp.net"));
         assert_eq!(mapped.sender_name.as_deref(), Some("Alice"));
         assert_eq!(mapped.text, "Hello");
         assert_eq!(mapped.sent_at, "2023-11-14T22:13:20.000Z");
@@ -225,10 +218,7 @@ mod tests {
         assert_eq!(mapped.kind, ChatKind::Direct);
         assert_eq!(mapped.name, "Alice");
         assert_eq!(mapped.unread_count, Some(2));
-        assert_eq!(
-            mapped.last_message_at.as_deref(),
-            Some("2023-11-14T22:13:20.000Z")
-        );
+        assert_eq!(mapped.last_message_at.as_deref(), Some("2023-11-14T22:13:20.000Z"));
         assert_eq!(mapped.member_count, None);
     }
 

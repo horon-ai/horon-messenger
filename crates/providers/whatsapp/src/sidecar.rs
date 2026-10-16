@@ -26,9 +26,7 @@ pub fn sidecar_script() -> PathBuf {
     if let Some(value) = std::env::var_os(SIDECAR_ENV).filter(|value| !value.is_empty()) {
         return PathBuf::from(value);
     }
-    Path::new(env!("CARGO_MANIFEST_DIR"))
-        .join("sidecar")
-        .join(SIDECAR_FILE)
+    Path::new(env!("CARGO_MANIFEST_DIR")).join("sidecar").join(SIDECAR_FILE)
 }
 
 fn request_timeout() -> Duration {
@@ -97,10 +95,7 @@ impl Sidecar {
         if guard.is_none() {
             *guard = Some(SidecarSession::new(self.spec()?, request_timeout()));
         }
-        Ok(guard
-            .as_ref()
-            .expect("the sidecar session was just built")
-            .clone())
+        Ok(guard.as_ref().expect("the sidecar session was just built").clone())
     }
 
     /// Sends one request over the reused sidecar process.
@@ -158,8 +153,7 @@ for line in sys.stdin:
     }
 
     fn temp_pid_file(name: &str) -> PathBuf {
-        let path =
-            std::env::temp_dir().join(format!("hm-wa-sidecar-{name}-{}.txt", std::process::id()));
+        let path = std::env::temp_dir().join(format!("hm-wa-sidecar-{name}-{}.txt", std::process::id()));
         let _ = std::fs::remove_file(&path);
         path
     }
@@ -204,11 +198,7 @@ for line in sys.stdin:
                 .unwrap();
         }
         let pids = recorded_pids(&pid_file);
-        assert_eq!(
-            pids.len(),
-            1,
-            "three requests must reuse one sidecar process: {pids:?}"
-        );
+        assert_eq!(pids.len(), 1, "three requests must reuse one sidecar process: {pids:?}");
         drop(sidecar);
         let _ = std::fs::remove_file(&pid_file);
     }
@@ -222,11 +212,7 @@ for line in sys.stdin:
             .await
             .unwrap();
         let first = recorded_pids(&pid_file);
-        assert_eq!(
-            first.len(),
-            1,
-            "the first call starts one process: {first:?}"
-        );
+        assert_eq!(first.len(), 1, "the first call starts one process: {first:?}");
 
         sidecar
             .request("chats.list", serde_json::json!({}), true)
@@ -266,11 +252,7 @@ for line in sys.stdin:
     fn sidecar_script_resolves_from_env_then_crate() {
         unsafe { std::env::remove_var(SIDECAR_ENV) };
         let default = sidecar_script();
-        assert!(
-            default.ends_with("sidecar/index.mjs"),
-            "{}",
-            default.display()
-        );
+        assert!(default.ends_with("sidecar/index.mjs"), "{}", default.display());
         assert!(default.is_file(), "{}", default.display());
 
         let dir = std::env::temp_dir().join(format!("hm-whatsapp-sidecar-{}", std::process::id()));

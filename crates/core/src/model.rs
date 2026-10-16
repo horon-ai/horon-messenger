@@ -190,5 +190,4 @@ pub struct Event {
 }
 
 /// The stream a provider returns from `listen`.
-pub type EventStream =
-    std::pin::Pin<Box<dyn futures_core::Stream<Item = crate::error::Result<Event>> + Send>>;
+pub type EventStream = std::pin::Pin<Box<dyn futures_core::Stream<Item = crate::error::Result<Event>> + Send>>;

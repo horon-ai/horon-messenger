@@ -10,10 +10,7 @@ use tower::ServiceExt;
 
 fn router() -> Router {
     let dir = std::env::temp_dir().join(format!("horon-server-http-test-{}", std::process::id()));
-    let client = Client::builder()
-        .config_dir(dir)
-        .build()
-        .expect("build client");
+    let client = Client::builder().config_dir(dir).build().expect("build client");
     build_router(Arc::new(client))
 }
 
@@ -24,9 +21,7 @@ fn get(uri: &str) -> Request<Body> {
 async fn call(router: &Router, request: Request<Body>) -> (StatusCode, Value, String) {
     let response = router.clone().oneshot(request).await.expect("send request");
     let status = response.status();
-    let bytes = to_bytes(response.into_body(), usize::MAX)
-        .await
-        .expect("read body");
+    let bytes = to_bytes(response.into_body(), usize::MAX).await.expect("read body");
     let raw = String::from_utf8_lossy(&bytes).into_owned();
     let json = serde_json::from_slice(&bytes).unwrap_or(Value::Null);
     (status, json, raw)

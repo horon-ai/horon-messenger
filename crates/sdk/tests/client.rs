@@ -1,6 +1,4 @@
-use horon_messenger_sdk::{
-    ChatKind, ChatQuery, Client, Delivery, MessageQuery, ProviderKind, SendRequest,
-};
+use horon_messenger_sdk::{ChatKind, ChatQuery, Client, Delivery, MessageQuery, ProviderKind, SendRequest};
 
 #[tokio::test]
 async fn default_client_registers_the_mock_provider() {
@@ -47,10 +45,7 @@ async fn chat_search_filters_by_name() {
         search: Some("standup".to_owned()),
         limit: None,
     };
-    let chats = client
-        .list_chats(ProviderKind::Mock, &query)
-        .await
-        .expect("chats");
+    let chats = client.list_chats(ProviderKind::Mock, &query).await.expect("chats");
     assert_eq!(chats.len(), 1);
     assert_eq!(chats[0].id, "team");
 }
@@ -69,10 +64,7 @@ async fn send_message_is_visible_on_the_next_read() {
         attachments: Vec::new(),
         idempotency_key: None,
     };
-    let result = client
-        .send_message(ProviderKind::Mock, &request)
-        .await
-        .expect("send");
+    let result = client.send_message(ProviderKind::Mock, &request).await.expect("send");
     assert!(result.accepted);
     assert_eq!(result.delivery, Delivery::Confirmed);
     assert!(result.message_id.is_some());

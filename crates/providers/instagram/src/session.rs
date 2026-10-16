@@ -38,10 +38,7 @@ mod tests {
 
     #[test]
     fn cookie_header_joins_session_and_user_id() {
-        assert_eq!(
-            session(None).cookie_header(),
-            "sessionid=SID; ds_user_id=4242"
-        );
+        assert_eq!(session(None).cookie_header(), "sessionid=SID; ds_user_id=4242");
     }
 
     #[test]

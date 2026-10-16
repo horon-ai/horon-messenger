@@ -39,15 +39,11 @@ impl QaFakeBackend {
     }
 
     fn closed(&self) -> bool {
-        std::env::var(STATE_ENV)
-            .map(|value| value == "closed")
-            .unwrap_or(false)
+        std::env::var(STATE_ENV).map(|value| value == "closed").unwrap_or(false)
     }
 
     fn malformed(&self) -> bool {
-        std::env::var(MALFORMED_ENV)
-            .map(|value| value == "1")
-            .unwrap_or(false)
+        std::env::var(MALFORMED_ENV).map(|value| value == "1").unwrap_or(false)
     }
 
     fn ready(&self) -> Result<()> {
@@ -117,12 +113,7 @@ impl TelegramBackend for QaFakeBackend {
             .collect()
     }
 
-    async fn search_messages(
-        &self,
-        chat_id: Option<&str>,
-        query: &str,
-        limit: usize,
-    ) -> Result<Vec<Message>> {
+    async fn search_messages(&self, chat_id: Option<&str>, query: &str, limit: usize) -> Result<Vec<Message>> {
         let all = match chat_id {
             Some(chat_id) => self.list_messages(chat_id, usize::MAX).await?,
             None => {
@@ -143,12 +134,7 @@ impl TelegramBackend for QaFakeBackend {
             .collect())
     }
 
-    async fn send_message(
-        &self,
-        chat_id: &str,
-        _text: &str,
-        _reply_to: Option<&str>,
-    ) -> Result<String> {
+    async fn send_message(&self, chat_id: &str, _text: &str, _reply_to: Option<&str>) -> Result<String> {
         self.ready()?;
         if chat_id.is_empty() {
             return Err(Error::InvalidInput {

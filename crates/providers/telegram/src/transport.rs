@@ -20,20 +20,10 @@ pub trait TelegramBackend: Send + Sync {
     async fn list_messages(&self, chat_id: &str, limit: usize) -> Result<Vec<Message>>;
 
     /// Searches messages across one chat or every chat.
-    async fn search_messages(
-        &self,
-        chat_id: Option<&str>,
-        query: &str,
-        limit: usize,
-    ) -> Result<Vec<Message>>;
+    async fn search_messages(&self, chat_id: Option<&str>, query: &str, limit: usize) -> Result<Vec<Message>>;
 
     /// Sends a text message and returns its id.
-    async fn send_message(
-        &self,
-        chat_id: &str,
-        text: &str,
-        reply_to: Option<&str>,
-    ) -> Result<String>;
+    async fn send_message(&self, chat_id: &str, text: &str, reply_to: Option<&str>) -> Result<String>;
 
     /// Lists the members of a chat.
     async fn list_members(&self, chat_id: &str) -> Result<Vec<Member>>;

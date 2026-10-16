@@ -105,19 +105,11 @@ fn media_url(item: &Item) -> Option<String> {
     if let Some(url) = image_candidate(item.media_share.as_ref()) {
         return Some(url);
     }
-    image_candidate(
-        item.visual_media
-            .as_ref()
-            .and_then(|value| value.get("media")),
-    )
+    image_candidate(item.visual_media.as_ref().and_then(|value| value.get("media")))
 }
 
 fn thread_name(thread: &Thread, fallback: &str) -> String {
-    if let Some(title) = thread
-        .thread_title
-        .as_ref()
-        .filter(|title| !title.is_empty())
-    {
+    if let Some(title) = thread.thread_title.as_ref().filter(|title| !title.is_empty()) {
         return title.clone();
     }
     let joined = thread
@@ -132,11 +124,7 @@ fn thread_name(thread: &Thread, fallback: &str) -> String {
         .filter(|name| !name.is_empty())
         .collect::<Vec<_>>()
         .join(", ");
-    if joined.is_empty() {
-        fallback.to_owned()
-    } else {
-        joined
-    }
+    if joined.is_empty() { fallback.to_owned() } else { joined }
 }
 
 /// Maps an Instagram thread onto the domain chat.
@@ -153,11 +141,7 @@ pub fn chat(thread: &Thread) -> Chat {
         provider: PROVIDER,
         id,
         name,
-        kind: if is_group {
-            ChatKind::Group
-        } else {
-            ChatKind::Direct
-        },
+        kind: if is_group { ChatKind::Group } else { ChatKind::Direct },
         unread_count: Some(thread.read_state.unwrap_or(0)),
         last_message_at,
         member_count: Some(thread.users.len() as u64 + 1),
@@ -183,11 +167,7 @@ pub fn message(item: &Item, chat_id: &str) -> Message {
         provider: PROVIDER,
         id: item.item_id.clone().unwrap_or_default(),
         chat_id: chat_id.to_owned(),
-        sender_id: item
-            .user_id
-            .as_ref()
-            .map(value_to_string)
-            .filter(|id| !id.is_empty()),
+        sender_id: item.user_id.as_ref().map(value_to_string).filter(|id| !id.is_empty()),
         sender_name: None,
         text: message_text(item),
         sent_at: item
@@ -258,10 +238,7 @@ mod tests {
         assert_eq!(chat.kind, ChatKind::Direct);
         assert_eq!(chat.unread_count, Some(3));
         assert_eq!(chat.member_count, Some(2));
-        assert_eq!(
-            chat.last_message_at.as_deref(),
-            Some("2023-11-14T22:14:20.000Z")
-        );
+        assert_eq!(chat.last_message_at.as_deref(), Some("2023-11-14T22:14:20.000Z"));
     }
 
     #[test]
@@ -314,18 +291,12 @@ mod tests {
         });
         let message = message(&item(value), "T1");
         assert_eq!(message.attachments.len(), 1);
-        assert_eq!(
-            message.attachments[0].url.as_deref(),
-            Some("https://cdn.example/a.jpg")
-        );
+        assert_eq!(message.attachments[0].url.as_deref(), Some("https://cdn.example/a.jpg"));
     }
 
     #[test]
     fn like_item_maps_to_a_placeholder_text() {
-        let message = message(
-            &item(serde_json::json!({ "item_id": "l1", "item_type": "like" })),
-            "T1",
-        );
+        let message = message(&item(serde_json::json!({ "item_id": "l1", "item_type": "like" })), "T1");
         assert_eq!(message.text, "Liked a message");
     }
 

@@ -14,10 +14,9 @@ use async_trait::async_trait;
 use serde_json::Value;
 
 use horon_messenger_core::{
-    AccountSummary, AuthMethod, AuthProvider, AuthStatus, Capabilities, Chat, ChatKind, ChatQuery,
-    ConfigPaths, CredentialStore, Delivery, Error, FileCredentialStore, LoginOptions, LoginOutcome,
-    Member, Message, MessagePage, MessageQuery, Profile, Provider, ProviderKind, Result,
-    SendRequest, SendResult, Snapshot, now_rfc3339,
+    AccountSummary, AuthMethod, AuthProvider, AuthStatus, Capabilities, Chat, ChatKind, ChatQuery, ConfigPaths,
+    CredentialStore, Delivery, Error, FileCredentialStore, LoginOptions, LoginOutcome, Member, Message, MessagePage,
+    MessageQuery, Profile, Provider, ProviderKind, Result, SendRequest, SendResult, Snapshot, now_rfc3339,
 };
 
 use client::TelegramBotClient;
@@ -64,19 +63,12 @@ impl TelegramBotProvider {
         }
         let stored = self.credentials.load(PROVIDER, DEFAULT_ACCOUNT)?;
         Ok(stored
-            .and_then(|value| {
-                value
-                    .get("token")
-                    .and_then(Value::as_str)
-                    .map(str::to_owned)
-            })
+            .and_then(|value| value.get("token").and_then(Value::as_str).map(str::to_owned))
             .filter(|token| !token.is_empty()))
     }
 
     fn client(&self) -> Result<TelegramBotClient> {
-        let token = self
-            .token()?
-            .ok_or(Error::AuthRequired { provider: PROVIDER })?;
+        let token = self.token()?.ok_or(Error::AuthRequired { provider: PROVIDER })?;
         Ok(TelegramBotClient::new(self.http.clone(), token))
     }
 
@@ -293,11 +285,8 @@ impl AuthProvider for TelegramBotProvider {
             .ok_or_else(|| Error::InvalidInput {
                 message: "Telegram Bot login needs a token".to_owned(),
             })?;
-        self.credentials.save(
-            PROVIDER,
-            DEFAULT_ACCOUNT,
-            &serde_json::json!({ "token": token }),
-        )?;
+        self.credentials
+            .save(PROVIDER, DEFAULT_ACCOUNT, &serde_json::json!({ "token": token }))?;
         Ok(LoginOutcome {
             provider: PROVIDER,
             authenticated: true,
@@ -329,22 +318,19 @@ mod tests {
     #[test]
     fn chat_mapping_prefers_title_then_name() {
         let group: TelegramChat =
-            serde_json::from_value(json!({ "id": -100, "type": "supergroup", "title": "Team" }))
-                .unwrap();
+            serde_json::from_value(json!({ "id": -100, "type": "supergroup", "title": "Team" })).unwrap();
         let chat = TelegramBotProvider::chat(&group);
         assert_eq!(chat.id, "-100");
         assert_eq!(chat.name, "Team");
         assert_eq!(chat.kind, ChatKind::Group);
 
-        let private: TelegramChat = serde_json::from_value(
-            json!({ "id": 7, "type": "private", "first_name": "Ada", "last_name": "L" }),
-        )
-        .unwrap();
+        let private: TelegramChat =
+            serde_json::from_value(json!({ "id": 7, "type": "private", "first_name": "Ada", "last_name": "L" }))
+                .unwrap();
         assert_eq!(TelegramBotProvider::chat(&private).name, "Ada L");
 
         let username_only: TelegramChat =
-            serde_json::from_value(json!({ "id": 8, "type": "private", "username": "ada" }))
-                .unwrap();
+            serde_json::from_value(json!({ "id": 8, "type": "private", "username": "ada" })).unwrap();
         assert_eq!(TelegramBotProvider::chat(&username_only).name, "ada");
     }
 
@@ -366,11 +352,7 @@ mod tests {
         assert_eq!(message.sender_name.as_deref(), Some("Ada"));
         assert_eq!(message.text, "hello");
         assert_eq!(message.reply_to.as_deref(), Some("8999"));
-        assert!(
-            message.sent_at.starts_with("2023-11-14T"),
-            "{}",
-            message.sent_at
-        );
+        assert!(message.sent_at.starts_with("2023-11-14T"), "{}", message.sent_at);
     }
 
     #[test]

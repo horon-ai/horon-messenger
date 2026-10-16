@@ -118,11 +118,9 @@ pub struct HttpClient {
 impl HttpClient {
     /// Builds a client with the default retry budget.
     pub fn new() -> Result<Self> {
-        let http = reqwest::Client::builder()
-            .build()
-            .map_err(|error| Error::Internal {
-                message: format!("failed to build the HTTP client: {error}"),
-            })?;
+        let http = reqwest::Client::builder().build().map_err(|error| Error::Internal {
+            message: format!("failed to build the HTTP client: {error}"),
+        })?;
         Ok(Self::with_client(http))
     }
 
@@ -192,10 +190,7 @@ impl HttpClient {
 
     fn transport_error(request: &Request, attempt: u32, error: &reqwest::Error) -> Error {
         let message = if request.idempotent {
-            format!(
-                "request to {} failed after {attempt} retries: {error}",
-                request.url
-            )
+            format!("request to {} failed after {attempt} retries: {error}", request.url)
         } else {
             format!(
                 "request to {} was sent but the outcome is unknown and it is not retried automatically (non-idempotent call): {error}",
@@ -231,8 +226,7 @@ impl HttpClient {
                 }
             };
             let status = response.status();
-            self.update_bucket(&request.bucket_key, response.headers())
-                .await;
+            self.update_bucket(&request.bucket_key, response.headers()).await;
 
             if status == StatusCode::TOO_MANY_REQUESTS && attempt < self.max_retries {
                 let delay = retry_after(response.headers());
@@ -266,11 +260,7 @@ impl HttpClient {
         let (status, bytes) = self.execute(&request).await?;
         let value: Value = serde_json::from_slice(&bytes).unwrap_or(Value::Null);
         if !status.is_success() {
-            return Err(map_http_status(
-                request.provider,
-                status,
-                error_message(&value, status),
-            ));
+            return Err(map_http_status(request.provider, status, error_message(&value, status)));
         }
         Ok(value)
     }
@@ -293,12 +283,8 @@ impl HttpClient {
         provider: ProviderKind,
         bucket_key: impl Into<String>,
     ) -> Result<T> {
-        self.request(
-            Request::get(url, provider)
-                .headers(headers)
-                .bucket(bucket_key),
-        )
-        .await
+        self.request(Request::get(url, provider).headers(headers).bucket(bucket_key))
+            .await
     }
 
     /// Sends a non-idempotent POST that is never retried after transmission.

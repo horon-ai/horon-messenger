@@ -10,9 +10,7 @@ use serde_json::Value;
 use horon_messenger_core::{Error, ProviderKind, Result};
 use horon_messenger_provider_common::{HttpClient, Request, urlencode};
 
-use crate::models::{
-    BroadcastResponse, CurrentUserResponse, InboxResponse, Thread, ThreadResponse,
-};
+use crate::models::{BroadcastResponse, CurrentUserResponse, InboxResponse, Thread, ThreadResponse};
 use crate::session::InstagramSession;
 
 /// The default Instagram mobile API base URL.
@@ -26,8 +24,7 @@ pub const DEFAULT_TIMEOUT: Duration = Duration::from_secs(30);
 
 const PROVIDER: ProviderKind = ProviderKind::Instagram;
 const IG_VERSION: &str = "428.0.0.47.67";
-const DEVICE_STRING: &str =
-    "34/14; 480dpi; 1344x2992; Google/google; Pixel 8 Pro; husky; husky; en_US; 719358530";
+const DEVICE_STRING: &str = "34/14; 480dpi; 1344x2992; Google/google; Pixel 8 Pro; husky; husky; en_US; 719358530";
 
 /// Builds the Instagram Android user agent the API expects.
 pub fn user_agent() -> String {
@@ -55,10 +52,7 @@ fn decode<T: DeserializeOwned>(value: Value) -> Result<T> {
 }
 
 fn status_error(value: &Value, status: &str) -> Error {
-    let raw = value
-        .get("message")
-        .and_then(Value::as_str)
-        .unwrap_or(status);
+    let raw = value.get("message").and_then(Value::as_str).unwrap_or(status);
     let lower = raw.to_lowercase();
     if lower.contains("login_required") || lower.contains("not logged in") {
         Error::AuthFailed {
@@ -115,11 +109,7 @@ impl InstagramClient {
         insert(&mut headers, "user-agent", &user_agent());
         insert(&mut headers, "x-ig-app-id", APP_ID);
         insert(&mut headers, "x-ig-www-claim", "0");
-        insert(
-            &mut headers,
-            "ig-intended-user-id",
-            &self.session.ds_user_id,
-        );
+        insert(&mut headers, "ig-intended-user-id", &self.session.ds_user_id);
         insert(
             &mut headers,
             "content-type",
@@ -177,14 +167,9 @@ impl InstagramClient {
 
     /// Fetches the direct-message inbox threads.
     pub async fn inbox(&self, limit: usize) -> Result<Vec<Thread>> {
-        let value = self
-            .call(&format!("/direct_v2/inbox/?limit={limit}"))
-            .await?;
+        let value = self.call(&format!("/direct_v2/inbox/?limit={limit}")).await?;
         let response: InboxResponse = decode(value)?;
-        Ok(response
-            .inbox
-            .map(|inbox| inbox.threads)
-            .unwrap_or_default())
+        Ok(response.inbox.map(|inbox| inbox.threads).unwrap_or_default())
     }
 
     /// Fetches one thread with its recent items.
@@ -216,11 +201,7 @@ impl InstagramClient {
 
 #[cfg(test)]
 impl InstagramClient {
-    pub(crate) fn test_client(
-        session: InstagramSession,
-        base_url: String,
-        timeout: Duration,
-    ) -> Self {
+    pub(crate) fn test_client(session: InstagramSession, base_url: String, timeout: Duration) -> Self {
         Self {
             http: HttpClient::new().expect("http client"),
             base_url,
@@ -245,33 +226,20 @@ mod tests {
 
     #[test]
     fn headers_carry_user_agent_app_id_cookie_and_intended_user() {
-        let client = InstagramClient::test_client(
-            session(),
-            "http://127.0.0.1:1".to_owned(),
-            DEFAULT_TIMEOUT,
-        );
+        let client = InstagramClient::test_client(session(), "http://127.0.0.1:1".to_owned(), DEFAULT_TIMEOUT);
         let headers = client.headers();
-        assert!(
-            headers["user-agent"]
-                .to_str()
-                .unwrap()
-                .starts_with("Instagram ")
-        );
+        assert!(headers["user-agent"].to_str().unwrap().starts_with("Instagram "));
         assert_eq!(headers["x-ig-app-id"], APP_ID);
         assert_eq!(headers["x-ig-device-id"], "android-mock-device");
         assert_eq!(headers["ig-intended-user-id"], "4242");
-        assert_eq!(
-            headers["cookie"],
-            "sessionid=SID; ds_user_id=4242; csrftoken=TOKEN"
-        );
+        assert_eq!(headers["cookie"], "sessionid=SID; ds_user_id=4242; csrftoken=TOKEN");
     }
 
     #[test]
     fn headers_omit_the_device_id_when_absent() {
         let mut session = session();
         session.device_id = None;
-        let client =
-            InstagramClient::test_client(session, "http://127.0.0.1:1".to_owned(), DEFAULT_TIMEOUT);
+        let client = InstagramClient::test_client(session, "http://127.0.0.1:1".to_owned(), DEFAULT_TIMEOUT);
         assert!(client.headers().get("x-ig-device-id").is_none());
     }
 
@@ -289,12 +257,9 @@ mod tests {
         assert!(check_status(&serde_json::json!({ "status": "ok" })).is_ok());
         let missing = check_status(&serde_json::json!({ "inbox": {} })).unwrap_err();
         assert_eq!(missing.code(), horon_messenger_core::ErrorCode::Protocol);
-        let fail =
-            check_status(&serde_json::json!({ "status": "fail", "message": "login_required" }))
-                .unwrap_err();
+        let fail = check_status(&serde_json::json!({ "status": "fail", "message": "login_required" })).unwrap_err();
         assert_eq!(fail.code(), horon_messenger_core::ErrorCode::AuthFailed);
-        let other =
-            check_status(&serde_json::json!({ "status": "fail", "message": "boom" })).unwrap_err();
+        let other = check_status(&serde_json::json!({ "status": "fail", "message": "boom" })).unwrap_err();
         assert_eq!(other.code(), horon_messenger_core::ErrorCode::Protocol);
     }
 
@@ -308,11 +273,7 @@ mod tests {
                 held.push(socket);
             }
         });
-        let client = InstagramClient::test_client(
-            session(),
-            format!("http://{addr}"),
-            Duration::from_millis(200),
-        );
+        let client = InstagramClient::test_client(session(), format!("http://{addr}"), Duration::from_millis(200));
         let error = client.current_user().await.unwrap_err();
         assert!(matches!(error, Error::Network { .. }), "got {error:?}");
         assert!(error.to_string().contains("timed out"), "{error}");
@@ -334,13 +295,8 @@ mod tests {
                 let _ = tokio::io::AsyncWriteExt::write_all(&mut socket, response.as_bytes()).await;
             }
         });
-        let client =
-            InstagramClient::test_client(session(), format!("http://{addr}"), DEFAULT_TIMEOUT);
+        let client = InstagramClient::test_client(session(), format!("http://{addr}"), DEFAULT_TIMEOUT);
         let error = client.current_user().await.unwrap_err();
-        assert_eq!(
-            error.code(),
-            horon_messenger_core::ErrorCode::Protocol,
-            "got {error:?}"
-        );
+        assert_eq!(error.code(), horon_messenger_core::ErrorCode::Protocol, "got {error:?}");
     }
 }

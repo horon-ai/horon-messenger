@@ -5,8 +5,7 @@ use std::time::{Duration, Instant};
 
 use async_trait::async_trait;
 use horon_messenger_core::{
-    Chat, ConfigPaths, CredentialStore, Error, FileCredentialStore, Member, Message, Profile,
-    ProviderKind, Result,
+    Chat, ConfigPaths, CredentialStore, Error, FileCredentialStore, Member, Message, Profile, ProviderKind, Result,
 };
 use serde_json::{Value, json};
 
@@ -35,13 +34,12 @@ impl TdlibConfig {
         let value = store
             .load(PROVIDER, account_id)?
             .ok_or(Error::AuthRequired { provider: PROVIDER })?;
-        let api_id =
-            value
-                .get("api_id")
-                .and_then(Value::as_i64)
-                .ok_or_else(|| Error::InvalidInput {
-                    message: "Telegram credentials need a numeric `api_id`".to_owned(),
-                })?;
+        let api_id = value
+            .get("api_id")
+            .and_then(Value::as_i64)
+            .ok_or_else(|| Error::InvalidInput {
+                message: "Telegram credentials need a numeric `api_id`".to_owned(),
+            })?;
         let api_hash = value
             .get("api_hash")
             .and_then(Value::as_str)
@@ -53,10 +51,7 @@ impl TdlibConfig {
         Ok(Self {
             api_id,
             api_hash,
-            phone_number: value
-                .get("phone_number")
-                .and_then(Value::as_str)
-                .map(str::to_owned),
+            phone_number: value.get("phone_number").and_then(Value::as_str).map(str::to_owned),
         })
     }
 }
@@ -113,13 +108,7 @@ impl TdlibBackend {
         let guard = self.lock()?;
         guard
             .as_ref()
-            .map(|loaded| {
-                (
-                    loaded.library.clone(),
-                    loaded.client_id,
-                    loaded.state.clone(),
-                )
-            })
+            .map(|loaded| (loaded.library.clone(), loaded.client_id, loaded.state.clone()))
             .ok_or(Error::Internal {
                 message: "TDLib client is not open".to_owned(),
             })
@@ -158,12 +147,7 @@ impl TdlibBackend {
         }
     }
 
-    fn set_parameters(
-        &self,
-        library: &TdlibLibrary,
-        client_id: i32,
-        deadline: Instant,
-    ) -> Result<()> {
+    fn set_parameters(&self, library: &TdlibLibrary, client_id: i32, deadline: Instant) -> Result<()> {
         let provider_dir = self.paths.ensure_provider_dir(PROVIDER)?;
         let database = provider_dir.join(format!("tdlib-{}", self.account_id));
         let files = provider_dir.join(format!("files-{}", self.account_id));
@@ -246,12 +230,7 @@ impl TelegramBackend for TdlibBackend {
         })
     }
 
-    async fn search_messages(
-        &self,
-        chat_id: Option<&str>,
-        query: &str,
-        limit: usize,
-    ) -> Result<Vec<Message>> {
+    async fn search_messages(&self, chat_id: Option<&str>, query: &str, limit: usize) -> Result<Vec<Message>> {
         self.run(|library, client_id, deadline| {
             let (request, id) = match chat_id {
                 Some(reference) => {
@@ -283,12 +262,7 @@ impl TelegramBackend for TdlibBackend {
         })
     }
 
-    async fn send_message(
-        &self,
-        chat_id: &str,
-        text: &str,
-        reply_to: Option<&str>,
-    ) -> Result<String> {
+    async fn send_message(&self, chat_id: &str, text: &str, reply_to: Option<&str>) -> Result<String> {
         self.run(|library, client_id, deadline| {
             let id = resolve_chat_id(library, client_id, chat_id, deadline)?;
             let reply = reply_to.and_then(|reply| reply.parse::<i64>().ok());
@@ -402,10 +376,7 @@ fn call(library: &TdlibLibrary, client_id: i32, query: Value, deadline: Instant)
                 provider: PROVIDER,
                 message: format!(
                     "TDLib did not answer `{}` before the timeout",
-                    request
-                        .get("@type")
-                        .and_then(Value::as_str)
-                        .unwrap_or("request")
+                    request.get("@type").and_then(Value::as_str).unwrap_or("request")
                 ),
             });
         }
@@ -428,12 +399,7 @@ fn receive(library: &TdlibLibrary) -> Result<Option<Value>> {
     Ok(Some(mapping::parse_response(&text)?))
 }
 
-fn fetch_chats(
-    library: &TdlibLibrary,
-    client_id: i32,
-    deadline: Instant,
-    limit: usize,
-) -> Result<Vec<Value>> {
+fn fetch_chats(library: &TdlibLibrary, client_id: i32, deadline: Instant, limit: usize) -> Result<Vec<Value>> {
     let response = call(
         library,
         client_id,
@@ -456,12 +422,7 @@ fn fetch_chats(
     Ok(chats)
 }
 
-fn resolve_chat_id(
-    library: &TdlibLibrary,
-    client_id: i32,
-    reference: &str,
-    deadline: Instant,
-) -> Result<i64> {
+fn resolve_chat_id(library: &TdlibLibrary, client_id: i32, reference: &str, deadline: Instant) -> Result<i64> {
     if let Ok(id) = reference.parse::<i64>() {
         return Ok(id);
     }
@@ -471,12 +432,10 @@ fn resolve_chat_id(
         json!({ "@type": "searchPublicChat", "username": reference.trim_start_matches('@') }),
         deadline,
     )?;
-    chat.get("id")
-        .and_then(Value::as_i64)
-        .ok_or_else(|| Error::NotFound {
-            provider: PROVIDER,
-            resource: format!("chat `{reference}`"),
-        })
+    chat.get("id").and_then(Value::as_i64).ok_or_else(|| Error::NotFound {
+        provider: PROVIDER,
+        resource: format!("chat `{reference}`"),
+    })
 }
 
 fn unwrap_response(raw: &Value) -> Result<Value> {

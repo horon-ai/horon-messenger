@@ -7,10 +7,9 @@ use async_trait::async_trait;
 use serde_json::Value;
 
 use horon_messenger_core::{
-    AccountSummary, AuthMethod, AuthProvider, AuthStatus, Capabilities, Chat, ChatKind, ChatQuery,
-    ConfigPaths, CredentialStore, Delivery, Error, FileCredentialStore, LoginOptions, LoginOutcome,
-    Member, Message, MessagePage, MessageQuery, Profile, Provider, ProviderKind, Result,
-    SendRequest, SendResult, Snapshot, now_rfc3339,
+    AccountSummary, AuthMethod, AuthProvider, AuthStatus, Capabilities, Chat, ChatKind, ChatQuery, ConfigPaths,
+    CredentialStore, Delivery, Error, FileCredentialStore, LoginOptions, LoginOutcome, Member, Message, MessagePage,
+    MessageQuery, Profile, Provider, ProviderKind, Result, SendRequest, SendResult, Snapshot, now_rfc3339,
 };
 
 use client::{ChannelTalkClient, ChatRef};
@@ -81,9 +80,7 @@ impl ChannelTalkProvider {
     }
 
     fn client(&self) -> Result<ChannelTalkClient> {
-        let credentials = self
-            .resolve()?
-            .ok_or(Error::AuthRequired { provider: PROVIDER })?;
+        let credentials = self.resolve()?.ok_or(Error::AuthRequired { provider: PROVIDER })?;
         Ok(ChannelTalkClient::new(
             self.http.clone(),
             credentials.account_cookie,
@@ -160,13 +157,7 @@ impl Provider for ChannelTalkProvider {
     }
 
     async fn list_chats(&self, query: &ChatQuery) -> Result<Vec<Chat>> {
-        let mut chats: Vec<Chat> = self
-            .client()?
-            .list_channels()
-            .await?
-            .iter()
-            .map(Self::chat)
-            .collect();
+        let mut chats: Vec<Chat> = self.client()?.list_channels().await?.iter().map(Self::chat).collect();
         if let Some(search) = &query.search {
             let needle = search.to_lowercase();
             chats.retain(|chat| chat.name.to_lowercase().contains(&needle));
@@ -187,10 +178,7 @@ impl Provider for ChannelTalkProvider {
         let limit = query.limit.unwrap_or(25);
         let messages = self.client()?.list_messages(&reference, limit).await?;
         let has_more = messages.len() >= limit;
-        let mut mapped: Vec<Message> = messages
-            .iter()
-            .map(|message| Self::message(chat_id, message))
-            .collect();
+        let mut mapped: Vec<Message> = messages.iter().map(|message| Self::message(chat_id, message)).collect();
         if let Some(search) = &query.search {
             let needle = search.to_lowercase();
             mapped.retain(|message| message.text.to_lowercase().contains(&needle));
@@ -204,20 +192,13 @@ impl Provider for ChannelTalkProvider {
         })
     }
 
-    async fn search_messages(
-        &self,
-        chat_id: Option<&str>,
-        query: &MessageQuery,
-    ) -> Result<MessagePage> {
+    async fn search_messages(&self, chat_id: Option<&str>, query: &MessageQuery) -> Result<MessagePage> {
         let channel_id = chat_id.ok_or_else(|| Error::InvalidInput {
             message: "Channel Talk search needs a workspace id".to_owned(),
         })?;
         let term = query.search.clone().unwrap_or_default();
         let hits = self.client()?.search_messages(channel_id, &term).await?;
-        let messages = hits
-            .iter()
-            .map(|hit| Self::message(channel_id, &hit.source))
-            .collect();
+        let messages = hits.iter().map(|hit| Self::message(channel_id, &hit.source)).collect();
         Ok(MessagePage {
             provider: PROVIDER,
             chat_id: channel_id.to_owned(),
@@ -229,10 +210,7 @@ impl Provider for ChannelTalkProvider {
 
     async fn send_message(&self, request: &SendRequest) -> Result<SendResult> {
         let reference = ChatRef::parse(&request.chat_id)?;
-        let message = self
-            .client()?
-            .send_message(&reference, &request.text)
-            .await?;
+        let message = self.client()?.send_message(&reference, &request.text).await?;
         Ok(SendResult {
             provider: PROVIDER,
             chat_id: request.chat_id.clone(),

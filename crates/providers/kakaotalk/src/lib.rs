@@ -2,9 +2,7 @@
 //! `~/Desktop/dev/alpox/kakaotalk-bridge`; until then every advertised operation
 //! returns `NotImplemented`.
 
-use horon_messenger_core::{
-    Capabilities, ConfigPaths, FileCredentialStore, Provider, ProviderKind,
-};
+use horon_messenger_core::{Capabilities, ConfigPaths, FileCredentialStore, Provider, ProviderKind};
 
 #[derive(Debug, Clone)]
 pub struct KakaoTalkProvider {

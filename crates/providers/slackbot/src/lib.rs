@@ -9,10 +9,9 @@ use async_trait::async_trait;
 use serde_json::Value;
 
 use horon_messenger_core::{
-    AccountSummary, AuthMethod, AuthProvider, AuthStatus, Capabilities, Chat, ChatKind, ChatQuery,
-    ConfigPaths, CredentialStore, Delivery, Error, FileCredentialStore, LoginOptions, LoginOutcome,
-    Member, Message, MessagePage, MessageQuery, Profile, Provider, ProviderKind, Result,
-    SendRequest, SendResult, Snapshot, now_rfc3339,
+    AccountSummary, AuthMethod, AuthProvider, AuthStatus, Capabilities, Chat, ChatKind, ChatQuery, ConfigPaths,
+    CredentialStore, Delivery, Error, FileCredentialStore, LoginOptions, LoginOutcome, Member, Message, MessagePage,
+    MessageQuery, Profile, Provider, ProviderKind, Result, SendRequest, SendResult, Snapshot, now_rfc3339,
 };
 
 use client::SlackBotClient;
@@ -48,20 +47,12 @@ impl SlackBotProvider {
     }
 
     fn resolve(&self) -> Result<Option<String>> {
-        let token = match std::env::var(TOKEN_ENV)
-            .ok()
-            .filter(|value| !value.is_empty())
-        {
+        let token = match std::env::var(TOKEN_ENV).ok().filter(|value| !value.is_empty()) {
             Some(token) => Some(token),
             None => self
                 .credentials
                 .load(PROVIDER, DEFAULT_ACCOUNT)?
-                .and_then(|value| {
-                    value
-                        .get("token")
-                        .and_then(Value::as_str)
-                        .map(str::to_owned)
-                })
+                .and_then(|value| value.get("token").and_then(Value::as_str).map(str::to_owned))
                 .filter(|token| !token.is_empty()),
         };
         if let Some(token) = &token {
@@ -71,9 +62,7 @@ impl SlackBotProvider {
     }
 
     fn client(&self) -> Result<SlackBotClient> {
-        let token = self
-            .resolve()?
-            .ok_or(Error::AuthRequired { provider: PROVIDER })?;
+        let token = self.resolve()?.ok_or(Error::AuthRequired { provider: PROVIDER })?;
         Ok(SlackBotClient::new(self.http.clone(), token))
     }
 }
@@ -147,13 +136,7 @@ impl Provider for SlackBotProvider {
 
     async fn list_chats(&self, query: &ChatQuery) -> Result<Vec<Chat>> {
         let limit = query.limit.unwrap_or(200).max(1);
-        let mut chats: Vec<Chat> = self
-            .client()?
-            .list_channels(limit)
-            .await?
-            .iter()
-            .map(chat)
-            .collect();
+        let mut chats: Vec<Chat> = self.client()?.list_channels(limit).await?.iter().map(chat).collect();
         if let Some(search) = &query.search {
             let needle = search.to_lowercase();
             chats.retain(|chat| chat.name.to_lowercase().contains(&needle));
@@ -285,11 +268,8 @@ impl AuthProvider for SlackBotProvider {
                 message: "Slack Bot login needs a token".to_owned(),
             })?;
         validate_token(&token)?;
-        self.credentials.save(
-            PROVIDER,
-            DEFAULT_ACCOUNT,
-            &serde_json::json!({ "token": token }),
-        )?;
+        self.credentials
+            .save(PROVIDER, DEFAULT_ACCOUNT, &serde_json::json!({ "token": token }))?;
         Ok(LoginOutcome {
             provider: PROVIDER,
             authenticated: true,

@@ -24,10 +24,9 @@ use std::sync::Mutex;
 
 use async_trait::async_trait;
 use horon_messenger_core::{
-    AccountSummary, AuthMethod, AuthProvider, AuthStatus, Capabilities, Chat, ChatQuery,
-    ConfigPaths, CredentialStore, Delivery, FileCredentialStore, LoginOptions, LoginOutcome,
-    Member, Message, MessagePage, MessageQuery, Profile, Provider, ProviderKind, Result,
-    SendRequest, SendResult, Snapshot, now_rfc3339,
+    AccountSummary, AuthMethod, AuthProvider, AuthStatus, Capabilities, Chat, ChatQuery, ConfigPaths, CredentialStore,
+    Delivery, FileCredentialStore, LoginOptions, LoginOutcome, Member, Message, MessagePage, MessageQuery, Profile,
+    Provider, ProviderKind, Result, SendRequest, SendResult, Snapshot, now_rfc3339,
 };
 
 use crate::transport::TelegramBackend;
@@ -137,9 +136,7 @@ pub fn account_id_for(phone: Option<&str>) -> String {
         return DEFAULT_ACCOUNT.to_owned();
     }
     let had_plus = raw.starts_with('+');
-    let normalized = raw
-        .to_lowercase()
-        .replace(|c: char| !c.is_ascii_alphanumeric(), "-");
+    let normalized = raw.to_lowercase().replace(|c: char| !c.is_ascii_alphanumeric(), "-");
     let trimmed = normalized.trim_matches('-');
     if trimmed.is_empty() {
         return DEFAULT_ACCOUNT.to_owned();
@@ -180,16 +177,10 @@ impl Provider for TelegramProvider {
     }
 
     async fn list_chats(&self, query: &ChatQuery) -> Result<Vec<Chat>> {
-        let mut chats = self
-            .backend()?
-            .list_chats(query.limit.unwrap_or(DEFAULT_LIMIT))
-            .await?;
+        let mut chats = self.backend()?.list_chats(query.limit.unwrap_or(DEFAULT_LIMIT)).await?;
         if let Some(search) = &query.search {
             let needle = search.to_lowercase();
-            chats.retain(|chat| {
-                chat.name.to_lowercase().contains(&needle)
-                    || chat.id.to_lowercase().contains(&needle)
-            });
+            chats.retain(|chat| chat.name.to_lowercase().contains(&needle) || chat.id.to_lowercase().contains(&needle));
         }
         if let Some(limit) = query.limit {
             chats.truncate(limit);
@@ -216,17 +207,10 @@ impl Provider for TelegramProvider {
         Ok(Self::page(chat_id, messages, true))
     }
 
-    async fn search_messages(
-        &self,
-        chat_id: Option<&str>,
-        query: &MessageQuery,
-    ) -> Result<MessagePage> {
+    async fn search_messages(&self, chat_id: Option<&str>, query: &MessageQuery) -> Result<MessagePage> {
         let needle = query.search.clone().unwrap_or_default();
         let limit = query.limit.unwrap_or(DEFAULT_LIMIT);
-        let messages = self
-            .backend()?
-            .search_messages(chat_id, &needle, limit)
-            .await?;
+        let messages = self.backend()?.search_messages(chat_id, &needle, limit).await?;
         Ok(Self::page(chat_id.unwrap_or_default(), messages, true))
     }
 
@@ -299,14 +283,10 @@ impl AuthProvider for TelegramProvider {
     }
 
     async fn login(&self, options: &LoginOptions) -> Result<LoginOutcome> {
-        let account_id = options.account_id.clone().unwrap_or_else(|| {
-            account_id_for(
-                options
-                    .params
-                    .get("phone")
-                    .and_then(serde_json::Value::as_str),
-            )
-        });
+        let account_id = options
+            .account_id
+            .clone()
+            .unwrap_or_else(|| account_id_for(options.params.get("phone").and_then(serde_json::Value::as_str)));
         let mut stored = self
             .credentials
             .load(PROVIDER, &account_id)?
@@ -335,9 +315,7 @@ impl AuthProvider for TelegramProvider {
     }
 
     async fn logout(&self, account_id: Option<&str>) -> Result<()> {
-        let account_id = account_id
-            .map(str::to_owned)
-            .unwrap_or_else(|| self.account_id());
+        let account_id = account_id.map(str::to_owned).unwrap_or_else(|| self.account_id());
         self.credentials.delete(PROVIDER, &account_id)
     }
 }
@@ -386,13 +364,7 @@ mod tests {
         assert_eq!(direct.name, "Ada Lovelace");
         assert_eq!(direct.kind, ChatKind::Direct);
         assert_eq!(direct.unread_count, Some(3));
-        assert!(
-            direct
-                .last_message_at
-                .as_deref()
-                .unwrap()
-                .starts_with("2023-11-14T")
-        );
+        assert!(direct.last_message_at.as_deref().unwrap().starts_with("2023-11-14T"));
 
         let group = mapping::chat(&value("chat_1002.json")).unwrap();
         assert_eq!(group.kind, ChatKind::Group);
@@ -427,10 +399,7 @@ mod tests {
         assert!(photo.edited_at.is_some());
         assert_eq!(photo.attachments.len(), 1);
         assert_eq!(photo.attachments[0].id.as_deref(), Some("900"));
-        assert_eq!(
-            photo.attachments[0].local_path.as_deref(),
-            Some("/tmp/photo.jpg")
-        );
+        assert_eq!(photo.attachments[0].local_path.as_deref(), Some("/tmp/photo.jpg"));
 
         let text = mapping::message(&messages[1], 1001).unwrap();
         assert_eq!(text.text, "see you soon");
@@ -500,10 +469,9 @@ mod tests {
 
     #[test]
     fn missing_library_load_returns_a_typed_error_without_panicking() {
-        let error =
-            tdlib_library::TdlibLibrary::load_from(&[PathBuf::from("/no/such/libtdjson.dylib")])
-                .err()
-                .expect("a missing library must be an error");
+        let error = tdlib_library::TdlibLibrary::load_from(&[PathBuf::from("/no/such/libtdjson.dylib")])
+            .err()
+            .expect("a missing library must be an error");
         assert!(matches!(error, Error::Config { .. }), "got {error:?}");
 
         let empty = tdlib_library::TdlibLibrary::load_from(&[])
@@ -514,10 +482,7 @@ mod tests {
 
     #[test]
     fn account_id_derives_from_a_phone_number() {
-        assert_eq!(
-            account_id_for(Some("+82 10-0000-0000")),
-            "plus-82-10-0000-0000"
-        );
+        assert_eq!(account_id_for(Some("+82 10-0000-0000")), "plus-82-10-0000-0000");
         assert_eq!(account_id_for(Some("  ")), "default");
         assert_eq!(account_id_for(None), "default");
     }
@@ -544,10 +509,7 @@ mod tests {
         assert_eq!(chats.len(), 2);
         assert_eq!(chats[0].name, "Ada Lovelace");
 
-        let page = provider
-            .list_messages("1001", &MessageQuery::default())
-            .await
-            .unwrap();
+        let page = provider.list_messages("1001", &MessageQuery::default()).await.unwrap();
         assert_eq!(page.messages.len(), 2);
         assert_eq!(page.messages[0].text, "look at this");
 

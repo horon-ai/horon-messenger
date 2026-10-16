@@ -104,10 +104,7 @@ impl Envelope {
             map.insert("data".to_owned(), data);
         }
         if let Some(error) = self.error {
-            map.insert(
-                "error".to_owned(),
-                serde_json::to_value(error).unwrap_or(Value::Null),
-            );
+            map.insert("error".to_owned(), serde_json::to_value(error).unwrap_or(Value::Null));
         }
         map.insert(
             "meta".to_owned(),
@@ -125,4 +122,5 @@ impl Envelope {
     }
 }
 
-const FALLBACK: &str = r#"{"ok":false,"error":{"code":"INTERNAL","message":"failed to render envelope","retryable":false}}"#;
+const FALLBACK: &str =
+    r#"{"ok":false,"error":{"code":"INTERNAL","message":"failed to render envelope","retryable":false}}"#;

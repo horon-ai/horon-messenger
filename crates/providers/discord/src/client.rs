@@ -7,9 +7,7 @@ use serde_json::Value;
 use horon_messenger_core::{ProviderKind, Result};
 use horon_messenger_provider_common::{HttpClient, Request, urlencode};
 
-use crate::models::{
-    DiscordGuild, DiscordGuildMember, DiscordMessage, DiscordSearchResponse, DiscordUser,
-};
+use crate::models::{DiscordGuild, DiscordGuildMember, DiscordMessage, DiscordSearchResponse, DiscordUser};
 
 pub const DEFAULT_BASE_URL: &str = "https://discord.com/api/v10";
 pub const BASE_URL_ENV: &str = "HORON_MESSENGER_DISCORD_API_BASE";
@@ -36,8 +34,7 @@ impl DiscordClient {
 
     fn headers(&self) -> HeaderMap {
         let mut headers = HeaderMap::new();
-        let super_properties =
-            base64::engine::general_purpose::STANDARD.encode(SUPER_PROPERTIES.as_bytes());
+        let super_properties = base64::engine::general_purpose::STANDARD.encode(SUPER_PROPERTIES.as_bytes());
         let entries = [
             ("authorization", self.token.clone()),
             ("user-agent", USER_AGENT.to_owned()),
@@ -46,10 +43,7 @@ impl DiscordClient {
             ("x-discord-timezone", "UTC".to_owned()),
         ];
         for (name, value) in entries {
-            if let (Ok(name), Ok(value)) = (
-                HeaderName::from_bytes(name.as_bytes()),
-                HeaderValue::from_str(&value),
-            ) {
+            if let (Ok(name), Ok(value)) = (HeaderName::from_bytes(name.as_bytes()), HeaderValue::from_str(&value)) {
                 headers.insert(name, value);
             }
         }
@@ -92,13 +86,7 @@ impl DiscordClient {
         self.http.request(request).await
     }
 
-    async fn request_ok(
-        &self,
-        method: Method,
-        path: &str,
-        body: Option<Value>,
-        idempotent: bool,
-    ) -> Result<()> {
+    async fn request_ok(&self, method: Method, path: &str, body: Option<Value>, idempotent: bool) -> Result<()> {
         let _: Value = self.request(method, path, body, idempotent).await?;
         Ok(())
     }
@@ -108,8 +96,7 @@ impl DiscordClient {
     }
 
     pub async fn list_guilds(&self) -> Result<Vec<DiscordGuild>> {
-        self.request(Method::GET, "/users/@me/guilds", None, true)
-            .await
+        self.request(Method::GET, "/users/@me/guilds", None, true).await
     }
 
     pub async fn get_guild(&self, guild_id: &str) -> Result<DiscordGuild> {
@@ -117,11 +104,7 @@ impl DiscordClient {
             .await
     }
 
-    pub async fn list_messages(
-        &self,
-        channel_id: &str,
-        limit: usize,
-    ) -> Result<Vec<DiscordMessage>> {
+    pub async fn list_messages(&self, channel_id: &str, limit: usize) -> Result<Vec<DiscordMessage>> {
         self.request(
             Method::GET,
             &format!("/channels/{channel_id}/messages?limit={limit}"),
@@ -160,11 +143,7 @@ impl DiscordClient {
         .await
     }
 
-    pub async fn search_messages(
-        &self,
-        guild_id: &str,
-        query: &str,
-    ) -> Result<DiscordSearchResponse> {
+    pub async fn search_messages(&self, guild_id: &str, query: &str) -> Result<DiscordSearchResponse> {
         let encoded = urlencode(query);
         self.request(
             Method::GET,
@@ -203,10 +182,7 @@ mod tests {
             DiscordClient::bucket_key(&Method::GET, "/channels/123/messages?limit=50"),
             "GET:/channels/{id}/messages"
         );
-        assert_eq!(
-            DiscordClient::bucket_key(&Method::GET, "/users/@me"),
-            "GET:/users/@me"
-        );
+        assert_eq!(DiscordClient::bucket_key(&Method::GET, "/users/@me"), "GET:/users/@me");
     }
 
     #[test]

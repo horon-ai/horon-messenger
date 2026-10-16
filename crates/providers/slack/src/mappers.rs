@@ -149,8 +149,7 @@ mod tests {
 
     #[test]
     fn search_page_handles_an_empty_messages_block() {
-        let response: SlackSearchMessages =
-            serde_json::from_value(serde_json::json!({ "ok": true })).unwrap();
+        let response: SlackSearchMessages = serde_json::from_value(serde_json::json!({ "ok": true })).unwrap();
         let page = search_page("", &response);
         assert!(page.messages.is_empty());
         assert_eq!(page.chat_id, "");

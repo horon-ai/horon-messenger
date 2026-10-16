@@ -46,20 +46,11 @@ impl Client {
         self.provider(kind)?.list_chats(query).await
     }
 
-    pub async fn list_messages(
-        &self,
-        kind: ProviderKind,
-        chat_id: &str,
-        query: &MessageQuery,
-    ) -> Result<MessagePage> {
+    pub async fn list_messages(&self, kind: ProviderKind, chat_id: &str, query: &MessageQuery) -> Result<MessagePage> {
         self.provider(kind)?.list_messages(chat_id, query).await
     }
 
-    pub async fn send_message(
-        &self,
-        kind: ProviderKind,
-        request: &SendRequest,
-    ) -> Result<SendResult> {
+    pub async fn send_message(&self, kind: ProviderKind, request: &SendRequest) -> Result<SendResult> {
         self.provider(kind)?.send_message(request).await
     }
 
@@ -158,21 +149,21 @@ fn register_builtin(registry: &mut ProviderRegistry, paths: &ConfigPaths) {
     }
     #[cfg(feature = "kakaotalk")]
     {
-        registry.register(Arc::new(
-            horon_messenger_provider_kakaotalk::KakaoTalkProvider::new(paths.clone()),
-        ));
+        registry.register(Arc::new(horon_messenger_provider_kakaotalk::KakaoTalkProvider::new(
+            paths.clone(),
+        )));
     }
     #[cfg(feature = "discord")]
     {
-        registry.register(Arc::new(
-            horon_messenger_provider_discord::DiscordProvider::new(paths.clone()),
-        ));
+        registry.register(Arc::new(horon_messenger_provider_discord::DiscordProvider::new(
+            paths.clone(),
+        )));
     }
     #[cfg(feature = "telegram")]
     {
-        registry.register(Arc::new(
-            horon_messenger_provider_telegram::TelegramProvider::new(paths.clone()),
-        ));
+        registry.register(Arc::new(horon_messenger_provider_telegram::TelegramProvider::new(
+            paths.clone(),
+        )));
     }
     #[cfg(feature = "channeltalk")]
     {
@@ -194,27 +185,27 @@ fn register_builtin(registry: &mut ProviderRegistry, paths: &ConfigPaths) {
     }
     #[cfg(feature = "slackbot")]
     {
-        registry.register(Arc::new(
-            horon_messenger_provider_slackbot::SlackBotProvider::new(paths.clone()),
-        ));
+        registry.register(Arc::new(horon_messenger_provider_slackbot::SlackBotProvider::new(
+            paths.clone(),
+        )));
     }
     #[cfg(feature = "slack")]
     {
-        registry.register(Arc::new(
-            horon_messenger_provider_slack::SlackProvider::new(paths.clone()),
-        ));
+        registry.register(Arc::new(horon_messenger_provider_slack::SlackProvider::new(
+            paths.clone(),
+        )));
     }
     #[cfg(feature = "imessage")]
     {
-        registry.register(Arc::new(
-            horon_messenger_provider_imessage::IMessageProvider::new(paths.clone()),
-        ));
+        registry.register(Arc::new(horon_messenger_provider_imessage::IMessageProvider::new(
+            paths.clone(),
+        )));
     }
     #[cfg(feature = "whatsapp")]
     {
-        registry.register(Arc::new(
-            horon_messenger_provider_whatsapp::WhatsAppProvider::new(paths.clone()),
-        ));
+        registry.register(Arc::new(horon_messenger_provider_whatsapp::WhatsAppProvider::new(
+            paths.clone(),
+        )));
     }
     #[cfg(feature = "line")]
     {
@@ -224,9 +215,9 @@ fn register_builtin(registry: &mut ProviderRegistry, paths: &ConfigPaths) {
     }
     #[cfg(feature = "instagram")]
     {
-        registry.register(Arc::new(
-            horon_messenger_provider_instagram::InstagramProvider::new(paths.clone()),
-        ));
+        registry.register(Arc::new(horon_messenger_provider_instagram::InstagramProvider::new(
+            paths.clone(),
+        )));
     }
     let _ = paths;
 }

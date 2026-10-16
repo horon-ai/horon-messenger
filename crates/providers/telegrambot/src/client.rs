@@ -60,11 +60,7 @@ impl TelegramBotClient {
             }
             url = format!("{url}?{}", query.build());
         }
-        let http_method = if body.is_some() {
-            Method::POST
-        } else {
-            Method::GET
-        };
+        let http_method = if body.is_some() { Method::POST } else { Method::GET };
         let mut request = Request::new(http_method, url, PROVIDER)
             .headers(Self::headers())
             .bucket(format!("telegrambot:{method}"))
@@ -118,22 +114,12 @@ impl TelegramBotClient {
 
     /// Calls `getChatAdministrators`, returning the chat's administrators.
     pub async fn get_chat_administrators(&self, chat_id: &str) -> Result<Vec<ChatMember>> {
-        self.call_typed(
-            "getChatAdministrators",
-            &[("chat_id", chat_id.to_owned())],
-            None,
-            true,
-        )
-        .await
+        self.call_typed("getChatAdministrators", &[("chat_id", chat_id.to_owned())], None, true)
+            .await
     }
 
     /// Calls `sendMessage`; the call is non-idempotent and is never retried automatically.
-    pub async fn send_message(
-        &self,
-        chat_id: &str,
-        text: &str,
-        reply_to: Option<&str>,
-    ) -> Result<Message> {
+    pub async fn send_message(&self, chat_id: &str, text: &str, reply_to: Option<&str>) -> Result<Message> {
         let mut body = serde_json::json!({ "chat_id": chat_id, "text": text });
         if let Some(reply_to) = reply_to.and_then(|value| value.parse::<i64>().ok()) {
             body["reply_to_message_id"] = serde_json::json!(reply_to);
@@ -189,10 +175,7 @@ mod tests {
         unsafe { std::env::set_var(BASE_URL_ENV, "http://127.0.0.1:8811") };
         let client = TelegramBotClient::new(HttpClient::shared(), "mock");
         assert_eq!(client.base_url, "http://127.0.0.1:8811");
-        assert_eq!(
-            client.method_url("getMe"),
-            "http://127.0.0.1:8811/botmock/getMe"
-        );
+        assert_eq!(client.method_url("getMe"), "http://127.0.0.1:8811/botmock/getMe");
         unsafe { std::env::remove_var(BASE_URL_ENV) };
     }
 
@@ -234,10 +217,7 @@ mod tests {
                 json!({ "ok": false, "error_code": 400, "description": "Bad Request" }),
                 ErrorCode::Protocol,
             ),
-            (
-                json!({ "ok": false, "description": "no code" }),
-                ErrorCode::Protocol,
-            ),
+            (json!({ "ok": false, "description": "no code" }), ErrorCode::Protocol),
         ];
         for (value, code) in cases {
             let envelope = envelope_from_value(value).unwrap();

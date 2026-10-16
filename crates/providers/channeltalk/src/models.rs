@@ -48,11 +48,7 @@ pub struct ChannelMessage {
 
 impl ChannelMessage {
     pub fn text(&self) -> String {
-        let mut parts: Vec<String> = self
-            .blocks
-            .iter()
-            .filter_map(|block| block.value.clone())
-            .collect();
+        let mut parts: Vec<String> = self.blocks.iter().filter_map(|block| block.value.clone()).collect();
         if let Some(plain) = &self.plain_text
             && !plain.is_empty()
         {

@@ -8,10 +8,9 @@ use async_trait::async_trait;
 use serde_json::Value;
 
 use horon_messenger_core::{
-    AccountSummary, AuthMethod, AuthProvider, AuthStatus, Capabilities, Chat, ChatQuery,
-    ConfigPaths, CredentialStore, Delivery, Error, FileCredentialStore, LoginOptions, LoginOutcome,
-    Member, Message, MessagePage, MessageQuery, Profile, Provider, ProviderKind, Result,
-    SendRequest, SendResult, Snapshot, now_rfc3339,
+    AccountSummary, AuthMethod, AuthProvider, AuthStatus, Capabilities, Chat, ChatQuery, ConfigPaths, CredentialStore,
+    Delivery, Error, FileCredentialStore, LoginOptions, LoginOutcome, Member, Message, MessagePage, MessageQuery,
+    Profile, Provider, ProviderKind, Result, SendRequest, SendResult, Snapshot, now_rfc3339,
 };
 
 use horon_messenger_provider_common::HttpClient;
@@ -136,12 +135,7 @@ impl Provider for SlackProvider {
         let limit = query.limit.unwrap_or(50);
         let history = self
             .client()?
-            .conversations_history(
-                chat_id,
-                limit,
-                query.after.as_deref(),
-                query.before.as_deref(),
-            )
+            .conversations_history(chat_id, limit, query.after.as_deref(), query.before.as_deref())
             .await?;
         let mut messages: Vec<Message> = history
             .messages
@@ -161,16 +155,9 @@ impl Provider for SlackProvider {
         })
     }
 
-    async fn search_messages(
-        &self,
-        chat_id: Option<&str>,
-        query: &MessageQuery,
-    ) -> Result<MessagePage> {
+    async fn search_messages(&self, chat_id: Option<&str>, query: &MessageQuery) -> Result<MessagePage> {
         let term = query.search.clone().unwrap_or_default();
-        let response = self
-            .client()?
-            .search_messages(&term, query.limit.unwrap_or(20))
-            .await?;
+        let response = self.client()?.search_messages(&term, query.limit.unwrap_or(20)).await?;
         Ok(mappers::search_page(chat_id.unwrap_or_default(), &response))
     }
 

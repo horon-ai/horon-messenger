@@ -39,20 +39,15 @@ impl McpServer {
                 if line.trim().is_empty() {
                     continue;
                 }
-                let frame: Value = serde_json::from_str(&line).unwrap_or_else(|error| {
-                    panic!("server sent a non-JSON line ({error}): {line}")
-                });
+                let frame: Value = serde_json::from_str(&line)
+                    .unwrap_or_else(|error| panic!("server sent a non-JSON line ({error}): {line}"));
                 if sender.send(frame).is_err() {
                     break;
                 }
             }
         });
 
-        Self {
-            child,
-            stdin,
-            frames,
-        }
+        Self { child, stdin, frames }
     }
 
     fn send(&mut self, frame: Value) {
@@ -102,10 +97,7 @@ impl TempConfig {
             .duration_since(std::time::UNIX_EPOCH)
             .expect("system clock after the epoch")
             .as_nanos();
-        let path = std::env::temp_dir().join(format!(
-            "horon-messenger-mcp-stdio-{}-{unique}",
-            std::process::id()
-        ));
+        let path = std::env::temp_dir().join(format!("horon-messenger-mcp-stdio-{}-{unique}", std::process::id()));
         std::fs::create_dir_all(&path).expect("create the temp config dir");
         Self { path }
     }
@@ -163,9 +155,7 @@ fn mcp_stdio_drives_initialize_and_tool_calls() {
         .as_array()
         .unwrap_or_else(|| panic!("list_providers data is an array: {providers}"));
     assert!(
-        provider_list
-            .iter()
-            .any(|provider| provider["kind"] == "mock"),
+        provider_list.iter().any(|provider| provider["kind"] == "mock"),
         "list_providers must include the mock provider: {providers}"
     );
 
@@ -184,11 +174,7 @@ fn mcp_stdio_drives_initialize_and_tool_calls() {
     let chat_list = chats["result"]["structuredContent"]["data"]
         .as_array()
         .unwrap_or_else(|| panic!("list_chats data is an array: {chats}"));
-    assert_eq!(
-        chat_list.len(),
-        3,
-        "the mock provider seeds three chats: {chats}"
-    );
+    assert_eq!(chat_list.len(), 3, "the mock provider seeds three chats: {chats}");
 
     server.send(json!({
         "jsonrpc": "2.0",

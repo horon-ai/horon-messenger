@@ -29,9 +29,7 @@ impl IMessageClient {
     }
 
     pub(crate) async fn list_chats(&mut self, limit: usize) -> Result<Vec<ImsgChat>> {
-        let value = self
-            .call("chats.list", json!({ "limit": limit }), true)
-            .await?;
+        let value = self.call("chats.list", json!({ "limit": limit }), true).await?;
         let parsed: ChatsList = serde_json::from_value(value).map_err(payload_error)?;
         Ok(parsed.chats)
     }
@@ -57,10 +55,7 @@ impl IMessageClient {
     }
 
     async fn call(&self, method: &str, params: Value, idempotent: bool) -> Result<Value> {
-        self.session
-            .call(method, params, idempotent)
-            .await
-            .map_err(classify)
+        self.session.call(method, params, idempotent).await.map_err(classify)
     }
 }
 
@@ -74,10 +69,7 @@ fn payload_error(error: serde_json::Error) -> Error {
 /// Rewrites an `imsg` permission failure into an error that names the missing macOS permission.
 fn classify(error: Error) -> Error {
     let text = error.to_string().to_lowercase();
-    if FULL_DISK_ACCESS_HINTS
-        .iter()
-        .any(|hint| text.contains(hint))
-    {
+    if FULL_DISK_ACCESS_HINTS.iter().any(|hint| text.contains(hint)) {
         return Error::AuthFailed {
             provider: PROVIDER,
             message: "imsg cannot read the Messages database; grant Full Disk Access to the app that launched horon-messenger (System Settings -> Privacy & Security -> Full Disk Access)".to_owned(),

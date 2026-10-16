@@ -7,8 +7,8 @@ use horon_messenger_core::{Error, ProviderKind, Result};
 use horon_messenger_provider_common::{HttpClient, Request, urlencode};
 
 use crate::models::{
-    SlackAuthTest, SlackChannel, SlackConversationsList, SlackHistory, SlackMembers,
-    SlackPostMessage, SlackSearchMessages, SlackUser,
+    SlackAuthTest, SlackChannel, SlackConversationsList, SlackHistory, SlackMembers, SlackPostMessage,
+    SlackSearchMessages, SlackUser,
 };
 
 pub const DEFAULT_BASE_URL: &str = "https://slack.com/api";
@@ -29,17 +29,16 @@ pub fn cookie_header(cookie: &str) -> String {
 /// Maps a Slack `error` code to the typed provider error.
 pub fn map_slack_error(error: &str) -> Error {
     match error {
-        "invalid_auth" | "not_authed" | "account_inactive" | "token_revoked" | "token_expired"
-        | "invalid_token" => Error::AuthFailed {
-            provider: PROVIDER,
-            message: error.to_owned(),
-        },
-        "channel_not_found" | "message_not_found" | "user_not_found" | "file_not_found" => {
-            Error::NotFound {
+        "invalid_auth" | "not_authed" | "account_inactive" | "token_revoked" | "token_expired" | "invalid_token" => {
+            Error::AuthFailed {
                 provider: PROVIDER,
-                resource: error.to_owned(),
+                message: error.to_owned(),
             }
         }
+        "channel_not_found" | "message_not_found" | "user_not_found" | "file_not_found" => Error::NotFound {
+            provider: PROVIDER,
+            resource: error.to_owned(),
+        },
         "ratelimited" => Error::RateLimited {
             provider: PROVIDER,
             retry_after_ms: None,
@@ -56,10 +55,7 @@ pub fn check_ok(value: &Value) -> Result<()> {
     match value.get("ok").and_then(Value::as_bool) {
         Some(true) => Ok(()),
         Some(false) => {
-            let error = value
-                .get("error")
-                .and_then(Value::as_str)
-                .unwrap_or("unknown_error");
+            let error = value.get("error").and_then(Value::as_str).unwrap_or("unknown_error");
             Err(map_slack_error(error))
         }
         None => Err(Error::Protocol {
@@ -144,9 +140,7 @@ impl SlackClient {
     }
 
     pub async fn auth_test(&self) -> Result<SlackAuthTest> {
-        let value = self
-            .call(Method::GET, "/auth.test", &[], None, true)
-            .await?;
+        let value = self.call(Method::GET, "/auth.test", &[], None, true).await?;
         decode(value)
     }
 
@@ -194,10 +188,7 @@ impl SlackClient {
         oldest: Option<&str>,
         latest: Option<&str>,
     ) -> Result<SlackHistory> {
-        let mut params: Vec<(&str, String)> = vec![
-            ("channel", channel.to_owned()),
-            ("limit", limit.to_string()),
-        ];
+        let mut params: Vec<(&str, String)> = vec![("channel", channel.to_owned()), ("limit", limit.to_string())];
         if let Some(oldest) = oldest {
             params.push(("oldest", oldest.to_owned()));
         }
@@ -214,10 +205,8 @@ impl SlackClient {
         let mut members = Vec::new();
         let mut cursor: Option<String> = None;
         loop {
-            let mut params: Vec<(&str, String)> = vec![
-                ("channel", channel.to_owned()),
-                ("limit", PAGE_LIMIT.to_string()),
-            ];
+            let mut params: Vec<(&str, String)> =
+                vec![("channel", channel.to_owned()), ("limit", PAGE_LIMIT.to_string())];
             if let Some(cursor) = &cursor {
                 params.push(("cursor", cursor.clone()));
             }
@@ -252,13 +241,7 @@ impl SlackClient {
 
     pub async fn users_info(&self, user: &str) -> Result<SlackUser> {
         let value = self
-            .call(
-                Method::GET,
-                "/users.info",
-                &[("user", user.to_owned())],
-                None,
-                true,
-            )
+            .call(Method::GET, "/users.info", &[("user", user.to_owned())], None, true)
             .await?;
         decode(value.get("user").cloned().unwrap_or(Value::Null))
     }
@@ -270,9 +253,7 @@ impl SlackClient {
             ("sort_dir", "desc".to_owned()),
             ("count", count.to_string()),
         ];
-        let value = self
-            .call(Method::GET, "/search.messages", &params, None, true)
-            .await?;
+        let value = self.call(Method::GET, "/search.messages", &params, None, true).await?;
         decode(value)
     }
 }
@@ -284,12 +265,7 @@ mod tests {
 
     #[test]
     fn headers_carry_bearer_token_and_cookie() {
-        let client = SlackClient::new(
-            HttpClient::shared(),
-            "xoxc-abc",
-            Some("secret-cookie".to_owned()),
-        )
-        .unwrap();
+        let client = SlackClient::new(HttpClient::shared(), "xoxc-abc", Some("secret-cookie".to_owned())).unwrap();
         let headers = client.headers();
         assert_eq!(headers.get("authorization").unwrap(), "Bearer xoxc-abc");
         assert_eq!(headers.get("cookie").unwrap(), "d=secret-cookie");
@@ -310,14 +286,11 @@ mod tests {
 
     #[test]
     fn ok_false_at_http_200_maps_to_typed_errors() {
-        let auth =
-            check_ok(&serde_json::json!({ "ok": false, "error": "invalid_auth" })).unwrap_err();
+        let auth = check_ok(&serde_json::json!({ "ok": false, "error": "invalid_auth" })).unwrap_err();
         assert_eq!(auth.code(), ErrorCode::AuthFailed);
-        let not_found = check_ok(&serde_json::json!({ "ok": false, "error": "channel_not_found" }))
-            .unwrap_err();
+        let not_found = check_ok(&serde_json::json!({ "ok": false, "error": "channel_not_found" })).unwrap_err();
         assert_eq!(not_found.code(), ErrorCode::NotFound);
-        let rate =
-            check_ok(&serde_json::json!({ "ok": false, "error": "ratelimited" })).unwrap_err();
+        let rate = check_ok(&serde_json::json!({ "ok": false, "error": "ratelimited" })).unwrap_err();
         assert_eq!(rate.code(), ErrorCode::RateLimited);
         let other = check_ok(&serde_json::json!({ "ok": false, "error": "boom" })).unwrap_err();
         assert_eq!(other.code(), ErrorCode::Protocol);

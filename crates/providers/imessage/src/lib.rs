@@ -11,9 +11,9 @@ use serde_json::{Value, json};
 use tokio::sync::Mutex;
 
 use horon_messenger_core::{
-    AccountSummary, AuthMethod, AuthProvider, AuthStatus, Capabilities, Chat, ChatKind, ChatQuery,
-    ConfigPaths, Error, FileCredentialStore, Member, Message, MessagePage, MessageQuery, Profile,
-    Provider, ProviderKind, Result, SendRequest, SendResult, Snapshot, now_rfc3339,
+    AccountSummary, AuthMethod, AuthProvider, AuthStatus, Capabilities, Chat, ChatKind, ChatQuery, ConfigPaths, Error,
+    FileCredentialStore, Member, Message, MessagePage, MessageQuery, Profile, Provider, ProviderKind, Result,
+    SendRequest, SendResult, Snapshot, now_rfc3339,
 };
 use horon_messenger_provider_common::{DEFAULT_TIMEOUT, SidecarSpec};
 
@@ -103,10 +103,7 @@ impl IMessageProvider {
                 ChatKind::Direct
             },
             unread_count: None,
-            last_message_at: chat
-                .last_message
-                .as_ref()
-                .and_then(|m| m.created_at.clone()),
+            last_message_at: chat.last_message.as_ref().and_then(|m| m.created_at.clone()),
             member_count: chat.participants.as_ref().map(|p| p.len() as u64),
             extra: json!({
                 "guid": chat.guid,
@@ -136,10 +133,7 @@ impl IMessageProvider {
             sender_id,
             sender_name: message.sender_name.clone(),
             text: message.text.clone().unwrap_or_default(),
-            sent_at: message
-                .created_at
-                .clone()
-                .unwrap_or_else(|| EPOCH.to_owned()),
+            sent_at: message.created_at.clone().unwrap_or_else(|| EPOCH.to_owned()),
             edited_at: None,
             attachments: Vec::new(),
             reply_to: None,
@@ -482,30 +476,20 @@ sys.exit(0)
 
     fn provider(script: &str) -> IMessageProvider {
         IMessageProvider::for_test(
-            SidecarSpec::new(
-                PROVIDER,
-                "python3",
-                vec!["-c".to_owned(), script.to_owned()],
-            ),
+            SidecarSpec::new(PROVIDER, "python3", vec!["-c".to_owned(), script.to_owned()]),
             Duration::from_secs(5),
         )
     }
 
     #[tokio::test]
     async fn maps_reference_chats_payload() {
-        let chats = provider(FIXTURE_STUB)
-            .list_chats(&ChatQuery::default())
-            .await
-            .unwrap();
+        let chats = provider(FIXTURE_STUB).list_chats(&ChatQuery::default()).await.unwrap();
         assert_eq!(chats.len(), 2);
         assert_eq!(chats[0].id, "42");
         assert_eq!(chats[0].name, "Jane");
         assert_eq!(chats[0].kind, ChatKind::Direct);
         assert_eq!(chats[0].member_count, Some(1));
-        assert_eq!(
-            chats[0].last_message_at.as_deref(),
-            Some("2026-06-24T00:00:00.000Z")
-        );
+        assert_eq!(chats[0].last_message_at.as_deref(), Some("2026-06-24T00:00:00.000Z"));
         assert_eq!(chats[0].extra["service"], "iMessage");
         assert_eq!(chats[1].id, "43");
         assert_eq!(chats[1].kind, ChatKind::Group);
@@ -600,26 +584,16 @@ sys.exit(0)
     #[tokio::test]
     async fn missing_binary_is_a_typed_error() {
         let provider = IMessageProvider::for_test(
-            SidecarSpec::new(
-                PROVIDER,
-                "/nonexistent/horon-messenger-imsg",
-                vec!["rpc".to_owned()],
-            ),
+            SidecarSpec::new(PROVIDER, "/nonexistent/horon-messenger-imsg", vec!["rpc".to_owned()]),
             Duration::from_secs(5),
         );
-        let error = provider
-            .list_chats(&ChatQuery::default())
-            .await
-            .unwrap_err();
+        let error = provider.list_chats(&ChatQuery::default()).await.unwrap_err();
         assert!(matches!(error, Error::Network { .. }), "got {error:?}");
     }
 
     #[tokio::test]
     async fn full_disk_access_denial_names_the_permission() {
-        let error = provider(FDA_STUB)
-            .list_chats(&ChatQuery::default())
-            .await
-            .unwrap_err();
+        let error = provider(FDA_STUB).list_chats(&ChatQuery::default()).await.unwrap_err();
         match error {
             Error::AuthFailed { message, .. } => {
                 assert!(message.contains("Full Disk Access"), "got {message}");
@@ -635,10 +609,7 @@ sys.exit(0)
             text: "hello".to_owned(),
             ..SendRequest::default()
         };
-        let error = provider(AUTOMATION_STUB)
-            .send_message(&request)
-            .await
-            .unwrap_err();
+        let error = provider(AUTOMATION_STUB).send_message(&request).await.unwrap_err();
         match error {
             Error::AuthFailed { message, .. } => {
                 assert!(message.contains("Automation"), "got {message}");
@@ -650,17 +621,10 @@ sys.exit(0)
     #[tokio::test]
     async fn hung_sidecar_times_out() {
         let provider = IMessageProvider::for_test(
-            SidecarSpec::new(
-                PROVIDER,
-                "python3",
-                vec!["-c".to_owned(), SILENT_STUB.to_owned()],
-            ),
+            SidecarSpec::new(PROVIDER, "python3", vec!["-c".to_owned(), SILENT_STUB.to_owned()]),
             Duration::from_millis(300),
         );
-        let error = provider
-            .list_chats(&ChatQuery::default())
-            .await
-            .unwrap_err();
+        let error = provider.list_chats(&ChatQuery::default()).await.unwrap_err();
         match error {
             Error::Network { message, .. } => {
                 assert!(message.contains("timed out"), "got {message}")
@@ -689,10 +653,7 @@ sys.exit(0)
 
     #[tokio::test]
     async fn a_dead_sidecar_is_a_typed_error() {
-        let error = provider(DEAD_STUB)
-            .list_chats(&ChatQuery::default())
-            .await
-            .unwrap_err();
+        let error = provider(DEAD_STUB).list_chats(&ChatQuery::default()).await.unwrap_err();
         assert!(matches!(error, Error::Network { .. }), "got {error:?}");
     }
 
@@ -734,10 +695,7 @@ for line in sys.stdin:
     }
 
     fn temp_pid_file(name: &str) -> std::path::PathBuf {
-        let path = std::env::temp_dir().join(format!(
-            "hm-imessage-sidecar-{name}-{}.txt",
-            std::process::id()
-        ));
+        let path = std::env::temp_dir().join(format!("hm-imessage-sidecar-{name}-{}.txt", std::process::id()));
         let _ = std::fs::remove_file(&path);
         path
     }
@@ -794,11 +752,7 @@ for line in sys.stdin:
         let provider = IMessageProvider::for_test(stub_spec(&pid_file, 1), Duration::from_secs(5));
         provider.list_chats(&ChatQuery::default()).await.unwrap();
         let first = recorded_pids(&pid_file);
-        assert_eq!(
-            first.len(),
-            1,
-            "the first call starts one process: {first:?}"
-        );
+        assert_eq!(first.len(), 1, "the first call starts one process: {first:?}");
 
         provider.list_chats(&ChatQuery::default()).await.unwrap();
         let after = recorded_pids(&pid_file);

@@ -10,15 +10,14 @@ use serde::de::DeserializeOwned;
 use serde_json::{Value, json};
 
 use horon_messenger_core::{
-    AccountSummary, AuthMethod, AuthProvider, AuthStatus, Capabilities, Chat, ChatQuery,
-    ConfigPaths, Delivery, Error, FileCredentialStore, LoginOptions, LoginOutcome, Member,
-    MessagePage, MessageQuery, Profile, Provider, ProviderKind, Result, SendRequest, SendResult,
-    Snapshot, now_rfc3339,
+    AccountSummary, AuthMethod, AuthProvider, AuthStatus, Capabilities, Chat, ChatQuery, ConfigPaths, Delivery, Error,
+    FileCredentialStore, LoginOptions, LoginOutcome, Member, MessagePage, MessageQuery, Profile, Provider,
+    ProviderKind, Result, SendRequest, SendResult, Snapshot, now_rfc3339,
 };
 
 use models::{
-    SidecarAuthStatus, SidecarChat, SidecarLogin, SidecarMessage, chat_from_sidecar,
-    member_from_sidecar, message_from_sidecar,
+    SidecarAuthStatus, SidecarChat, SidecarLogin, SidecarMessage, chat_from_sidecar, member_from_sidecar,
+    message_from_sidecar,
 };
 use sidecar::Sidecar;
 
@@ -71,12 +70,7 @@ impl WhatsAppProvider {
         }
     }
 
-    async fn request<T: DeserializeOwned>(
-        &self,
-        method: &str,
-        params: Value,
-        idempotent: bool,
-    ) -> Result<T> {
+    async fn request<T: DeserializeOwned>(&self, method: &str, params: Value, idempotent: bool) -> Result<T> {
         let value = self.sidecar.request(method, params, idempotent).await?;
         serde_json::from_value(value).map_err(|error| Error::Protocol {
             provider: PROVIDER,
@@ -111,9 +105,7 @@ impl Provider for WhatsAppProvider {
 
     async fn whoami(&self) -> Result<Profile> {
         let status = self.require_auth().await?;
-        let account = status
-            .account
-            .ok_or(Error::AuthRequired { provider: PROVIDER })?;
+        let account = status.account.ok_or(Error::AuthRequired { provider: PROVIDER })?;
         Ok(Profile {
             provider: PROVIDER,
             account_id: account.id,
@@ -321,9 +313,7 @@ mod tests {
     use super::*;
 
     fn provider() -> WhatsAppProvider {
-        WhatsAppProvider::new(ConfigPaths::at(
-            std::env::temp_dir().join("hm-whatsapp-caps"),
-        ))
+        WhatsAppProvider::new(ConfigPaths::at(std::env::temp_dir().join("hm-whatsapp-caps")))
     }
 
     #[test]

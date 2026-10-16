@@ -5,8 +5,8 @@ use std::process::ExitCode;
 use clap::{Args, Parser, Subcommand};
 use futures_util::StreamExt;
 use horon_messenger_sdk::{
-    ChatQuery, Client, ConfigPaths, DynProvider, Envelope, Error, LoginOptions, MessageQuery, Meta,
-    ProviderKind, SendRequest,
+    ChatQuery, Client, ConfigPaths, DynProvider, Envelope, Error, LoginOptions, MessageQuery, Meta, ProviderKind,
+    SendRequest,
 };
 use serde_json::{Map, Value};
 
@@ -26,12 +26,7 @@ struct Cli {
     pretty: bool,
 
     /// Config directory, overriding the platform default.
-    #[arg(
-        long,
-        global = true,
-        env = "HORON_MESSENGER_CONFIG_DIR",
-        value_name = "DIR"
-    )]
+    #[arg(long, global = true, env = "HORON_MESSENGER_CONFIG_DIR", value_name = "DIR")]
     config_dir: Option<PathBuf>,
 
     #[command(subcommand)]
@@ -192,10 +187,7 @@ fn main() -> ExitCode {
     let cli = Cli::parse();
     let pretty = cli.pretty;
     let envelope = match build_client(&cli) {
-        Ok(client) => match tokio::runtime::Builder::new_current_thread()
-            .enable_all()
-            .build()
-        {
+        Ok(client) => match tokio::runtime::Builder::new_current_thread().enable_all().build() {
             Ok(runtime) => runtime.block_on(dispatch(&client, cli.command, pretty)),
             Err(error) => Envelope::failure(
                 &Error::Internal {
@@ -254,9 +246,7 @@ async fn dispatch(client: &Client, command: Command, pretty: bool) -> Envelope {
     match command {
         Command::Providers => Envelope::success(client.describe(), Meta::now(None)),
         Command::Whoami { provider } => match resolve(&provider) {
-            Ok(provider) => {
-                Envelope::from_result(client.whoami(provider).await, Meta::now(Some(provider)))
-            }
+            Ok(provider) => Envelope::from_result(client.whoami(provider).await, Meta::now(Some(provider))),
             Err(error) => Envelope::failure(&error, Meta::now(None)),
         },
         Command::Chats {
@@ -266,10 +256,7 @@ async fn dispatch(client: &Client, command: Command, pretty: bool) -> Envelope {
         } => match resolve(&provider) {
             Ok(provider) => {
                 let query = ChatQuery { search, limit };
-                Envelope::from_result(
-                    client.list_chats(provider, &query).await,
-                    Meta::now(Some(provider)),
-                )
+                Envelope::from_result(client.list_chats(provider, &query).await, Meta::now(Some(provider)))
             }
             Err(error) => Envelope::failure(&error, Meta::now(None)),
         },
@@ -307,31 +294,22 @@ async fn dispatch(client: &Client, command: Command, pretty: bool) -> Envelope {
                     attachments: Vec::new(),
                     idempotency_key: None,
                 };
-                Envelope::from_result(
-                    client.send_message(provider, &request).await,
-                    Meta::now(Some(provider)),
-                )
+                Envelope::from_result(client.send_message(provider, &request).await, Meta::now(Some(provider)))
             }
             Err(error) => Envelope::failure(&error, Meta::now(None)),
         },
         Command::Members { provider, chat } => match resolve(&provider) {
-            Ok(provider) => Envelope::from_result(
-                client.list_members(provider, &chat).await,
-                Meta::now(Some(provider)),
-            ),
-            Err(error) => Envelope::failure(&error, Meta::now(None)),
-        },
-        Command::Snapshot { provider } => match resolve(&provider) {
             Ok(provider) => {
-                Envelope::from_result(client.snapshot(provider).await, Meta::now(Some(provider)))
+                Envelope::from_result(client.list_members(provider, &chat).await, Meta::now(Some(provider)))
             }
             Err(error) => Envelope::failure(&error, Meta::now(None)),
         },
+        Command::Snapshot { provider } => match resolve(&provider) {
+            Ok(provider) => Envelope::from_result(client.snapshot(provider).await, Meta::now(Some(provider))),
+            Err(error) => Envelope::failure(&error, Meta::now(None)),
+        },
         Command::Chat { provider, chat } => match resolve(&provider) {
-            Ok(provider) => Envelope::from_result(
-                client.get_chat(provider, &chat).await,
-                Meta::now(Some(provider)),
-            ),
+            Ok(provider) => Envelope::from_result(client.get_chat(provider, &chat).await, Meta::now(Some(provider))),
             Err(error) => Envelope::failure(&error, Meta::now(None)),
         },
         Command::Search {
@@ -348,26 +326,17 @@ async fn dispatch(client: &Client, command: Command, pretty: bool) -> Envelope {
                     after: None,
                 };
                 Envelope::from_result(
-                    client
-                        .search_messages(provider, chat.as_deref(), &query)
-                        .await,
+                    client.search_messages(provider, chat.as_deref(), &query).await,
                     Meta::now(Some(provider)),
                 )
             }
             Err(error) => Envelope::failure(&error, Meta::now(None)),
         },
         Command::MarkRead { provider, chat } => match resolve(&provider) {
-            Ok(provider) => Envelope::from_result(
-                client.mark_read(provider, &chat).await,
-                Meta::now(Some(provider)),
-            ),
+            Ok(provider) => Envelope::from_result(client.mark_read(provider, &chat).await, Meta::now(Some(provider))),
             Err(error) => Envelope::failure(&error, Meta::now(None)),
         },
-        Command::Listen {
-            provider,
-            chat,
-            limit,
-        } => match resolve(&provider) {
+        Command::Listen { provider, chat, limit } => match resolve(&provider) {
             Ok(provider) => dispatch_listen(client, provider, chat.as_deref(), limit, pretty).await,
             Err(error) => Envelope::failure(&error, Meta::now(None)),
         },
@@ -423,10 +392,7 @@ async fn dispatch_auth(client: &Client, args: AuthArgs) -> Envelope {
             match auth_for(client, kind) {
                 Ok(instance) => {
                     let auth = instance.auth().expect("auth_for checked auth");
-                    Envelope::from_result(
-                        auth.logout(account.as_deref()).await,
-                        Meta::now(Some(kind)),
-                    )
+                    Envelope::from_result(auth.logout(account.as_deref()).await, Meta::now(Some(kind)))
                 }
                 Err(error) => Envelope::failure(&error, Meta::now(Some(kind))),
             }
@@ -488,23 +454,16 @@ async fn dispatch_listen(
             Err(error) => return Envelope::failure(&error, Meta::now(Some(kind))),
         }
     }
-    Envelope::success(
-        serde_json::json!({ "events": count }),
-        Meta::now(Some(kind)),
-    )
+    Envelope::success(serde_json::json!({ "events": count }), Meta::now(Some(kind)))
 }
 
 fn dispatch_daemon(paths: &ConfigPaths, args: DaemonArgs) -> Envelope {
     let meta = Meta::now(None);
     match args.command {
         DaemonCommand::Status => Envelope::success(daemon::status(paths), meta),
-        DaemonCommand::Start { host, port } => {
-            Envelope::from_result(daemon::start(paths, &host, port), meta)
-        }
+        DaemonCommand::Start { host, port } => Envelope::from_result(daemon::start(paths, &host, port), meta),
         DaemonCommand::Stop => Envelope::from_result(daemon::stop(paths), meta),
-        DaemonCommand::Restart { host, port } => {
-            Envelope::from_result(daemon::restart(paths, &host, port), meta)
-        }
+        DaemonCommand::Restart { host, port } => Envelope::from_result(daemon::restart(paths, &host, port), meta),
     }
 }
 

@@ -7,9 +7,9 @@ use async_trait::async_trait;
 use serde_json::Value;
 
 use horon_messenger_core::{
-    AccountSummary, AuthMethod, AuthProvider, AuthStatus, Capabilities, ConfigPaths,
-    CredentialStore, Delivery, Error, FileCredentialStore, LoginOptions, LoginOutcome, Profile,
-    Provider, ProviderKind, Result, SendRequest, SendResult, now_rfc3339,
+    AccountSummary, AuthMethod, AuthProvider, AuthStatus, Capabilities, ConfigPaths, CredentialStore, Delivery, Error,
+    FileCredentialStore, LoginOptions, LoginOutcome, Profile, Provider, ProviderKind, Result, SendRequest, SendResult,
+    now_rfc3339,
 };
 
 use horon_messenger_provider_common::HttpClient;
@@ -63,17 +63,12 @@ impl WhatsAppBotProvider {
     }
 
     fn resolve_credentials(&self) -> Result<Credentials> {
-        self.resolve()?
-            .ok_or(Error::AuthRequired { provider: PROVIDER })
+        self.resolve()?.ok_or(Error::AuthRequired { provider: PROVIDER })
     }
 
     fn client(&self) -> Result<WhatsAppBotClient> {
         let credentials = self.resolve_credentials()?;
-        WhatsAppBotClient::new(
-            self.http.clone(),
-            credentials.phone_number_id,
-            credentials.access_token,
-        )
+        WhatsAppBotClient::new(self.http.clone(), credentials.phone_number_id, credentials.access_token)
     }
 }
 
@@ -146,10 +141,7 @@ impl Provider for WhatsAppBotProvider {
     }
 
     async fn send_message(&self, request: &SendRequest) -> Result<SendResult> {
-        let response = self
-            .client()?
-            .send_text(&request.chat_id, &request.text)
-            .await?;
+        let response = self.client()?.send_text(&request.chat_id, &request.text).await?;
         Ok(SendResult {
             provider: PROVIDER,
             chat_id: request.chat_id.clone(),
@@ -236,9 +228,7 @@ mod tests {
     use super::*;
 
     fn provider() -> WhatsAppBotProvider {
-        WhatsAppBotProvider::new(ConfigPaths::at(
-            std::env::temp_dir().join("hm-whatsappbot-caps"),
-        ))
+        WhatsAppBotProvider::new(ConfigPaths::at(std::env::temp_dir().join("hm-whatsappbot-caps")))
     }
 
     #[test]
@@ -253,9 +243,7 @@ mod tests {
     fn stored_credentials_require_both_fields() {
         let both = serde_json::json!({ "phone_number_id": "phone", "access_token": "token" });
         assert!(credentials_from_value(&both).is_some());
-        assert!(
-            credentials_from_value(&serde_json::json!({ "phone_number_id": "phone" })).is_none()
-        );
+        assert!(credentials_from_value(&serde_json::json!({ "phone_number_id": "phone" })).is_none());
         assert!(credentials_from_value(&serde_json::json!({ "access_token": "token" })).is_none());
         let empty = serde_json::json!({ "phone_number_id": "", "access_token": "token" });
         assert!(credentials_from_value(&empty).is_none());
@@ -282,10 +270,7 @@ mod tests {
         ] {
             unsafe { std::env::remove_var(key) };
         }
-        assert_eq!(
-            provider.resolve().unwrap().unwrap().phone_number_id,
-            "stored-phone"
-        );
+        assert_eq!(provider.resolve().unwrap().unwrap().phone_number_id, "stored-phone");
 
         unsafe { std::env::set_var(PHONE_NUMBER_ID_ENV, "env-phone") };
         unsafe { std::env::set_var(ACCESS_TOKEN_ENV, "env-token") };
@@ -297,10 +282,7 @@ mod tests {
         unsafe { std::env::set_var(E2E_ACCESS_TOKEN_ENV, "e2e-token") };
         unsafe { std::env::remove_var(PHONE_NUMBER_ID_ENV) };
         unsafe { std::env::remove_var(ACCESS_TOKEN_ENV) };
-        assert_eq!(
-            provider.resolve().unwrap().unwrap().phone_number_id,
-            "e2e-phone"
-        );
+        assert_eq!(provider.resolve().unwrap().unwrap().phone_number_id, "e2e-phone");
 
         for key in [
             PHONE_NUMBER_ID_ENV,

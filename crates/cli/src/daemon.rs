@@ -93,10 +93,7 @@ pub fn start(paths: &ConfigPaths, host: &str, port: u16) -> Result<DaemonStatus>
     if let Some(parent) = log.parent() {
         horon_messenger_sdk::config::create_private_dir(parent)?;
     }
-    let stdout = fs::OpenOptions::new()
-        .create(true)
-        .append(true)
-        .open(&log)?;
+    let stdout = fs::OpenOptions::new().create(true).append(true).open(&log)?;
     let stderr = stdout.try_clone()?;
 
     let mut command = Command::new(&exe);
@@ -210,9 +207,9 @@ fn remove_state(paths: &ConfigPaths) {
 
 fn probe(host: &str, port: u16) -> bool {
     match format!("{host}:{port}").to_socket_addrs() {
-        Ok(addresses) => addresses.into_iter().any(|address| {
-            TcpStream::connect_timeout(&address, Duration::from_millis(400)).is_ok()
-        }),
+        Ok(addresses) => addresses
+            .into_iter()
+            .any(|address| TcpStream::connect_timeout(&address, Duration::from_millis(400)).is_ok()),
         Err(_) => false,
     }
 }
@@ -224,10 +221,7 @@ fn find_server() -> Result<PathBuf> {
             return Ok(path);
         }
         return Err(Error::Config {
-            message: format!(
-                "{SERVER_BIN_ENV} points to {} which is not a file",
-                path.display()
-            ),
+            message: format!("{SERVER_BIN_ENV} points to {} which is not a file", path.display()),
         });
     }
     if let Ok(exe) = std::env::current_exe()
@@ -242,9 +236,7 @@ fn find_server() -> Result<PathBuf> {
         return Ok(path);
     }
     Err(Error::Config {
-        message: format!(
-            "could not find `{SERVER_BIN}`; install the server package or set {SERVER_BIN_ENV}"
-        ),
+        message: format!("could not find `{SERVER_BIN}`; install the server package or set {SERVER_BIN_ENV}"),
     })
 }
 
@@ -298,9 +290,7 @@ fn terminate(pid: u32) -> Result<()> {
 #[cfg(windows)]
 fn terminate(pid: u32) -> Result<()> {
     let pid = pid.to_string();
-    let status = Command::new("taskkill")
-        .args(["/PID", pid.as_str()])
-        .status()?;
+    let status = Command::new("taskkill").args(["/PID", pid.as_str()]).status()?;
     if status.success() {
         Ok(())
     } else {

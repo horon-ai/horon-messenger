@@ -23,10 +23,9 @@ use serde_json::{Value, json};
 use tokio::sync::Mutex;
 
 use horon_messenger_core::{
-    AccountSummary, AuthMethod, AuthProvider, AuthStatus, Capabilities, Chat, ChatKind, ChatQuery,
-    ConfigPaths, CredentialStore, Delivery, Error, FileCredentialStore, LoginOptions, LoginOutcome,
-    Member, Message, MessagePage, MessageQuery, Profile, Provider, ProviderKind, Result,
-    SendRequest, SendResult, Snapshot, now_rfc3339,
+    AccountSummary, AuthMethod, AuthProvider, AuthStatus, Capabilities, Chat, ChatKind, ChatQuery, ConfigPaths,
+    CredentialStore, Delivery, Error, FileCredentialStore, LoginOptions, LoginOutcome, Member, Message, MessagePage,
+    MessageQuery, Profile, Provider, ProviderKind, Result, SendRequest, SendResult, Snapshot, now_rfc3339,
 };
 use horon_messenger_provider_common::{DEFAULT_TIMEOUT, SidecarSpec};
 
@@ -84,11 +83,8 @@ impl LineProvider {
 
     fn current_account(&self) -> Result<String> {
         let accounts = self.credentials.list(PROVIDER)?;
-        let explicit = std::env::var(ACCOUNT_ENV)
-            .ok()
-            .filter(|value| !value.is_empty());
-        select_account(explicit.as_deref(), &accounts)?
-            .ok_or(Error::AuthRequired { provider: PROVIDER })
+        let explicit = std::env::var(ACCOUNT_ENV).ok().filter(|value| !value.is_empty());
+        select_account(explicit.as_deref(), &accounts)?.ok_or(Error::AuthRequired { provider: PROVIDER })
     }
 
     async fn session(&self) -> Result<LineClient> {
@@ -178,10 +174,7 @@ impl LineProvider {
         use std::sync::atomic::{AtomicU64, Ordering};
         static COUNTER: AtomicU64 = AtomicU64::new(0);
         let n = COUNTER.fetch_add(1, Ordering::Relaxed);
-        let dir = std::env::temp_dir().join(format!(
-            "horon-messenger-line-tests-{}-{n}",
-            std::process::id()
-        ));
+        let dir = std::env::temp_dir().join(format!("horon-messenger-line-tests-{}-{n}", std::process::id()));
         let paths = ConfigPaths::at(dir);
         let provider = Self {
             credentials: FileCredentialStore::new(paths.clone()),
@@ -263,10 +256,7 @@ impl Provider for LineProvider {
         let mut chats: Vec<Chat> = result?.iter().map(Self::chat).collect();
         if let Some(search) = &query.search {
             let needle = search.to_lowercase();
-            chats.retain(|chat| {
-                chat.name.to_lowercase().contains(&needle)
-                    || chat.id.to_lowercase().contains(&needle)
-            });
+            chats.retain(|chat| chat.name.to_lowercase().contains(&needle) || chat.id.to_lowercase().contains(&needle));
         }
         Ok(chats)
     }
@@ -300,10 +290,7 @@ impl Provider for LineProvider {
         }
         let messages = result?;
         let has_more = messages.len() >= count;
-        let mut mapped: Vec<Message> = messages
-            .iter()
-            .map(|message| Self::message(chat_id, message))
-            .collect();
+        let mut mapped: Vec<Message> = messages.iter().map(|message| Self::message(chat_id, message)).collect();
         if let Some(search) = &query.search {
             let needle = search.to_lowercase();
             mapped.retain(|message| message.text.to_lowercase().contains(&needle));
@@ -438,11 +425,7 @@ impl AuthProvider for LineProvider {
         if let Some(device) = device {
             params["device"] = json!(device);
         }
-        if let Some(account) = options
-            .account_id
-            .clone()
-            .filter(|account| !account.is_empty())
-        {
+        if let Some(account) = options.account_id.clone().filter(|account| !account.is_empty()) {
             params["account_id"] = json!(account);
         }
         let mut client = LineClient::connect(self.spec()?, self.timeout).await?;
@@ -462,10 +445,7 @@ impl AuthProvider for LineProvider {
             .or_else(|| options.account_id.clone())
             .unwrap_or_else(|| key.clone());
         let auth_token = response.auth_token.clone().or_else(|| plan.stored_token());
-        let device_value = response
-            .device
-            .clone()
-            .or_else(|| device.map(str::to_owned));
+        let device_value = response.device.clone().or_else(|| device.map(str::to_owned));
         self.credentials.save(
             PROVIDER,
             &key,
@@ -484,17 +464,12 @@ impl AuthProvider for LineProvider {
             authenticated: true,
             account_id: Some(account_id),
             next_action: None,
-            message: response
-                .display_name
-                .map(|name| format!("signed in to LINE as {name}")),
+            message: response.display_name.map(|name| format!("signed in to LINE as {name}")),
         })
     }
 
     async fn logout(&self, account_id: Option<&str>) -> Result<()> {
-        let key = match account_id
-            .map(str::trim)
-            .filter(|account| !account.is_empty())
-        {
+        let key = match account_id.map(str::trim).filter(|account| !account.is_empty()) {
             Some(account) => account.to_owned(),
             None => self.current_account()?,
         };
@@ -554,11 +529,7 @@ fn plan_login(params: &Value, stored: Option<&Value>) -> Result<LoginPlan> {
             password: password.to_owned(),
         });
     }
-    if let Some(token) = non_empty(
-        stored
-            .and_then(|value| value.get("auth_token"))
-            .and_then(Value::as_str),
-    ) {
+    if let Some(token) = non_empty(stored.and_then(|value| value.get("auth_token")).and_then(Value::as_str)) {
         return Ok(LoginPlan::Token(token.to_owned()));
     }
     Err(Error::InvalidInput {
@@ -673,11 +644,7 @@ sys.exit(0)
 "#;
 
     fn stub(script: &str) -> SidecarSpec {
-        SidecarSpec::new(
-            PROVIDER,
-            "python3",
-            vec!["-c".to_owned(), script.to_owned()],
-        )
+        SidecarSpec::new(PROVIDER, "python3", vec!["-c".to_owned(), script.to_owned()])
     }
 
     fn provider(script: &str) -> LineProvider {
@@ -686,10 +653,7 @@ sys.exit(0)
 
     #[tokio::test]
     async fn maps_reference_chat_payload() {
-        let chats = provider(FIXTURE_STUB)
-            .list_chats(&ChatQuery::default())
-            .await
-            .unwrap();
+        let chats = provider(FIXTURE_STUB).list_chats(&ChatQuery::default()).await.unwrap();
         assert_eq!(chats.len(), 2);
         assert_eq!(chats[0].id, "u_friend");
         assert_eq!(chats[0].name, "Friend");
@@ -773,11 +737,7 @@ sys.exit(0)
         let outcome = provider.login(&options).await.unwrap();
         assert!(outcome.authenticated);
         assert_eq!(outcome.account_id.as_deref(), Some("u_self"));
-        let stored = provider
-            .credentials()
-            .load(PROVIDER, DEFAULT_ACCOUNT)
-            .unwrap()
-            .unwrap();
+        let stored = provider.credentials().load(PROVIDER, DEFAULT_ACCOUNT).unwrap().unwrap();
         assert_eq!(stored["account_id"], "u_self");
         assert_eq!(stored["auth_token"], "returned-token");
         assert_eq!(stored["method"], "token");
@@ -807,10 +767,7 @@ sys.exit(0)
     #[tokio::test]
     async fn operations_without_credentials_report_auth_required() {
         let provider = LineProvider::for_test(stub(FIXTURE_STUB), Duration::from_secs(5), false);
-        let error = provider
-            .list_chats(&ChatQuery::default())
-            .await
-            .unwrap_err();
+        let error = provider.list_chats(&ChatQuery::default()).await.unwrap_err();
         assert!(matches!(error, Error::AuthRequired { .. }), "got {error:?}");
     }
 
@@ -844,10 +801,7 @@ sys.exit(0)
 
     #[tokio::test]
     async fn a_dead_sidecar_is_a_typed_error() {
-        let error = provider(DEAD_STUB)
-            .list_chats(&ChatQuery::default())
-            .await
-            .unwrap_err();
+        let error = provider(DEAD_STUB).list_chats(&ChatQuery::default()).await.unwrap_err();
         assert!(matches!(error, Error::Network { .. }), "got {error:?}");
     }
 
@@ -907,20 +861,14 @@ sys.exit(0)
             Some(DEFAULT_ACCOUNT)
         );
         let single = vec!["u_only".to_owned()];
-        assert_eq!(
-            select_account(None, &single).unwrap().as_deref(),
-            Some("u_only")
-        );
+        assert_eq!(select_account(None, &single).unwrap().as_deref(), Some("u_only"));
         assert_eq!(select_account(None, &[]).unwrap(), None);
     }
 
     #[test]
     fn account_selection_honors_an_explicit_name_and_rejects_unknown() {
         let accounts = vec!["u_a".to_owned(), "u_b".to_owned()];
-        assert_eq!(
-            select_account(Some("u_b"), &accounts).unwrap().as_deref(),
-            Some("u_b")
-        );
+        assert_eq!(select_account(Some("u_b"), &accounts).unwrap().as_deref(), Some("u_b"));
         let error = select_account(Some("u_missing"), &accounts).unwrap_err();
         assert!(matches!(error, Error::NotFound { .. }), "got {error:?}");
     }
@@ -972,8 +920,7 @@ for line in sys.stdin:
     }
 
     fn temp_pid_file(name: &str) -> std::path::PathBuf {
-        let path =
-            std::env::temp_dir().join(format!("hm-line-sidecar-{name}-{}.txt", std::process::id()));
+        let path = std::env::temp_dir().join(format!("hm-line-sidecar-{name}-{}.txt", std::process::id()));
         let _ = std::fs::remove_file(&path);
         path
     }
@@ -1010,8 +957,7 @@ for line in sys.stdin:
     #[tokio::test]
     async fn sidecar_process_is_reused() {
         let pid_file = temp_pid_file("reused");
-        let provider =
-            LineProvider::for_test(stub_spec(&pid_file, 0), Duration::from_secs(5), true);
+        let provider = LineProvider::for_test(stub_spec(&pid_file, 0), Duration::from_secs(5), true);
         for _ in 0..3 {
             provider.list_chats(&ChatQuery::default()).await.unwrap();
         }
@@ -1028,15 +974,10 @@ for line in sys.stdin:
     #[tokio::test]
     async fn sidecar_restarts_after_death() {
         let pid_file = temp_pid_file("restart");
-        let provider =
-            LineProvider::for_test(stub_spec(&pid_file, 2), Duration::from_secs(5), true);
+        let provider = LineProvider::for_test(stub_spec(&pid_file, 2), Duration::from_secs(5), true);
         provider.list_chats(&ChatQuery::default()).await.unwrap();
         let first = recorded_pids(&pid_file);
-        assert_eq!(
-            first.len(),
-            1,
-            "the first call starts one process: {first:?}"
-        );
+        assert_eq!(first.len(), 1, "the first call starts one process: {first:?}");
 
         provider.list_chats(&ChatQuery::default()).await.unwrap();
         let after = recorded_pids(&pid_file);
@@ -1056,8 +997,7 @@ for line in sys.stdin:
     #[tokio::test]
     async fn sidecar_child_is_reaped_on_drop() {
         let pid_file = temp_pid_file("reaped");
-        let provider =
-            LineProvider::for_test(stub_spec(&pid_file, 0), Duration::from_secs(5), true);
+        let provider = LineProvider::for_test(stub_spec(&pid_file, 0), Duration::from_secs(5), true);
         provider.list_chats(&ChatQuery::default()).await.unwrap();
         let pids = recorded_pids(&pid_file);
         assert_eq!(pids.len(), 1, "expected one live process: {pids:?}");

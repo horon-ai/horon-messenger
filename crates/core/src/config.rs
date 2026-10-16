@@ -75,9 +75,7 @@ pub fn write_private_atomic(path: &Path, bytes: &[u8]) -> Result<()> {
     create_private_dir(parent)?;
     let temp = parent.join(format!(
         ".{}.tmp-{}",
-        path.file_name()
-            .and_then(|name| name.to_str())
-            .unwrap_or("file"),
+        path.file_name().and_then(|name| name.to_str()).unwrap_or("file"),
         std::process::id()
     ));
     std::fs::write(&temp, bytes)?;

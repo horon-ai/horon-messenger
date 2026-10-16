@@ -30,7 +30,7 @@ jobs:
           ref: ${{ github.event.workflow_run.head_sha || 'main' }}
           fetch-depth: 0
       - name: Install the pinned toolchain
-        run: rustup toolchain install 1.97.1 --profile minimal
+        run: rustup toolchain install 1.99.1 --profile minimal
       - name: Compute the next version
         id: version
         run: |

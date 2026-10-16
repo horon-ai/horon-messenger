@@ -87,11 +87,7 @@ impl TdlibLibrary {
         if pointer.is_null() {
             return None;
         }
-        Some(
-            unsafe { CStr::from_ptr(pointer) }
-                .to_string_lossy()
-                .into_owned(),
-        )
+        Some(unsafe { CStr::from_ptr(pointer) }.to_string_lossy().into_owned())
     }
 
     #[cfg(unix)]

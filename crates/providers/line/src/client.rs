@@ -7,8 +7,7 @@ use horon_messenger_provider_common::{SidecarSession, SidecarSpec};
 
 use crate::PROVIDER;
 use crate::models::{
-    ChatsList, LineChat, LineMember, LineMessage, LineProfile, LineSendResult, LoginResponse,
-    MembersList, MessagesList,
+    ChatsList, LineChat, LineMember, LineMessage, LineProfile, LineSendResult, LoginResponse, MembersList, MessagesList,
 };
 
 const AUTH_HINTS: [&str; 6] = [
@@ -50,25 +49,16 @@ impl LineClient {
         Ok(parsed.chats)
     }
 
-    pub(crate) async fn list_messages(
-        &mut self,
-        chat_id: &str,
-        count: usize,
-    ) -> Result<Vec<LineMessage>> {
+    pub(crate) async fn list_messages(&mut self, chat_id: &str, count: usize) -> Result<Vec<LineMessage>> {
         let value = self
-            .call(
-                "messages.list",
-                json!({ "chat_id": chat_id, "count": count }),
-            )
+            .call("messages.list", json!({ "chat_id": chat_id, "count": count }))
             .await?;
         let parsed: MessagesList = serde_json::from_value(value).map_err(payload_error)?;
         Ok(parsed.messages)
     }
 
     pub(crate) async fn list_members(&mut self, chat_id: &str) -> Result<Vec<LineMember>> {
-        let value = self
-            .call("members.list", json!({ "chat_id": chat_id }))
-            .await?;
+        let value = self.call("members.list", json!({ "chat_id": chat_id })).await?;
         let parsed: MembersList = serde_json::from_value(value).map_err(payload_error)?;
         Ok(parsed.members)
     }
@@ -85,10 +75,7 @@ impl LineClient {
     }
 
     async fn call(&self, method: &str, params: Value) -> Result<Value> {
-        self.session
-            .call(method, params, false)
-            .await
-            .map_err(classify)
+        self.session.call(method, params, false).await.map_err(classify)
     }
 }
 

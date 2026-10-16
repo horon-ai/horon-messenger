@@ -36,16 +36,9 @@ impl SidecarSpec {
     }
 
     /// Resolves the program from `env_var` when it holds an executable path, else from `PATH`.
-    pub fn resolve(
-        provider: ProviderKind,
-        env_var: &str,
-        default_program: &str,
-        args: Vec<String>,
-    ) -> Result<Self> {
+    pub fn resolve(provider: ProviderKind, env_var: &str, default_program: &str, args: Vec<String>) -> Result<Self> {
         let program = resolve_program(env_var, default_program).ok_or_else(|| Error::Config {
-            message: format!(
-                "sidecar binary `{default_program}` was not found; set `{env_var}` to its path"
-            ),
+            message: format!("sidecar binary `{default_program}` was not found; set `{env_var}` to its path"),
         })?;
         Ok(Self {
             provider,
@@ -113,9 +106,7 @@ fn is_executable(path: &Path) -> bool {
 
 #[cfg(not(unix))]
 fn is_executable(path: &Path) -> bool {
-    std::fs::metadata(path)
-        .map(|meta| meta.is_file())
-        .unwrap_or(false)
+    std::fs::metadata(path).map(|meta| meta.is_file()).unwrap_or(false)
 }
 
 /// A spawned sidecar spoken to over line-delimited JSON-RPC 2.0 on stdin and stdout.
@@ -147,10 +138,7 @@ impl JsonRpcProcess {
             .kill_on_drop(true);
         let mut child = command.spawn().map_err(|error| Error::Network {
             provider,
-            message: format!(
-                "failed to spawn sidecar `{}`: {error}",
-                spec.program().display()
-            ),
+            message: format!("failed to spawn sidecar `{}`: {error}", spec.program().display()),
         })?;
         let stdin = child.stdin.take().ok_or_else(|| Error::Network {
             provider,
@@ -239,14 +227,10 @@ impl JsonRpcProcess {
     async fn read_response(&mut self, id: u64) -> Result<Value> {
         loop {
             let mut line = String::new();
-            let read = self
-                .stdout
-                .read_line(&mut line)
-                .await
-                .map_err(|error| Error::Network {
-                    provider: self.provider,
-                    message: format!("failed to read from the sidecar: {error}"),
-                })?;
+            let read = self.stdout.read_line(&mut line).await.map_err(|error| Error::Network {
+                provider: self.provider,
+                message: format!("failed to read from the sidecar: {error}"),
+            })?;
             if read == 0 {
                 return Err(Error::Network {
                     provider: self.provider,
@@ -257,11 +241,10 @@ impl JsonRpcProcess {
             if trimmed.is_empty() {
                 continue;
             }
-            let message: Value =
-                serde_json::from_str(trimmed).map_err(|error| Error::Protocol {
-                    provider: self.provider,
-                    message: format!("sidecar returned non-JSON output: {error}"),
-                })?;
+            let message: Value = serde_json::from_str(trimmed).map_err(|error| Error::Protocol {
+                provider: self.provider,
+                message: format!("sidecar returned non-JSON output: {error}"),
+            })?;
             if message.get("id").and_then(Value::as_u64) != Some(id) {
                 continue;
             }
@@ -407,11 +390,7 @@ while True:
 ";
 
     fn python_stub(script: &str) -> SidecarSpec {
-        SidecarSpec::new(
-            ProviderKind::Mock,
-            "python3",
-            vec!["-c".to_owned(), script.to_owned()],
-        )
+        SidecarSpec::new(ProviderKind::Mock, "python3", vec!["-c".to_owned(), script.to_owned()])
     }
 
     const PID_RECORDING_STUB: &str = "\
@@ -454,8 +433,7 @@ sys.exit(0)
     }
 
     fn temp_pid_file(name: &str) -> PathBuf {
-        let path =
-            std::env::temp_dir().join(format!("hm-sidecar-{name}-{}.txt", std::process::id()));
+        let path = std::env::temp_dir().join(format!("hm-sidecar-{name}-{}.txt", std::process::id()));
         let _ = std::fs::remove_file(&path);
         path
     }
@@ -488,11 +466,7 @@ sys.exit(0)
             assert_eq!(value, serde_json::json!({ "echo": { "ping": true } }));
         }
         let pids = pid_lines(&pid_file);
-        assert_eq!(
-            pids.len(),
-            1,
-            "three calls must reuse one sidecar process: {pids:?}"
-        );
+        assert_eq!(pids.len(), 1, "three calls must reuse one sidecar process: {pids:?}");
         session.shutdown().await.unwrap();
         let _ = std::fs::remove_file(&pid_file);
     }
@@ -515,10 +489,7 @@ sys.exit(0)
 
         let idempotent_file = temp_pid_file("inflight-idem");
         let session = stub_session(INFLIGHT_EXIT_STUB, &idempotent_file);
-        let error = session
-            .call("read", serde_json::json!({}), true)
-            .await
-            .unwrap_err();
+        let error = session.call("read", serde_json::json!({}), true).await.unwrap_err();
         assert!(matches!(error, Error::Network { .. }), "got {error:?}");
         assert_eq!(
             pid_lines(&idempotent_file).len(),
@@ -544,27 +515,18 @@ sys.exit(0)
             .await
             .unwrap();
         assert_eq!(result, serde_json::json!({ "echo": { "hello": "world" } }));
-        let second = process
-            .call("echo", serde_json::json!([1, 2, 3]))
-            .await
-            .unwrap();
+        let second = process.call("echo", serde_json::json!([1, 2, 3])).await.unwrap();
         assert_eq!(second, serde_json::json!({ "echo": [1, 2, 3] }));
         process.shutdown().await.unwrap();
     }
 
     #[tokio::test]
     async fn call_times_out_when_the_child_never_replies() {
-        let mut process = JsonRpcProcess::start_with_timeout(
-            python_stub(SILENT_STUB),
-            Duration::from_millis(300),
-        )
-        .await
-        .unwrap();
-        let started = Instant::now();
-        let error = process
-            .call("echo", serde_json::json!({}))
+        let mut process = JsonRpcProcess::start_with_timeout(python_stub(SILENT_STUB), Duration::from_millis(300))
             .await
-            .unwrap_err();
+            .unwrap();
+        let started = Instant::now();
+        let error = process.call("echo", serde_json::json!({})).await.unwrap_err();
         let elapsed = started.elapsed();
         assert!(matches!(error, Error::Network { .. }), "got {error:?}");
         assert!(
@@ -589,13 +551,8 @@ sys.exit(0)
     #[tokio::test]
     async fn resolve_rejects_an_env_var_that_points_nowhere() {
         unsafe { std::env::set_var("HORON_SIDECAR_BOGUS_PATH", "/no/such/binary") };
-        let error = SidecarSpec::resolve(
-            ProviderKind::Mock,
-            "HORON_SIDECAR_BOGUS_PATH",
-            "python3",
-            Vec::new(),
-        )
-        .unwrap_err();
+        let error =
+            SidecarSpec::resolve(ProviderKind::Mock, "HORON_SIDECAR_BOGUS_PATH", "python3", Vec::new()).unwrap_err();
         unsafe { std::env::remove_var("HORON_SIDECAR_BOGUS_PATH") };
         assert!(matches!(error, Error::Config { .. }), "got {error:?}");
     }
@@ -613,30 +570,22 @@ sys.exit(0)
 
     #[tokio::test]
     async fn non_json_output_is_a_protocol_error() {
-        let mut process =
-            JsonRpcProcess::start_with_timeout(python_stub(GARBAGE_STUB), Duration::from_secs(5))
-                .await
-                .unwrap();
-        let error = process
-            .call("echo", serde_json::json!({}))
+        let mut process = JsonRpcProcess::start_with_timeout(python_stub(GARBAGE_STUB), Duration::from_secs(5))
             .await
-            .unwrap_err();
+            .unwrap();
+        let error = process.call("echo", serde_json::json!({})).await.unwrap_err();
         assert!(matches!(error, Error::Protocol { .. }), "got {error:?}");
         process.shutdown().await.unwrap();
     }
 
     #[tokio::test]
     async fn call_after_shutdown_returns_a_typed_error() {
-        let mut process =
-            JsonRpcProcess::start_with_timeout(python_stub(ECHO_STUB), Duration::from_millis(300))
-                .await
-                .unwrap();
+        let mut process = JsonRpcProcess::start_with_timeout(python_stub(ECHO_STUB), Duration::from_millis(300))
+            .await
+            .unwrap();
         process.shutdown().await.unwrap();
         let started = Instant::now();
-        let error = process
-            .call("echo", serde_json::json!({}))
-            .await
-            .unwrap_err();
+        let error = process.call("echo", serde_json::json!({})).await.unwrap_err();
         let elapsed = started.elapsed();
         assert!(matches!(error, Error::Network { .. }), "got {error:?}");
         assert!(

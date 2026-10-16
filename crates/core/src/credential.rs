@@ -30,19 +30,14 @@ impl FileCredentialStore {
     }
 
     fn account_file(&self, provider: ProviderKind, account_id: &str) -> Result<std::path::PathBuf> {
-        let safe = !account_id.is_empty()
-            && !account_id.contains('/')
-            && !account_id.contains('\\')
-            && account_id != "..";
+        let safe =
+            !account_id.is_empty() && !account_id.contains('/') && !account_id.contains('\\') && account_id != "..";
         if !safe {
             return Err(Error::InvalidInput {
                 message: format!("invalid account id `{account_id}`"),
             });
         }
-        Ok(self
-            .paths
-            .accounts_dir(provider)
-            .join(format!("{account_id}.json")))
+        Ok(self.paths.accounts_dir(provider).join(format!("{account_id}.json")))
     }
 }
 

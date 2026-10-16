@@ -1,8 +1,6 @@
 //! Pure TDLib JSON to domain mapping, shared by the real and `qa-fake` backends.
 
-use horon_messenger_core::{
-    Attachment, Chat, ChatKind, Error, Member, Message, Profile, ProviderKind, Result,
-};
+use horon_messenger_core::{Attachment, Chat, ChatKind, Error, Member, Message, Profile, ProviderKind, Result};
 use serde_json::Value;
 
 const PROVIDER: ProviderKind = ProviderKind::Telegram;
@@ -23,8 +21,7 @@ fn as_i64(value: &Value, name: &str) -> Result<i64> {
 
 /// Parses a raw TDLib response string, mapping non-JSON output to `Protocol`.
 pub fn parse_response(raw: &str) -> Result<Value> {
-    serde_json::from_str(raw)
-        .map_err(|error| protocol(format!("TDLib returned non-JSON output: {error}")))
+    serde_json::from_str(raw).map_err(|error| protocol(format!("TDLib returned non-JSON output: {error}")))
 }
 
 /// Maps a TDLib `user` object to a [`Profile`].
@@ -50,10 +47,7 @@ pub fn chat(value: &Value) -> Result<Chat> {
             .and_then(Value::as_str)
             .unwrap_or_default()
             .to_owned(),
-        kind: value
-            .get("type")
-            .map(chat_kind)
-            .unwrap_or(ChatKind::Unknown),
+        kind: value.get("type").map(chat_kind).unwrap_or(ChatKind::Unknown),
         unread_count: value.get("unread_count").and_then(Value::as_u64),
         last_message_at: value
             .get("last_message")
@@ -71,10 +65,7 @@ pub fn chat(value: &Value) -> Result<Chat> {
 /// Maps a TDLib `message` object to a [`Message`].
 pub fn message(value: &Value, fallback_chat_id: i64) -> Result<Message> {
     let id = as_i64(value, "id")?;
-    let chat_id = value
-        .get("chat_id")
-        .and_then(Value::as_i64)
-        .unwrap_or(fallback_chat_id);
+    let chat_id = value.get("chat_id").and_then(Value::as_i64).unwrap_or(fallback_chat_id);
     let content = value.get("content");
     Ok(Message {
         provider: PROVIDER,
@@ -88,10 +79,7 @@ pub fn message(value: &Value, fallback_chat_id: i64) -> Result<Message> {
             .and_then(Value::as_i64)
             .map(unix_to_rfc3339)
             .unwrap_or_else(horon_messenger_core::now_rfc3339),
-        edited_at: value
-            .get("edit_date")
-            .and_then(Value::as_i64)
-            .map(unix_to_rfc3339),
+        edited_at: value.get("edit_date").and_then(Value::as_i64).map(unix_to_rfc3339),
         attachments: content.map(attachments).unwrap_or_default(),
         reply_to: value
             .get("reply_to")
@@ -165,14 +153,8 @@ pub fn unix_to_rfc3339(seconds: i64) -> String {
 }
 
 fn display_name(user: &Value) -> Option<String> {
-    let first = user
-        .get("first_name")
-        .and_then(Value::as_str)
-        .unwrap_or_default();
-    let last = user
-        .get("last_name")
-        .and_then(Value::as_str)
-        .unwrap_or_default();
+    let first = user.get("first_name").and_then(Value::as_str).unwrap_or_default();
+    let last = user.get("last_name").and_then(Value::as_str).unwrap_or_default();
     let joined = format!("{first} {last}").trim().to_owned();
     (!joined.is_empty()).then_some(joined)
 }
@@ -199,11 +181,7 @@ fn chat_kind(kind: &Value) -> ChatKind {
         Some("chatTypePrivate") | Some("chatTypeSecret") => ChatKind::Direct,
         Some("chatTypeBasicGroup") => ChatKind::Group,
         Some("chatTypeSupergroup") => {
-            if kind
-                .get("is_channel")
-                .and_then(Value::as_bool)
-                .unwrap_or(false)
-            {
+            if kind.get("is_channel").and_then(Value::as_bool).unwrap_or(false) {
                 ChatKind::Channel
             } else {
                 ChatKind::Group
@@ -215,14 +193,8 @@ fn chat_kind(kind: &Value) -> ChatKind {
 
 fn sender_id(sender: &Value) -> Option<String> {
     match sender.get("@type").and_then(Value::as_str) {
-        Some("messageSenderUser") => sender
-            .get("user_id")
-            .and_then(Value::as_i64)
-            .map(|id| id.to_string()),
-        Some("messageSenderChat") => sender
-            .get("chat_id")
-            .and_then(Value::as_i64)
-            .map(|id| id.to_string()),
+        Some("messageSenderUser") => sender.get("user_id").and_then(Value::as_i64).map(|id| id.to_string()),
+        Some("messageSenderChat") => sender.get("chat_id").and_then(Value::as_i64).map(|id| id.to_string()),
         _ => None,
     }
 }
@@ -264,14 +236,8 @@ fn contact_name(contact: Option<&Value>) -> String {
     let Some(contact) = contact else {
         return String::new();
     };
-    let first = contact
-        .get("first_name")
-        .and_then(Value::as_str)
-        .unwrap_or_default();
-    let last = contact
-        .get("last_name")
-        .and_then(Value::as_str)
-        .unwrap_or_default();
+    let first = contact.get("first_name").and_then(Value::as_str).unwrap_or_default();
+    let last = contact.get("last_name").and_then(Value::as_str).unwrap_or_default();
     format!("{first} {last}").trim().to_owned()
 }
 
@@ -288,14 +254,7 @@ fn attachments(content: &Value) -> Vec<Attachment> {
 }
 
 fn find_file(content: &Value) -> Option<&Value> {
-    for key in [
-        "document",
-        "video",
-        "audio",
-        "voice_note",
-        "animation",
-        "photo",
-    ] {
+    for key in ["document", "video", "audio", "voice_note", "animation", "photo"] {
         let Some(holder) = content.get(key) else {
             continue;
         };
@@ -322,10 +281,7 @@ fn find_file(content: &Value) -> Option<&Value> {
 
 fn attachment(file: &Value) -> Attachment {
     Attachment {
-        id: file
-            .get("id")
-            .and_then(Value::as_i64)
-            .map(|id| id.to_string()),
+        id: file.get("id").and_then(Value::as_i64).map(|id| id.to_string()),
         file_name: non_empty(file.get("file_name").and_then(Value::as_str)),
         mime_type: non_empty(file.get("mime_type").and_then(Value::as_str)),
         size_bytes: file.get("size").and_then(Value::as_u64),
