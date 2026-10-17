@@ -9,13 +9,13 @@
     "horon"
   ],
   "license": "MIT",
-  "homepage": "https://github.com/horon-ai/horon-messenger",
+  "homepage": "https://github.com/horon-ai/messenger",
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/horon-ai/horon-messenger.git"
+    "url": "git+https://github.com/horon-ai/messenger.git"
   },
   "bugs": {
-    "url": "https://github.com/horon-ai/horon-messenger/issues"
+    "url": "https://github.com/horon-ai/messenger/issues"
   },
   "bin": {
     "horon-messenger-tui": "bin/horon-messenger-tui.js"
